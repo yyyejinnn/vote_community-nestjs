@@ -1,4 +1,5 @@
-import { Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Users } from '@prisma/client';
 import { SignUpUserDto } from 'src/common/dto/users.dto';
 import { UsersService } from './users.service';
 
@@ -12,7 +13,7 @@ export class UsersController {
   }
 
   @Post('sign-up')
-  signUp(data: SignUpUserDto) {
-    return this.usersService.signUp(data);
+  async signUp(@Body() data: SignUpUserDto): Promise<Users> {
+    return await this.usersService.signUp(data);
   }
 }
