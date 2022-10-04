@@ -1,4 +1,5 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Post } from '@nestjs/common';
+import { SignUpUserDto } from 'src/common/dto/users.dto';
 import { UsersService } from './users.service';
 
 @Controller('users')
@@ -10,8 +11,8 @@ export class UsersController {
     return this.usersService.getUserProfile();
   }
 
-  @Get('sign-up')
-  signUp() {
-    return this.usersService.signUp();
+  @Post('sign-up')
+  signUp(data: SignUpUserDto) {
+    return this.usersService.signUp(data);
   }
 }
