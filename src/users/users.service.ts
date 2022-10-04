@@ -16,7 +16,7 @@ export class UsersService {
     this._validatePassword(data.password, data.checkPassword);
     await this._validateNickname(data.nickname);
 
-    return this.usersRepository.createUser(data);
+    return await this.usersRepository.createUser(data);
   }
 
   private _validatePassword(password: string, checkPassword: string) {
