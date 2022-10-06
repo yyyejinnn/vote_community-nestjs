@@ -19,6 +19,14 @@ export class UsersRepository {
     });
   }
 
+  async findUserById(id: number): Promise<Users> {
+    return await this.prisma.users.findFirst({
+      where: {
+        id,
+      },
+    });
+  }
+
   async findUserByEmail(email: string): Promise<Users> {
     return await this.prisma.users.findFirst({
       where: {
@@ -39,7 +47,7 @@ export class UsersRepository {
     try {
       await this.prisma.refreshTokens.create({
         data: {
-          token: refreshToken,
+          token: refreshToken, // 암호화
           user: {
             connect: {
               id: userId,

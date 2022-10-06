@@ -1,13 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
+import { Users } from '@prisma/client';
 import { ExtractJwt, Strategy } from 'passport-jwt';
+import { UsersException } from 'src/common/interface/exception';
+import { CustomException } from 'src/common/middleware/http-exception.filter';
+import { UsersRepository } from '../users.repository';
 
 @Injectable()
 export class JwtAccessStrategy extends PassportStrategy(
   Strategy,
   'jwt-access-token',
 ) {
-  constructor() {
+  constructor(private readonly usersRepository: UsersRepository) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
@@ -15,9 +19,12 @@ export class JwtAccessStrategy extends PassportStrategy(
     });
   }
 
-  async validate(payload: any) {
-    // validate user
-    const user = {};
+  async validate(payload: JwtPayload) {
+    const user: Users = await this.usersRepository.findUserById(payload.sub);
+
+    if (!user) {
+      throw new CustomException(UsersException.USER_NOT_EXIST);
+    }
 
     return user;
   }

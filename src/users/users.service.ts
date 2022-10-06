@@ -35,15 +35,11 @@ export class UsersService {
     // 3. 중복 닉네임 확인
     await this._validateNickname(data.nickname);
 
-    const createdUser: Users = await this.usersRepository.createUser(data);
+    const { password, updatedAt, ...createdUser }: Users =
+      await this.usersRepository.createUser(data);
 
     return {
-      users: {
-        id: createdUser.id,
-        email: createdUser.email,
-        nickname: createdUser.nickname,
-        createdAt: createdUser.createdAt,
-      },
+      users: createdUser,
     };
   }
 
