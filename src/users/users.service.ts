@@ -1,9 +1,13 @@
 import { BadRequestException, HttpException, Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { PrismaClient, Users } from '@prisma/client';
 import { SignUpUserDto, SignInUserDto } from 'src/common/dto/users.dto';
 import { UsersException } from 'src/common/interface/exception';
 import { CustomException } from 'src/common/middleware/http-exception.filter';
 import { UsersRepository } from './users.repository';
+import * as bcrpyt from 'bcrypt';
+
+type ValidatePasswordType = 'signUp' | 'signIn';
 
 @Injectable()
 export class UsersService {
@@ -24,7 +28,7 @@ export class UsersService {
     }
 
     // 2. 비밀번호 일치 여부
-    this._validatePassword(data.password, data.checkPassword);
+    await this._validatePassword(data.password, data.checkPassword);
 
     // 3. 중복 닉네임 확인
     await this._validateNickname(data.nickname);
@@ -35,24 +39,33 @@ export class UsersService {
   }
 
   async signIn(data: SignInUserDto) {
+    // 1. 유효성 검사
     const user: Users = await this.usersRepository.findUserByEmail(data.email);
 
     if (!user) {
       throw new CustomException(UsersException.USER_NOT_EXIST);
     }
+    await this._validatePassword(data.password, user.password, 'signIn');
 
-    this._validatePassword(user.password, data.password);
+    // 2. 토큰 생성
+    const payload: JwtPayload = { sub: user.id, nickname: user.nickname };
 
-    const payload = { sub: user.id, nickname: user.nickname };
-
-    const accessToken = this.tokenService.createAccessToken(payload);
-    const refreshToken = this.tokenService.createRefreshToken(payload);
+    const accessToken: string = this.tokenService.createAccessToken(payload);
+    const refreshToken: string = this.tokenService.createRefreshToken(payload);
 
     return { accessToken, refreshToken };
   }
 
-  private _validatePassword(password: string, checkPassword: string) {
-    if (password !== checkPassword) {
+  private async _validatePassword(
+    password: string,
+    checkPassword: string,
+    type: ValidatePasswordType = 'signUp',
+  ) {
+    if (type == 'signUp' && password !== checkPassword) {
+      throw new CustomException(UsersException.NOT_MATCHED_PASSWORD);
+    }
+
+    if (type == 'signIn' && !(await bcrpyt.compare(password, checkPassword))) {
       throw new CustomException(UsersException.NOT_MATCHED_PASSWORD);
     }
   }
@@ -67,14 +80,25 @@ export class UsersService {
 }
 
 class TokenService {
-  createAccessToken(payload) {
-    return;
+  private readonly jwtService = new JwtService();
+
+  createAccessToken(payload: JwtPayload): string {
+    const accessToken: string = this.jwtService.sign(payload, {
+      secret: 'access-secret-key', // 임시
+      expiresIn: '3m', // 임시
+    });
+
+    return accessToken;
   }
 
-  createRefreshToken(payload) {
-    // 생성
+  createRefreshToken(payload: JwtPayload): string {
+    const refreshToken: string = this.jwtService.sign(payload, {
+      secret: 'refresh-secret-key',
+      expiresIn: '10m',
+    });
+
     // 암호화
     // db 저장
-    return;
+    return refreshToken;
   }
 }
