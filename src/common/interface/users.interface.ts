@@ -16,3 +16,7 @@ interface SignIn {
   accessToken: string;
   refreshToken: string;
 }
+
+interface RecreateAccessToken {
+  accessToken: string;
+}

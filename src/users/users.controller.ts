@@ -24,6 +24,12 @@ export class UsersController {
   }
 
   @UseGuards(JwtAccessGuard)
+  @Post('recreate/access-token')
+  async recreateAccessToken(@Body('refreshToken') refreshToken: string) {
+    return await this.usersService.recreateAccessToken(refreshToken);
+  }
+
+  @UseGuards(JwtAccessGuard)
   @Get('access-test')
   accessTest() {
     return 'Access token test';

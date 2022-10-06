@@ -11,7 +11,7 @@ type ValidatePasswordType = 'signUp' | 'signIn';
 
 @Injectable()
 export class UsersService {
-  private readonly tokenService;
+  private readonly tokenService: TokenService;
 
   constructor(private readonly usersRepository: UsersRepository) {
     this.tokenService = new TokenService(usersRepository);
@@ -84,10 +84,30 @@ export class UsersService {
       throw new CustomException(UsersException.NICKNAME_ALREADY_EXISTS);
     }
   }
+
+  async recreateAccessToken(
+    refreshToken: string,
+  ): Promise<RecreateAccessToken> {
+    if (!refreshToken) {
+      throw new CustomException(UsersException.TOKEN_NOT_EXISTS);
+    }
+
+    const verifiedUser: Users = await this.tokenService.verifyRefreshToken(
+      refreshToken,
+    );
+
+    const payload: JwtPayload = {
+      sub: verifiedUser.id,
+      nickname: verifiedUser.nickname,
+    };
+
+    const accessToken = this.tokenService.createAccessToken(payload);
+    return { accessToken };
+  }
 }
 
 class TokenService {
-  private readonly jwtService;
+  private readonly jwtService: JwtService;
 
   constructor(private readonly usersRepository: UsersRepository) {
     this.jwtService = new JwtService();
@@ -111,5 +131,34 @@ class TokenService {
     // 암호화
     await this.usersRepository.createRefreshToken(payload.sub, refreshToken);
     return refreshToken;
+  }
+
+  async verifyRefreshToken(refreshToken: string): Promise<Users> {
+    let verifiedToken;
+
+    try {
+      verifiedToken = this.jwtService.verify(refreshToken, {
+        secret: 'refresh-secret-key',
+      });
+    } catch (error) {
+      switch (error.message) {
+        case 'jwt expired':
+          throw new CustomException(UsersException.EXPIRED_TOKEN);
+        default:
+          throw new CustomException(UsersException.UNVERIFIED_TOKEN);
+      }
+    }
+
+    const user: Users = await this.usersRepository.findUserById(
+      verifiedToken.sub,
+    );
+
+    // matches refreshToken in refreshToken model
+
+    if (!user) {
+      throw new CustomException(UsersException.USER_NOT_EXIST);
+    }
+
+    return user;
   }
 }
