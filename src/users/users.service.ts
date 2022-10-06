@@ -21,7 +21,7 @@ export class UsersService {
     return await this.usersRepository.getUser();
   }
 
-  async signUp(data: SignUpUserDto) {
+  async signUp(data: SignUpUserDto): Promise<SignUp> {
     // 1. 이메일 중복 확인
     const user: Users = await this.usersRepository.findUserByEmail(data.email);
 
@@ -37,10 +37,17 @@ export class UsersService {
 
     const createdUser: Users = await this.usersRepository.createUser(data);
 
-    return { users: createdUser };
+    return {
+      users: {
+        id: createdUser.id,
+        email: createdUser.email,
+        nickname: createdUser.nickname,
+        createdAt: createdUser.createdAt,
+      },
+    };
   }
 
-  async signIn(data: SignInUserDto) {
+  async signIn(data: SignInUserDto): Promise<SignIn> {
     // 1. 유효성 검사
     const user: Users = await this.usersRepository.findUserByEmail(data.email);
 

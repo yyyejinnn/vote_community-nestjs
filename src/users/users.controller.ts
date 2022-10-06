@@ -13,12 +13,12 @@ export class UsersController {
   }
 
   @Post('sign-up')
-  async signUp(@Body() data: SignUpUserDto) {
+  async signUp(@Body() data: SignUpUserDto): Promise<SignUp> {
     return await this.usersService.signUp(data);
   }
 
   @Post('sign-in')
-  async signIn(@Body() data: SignInUserDto) {
+  async signIn(@Body() data: SignInUserDto): Promise<SignIn> {
     return await this.usersService.signIn(data);
   }
 }
