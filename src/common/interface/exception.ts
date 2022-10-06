@@ -15,7 +15,17 @@ export class UsersException {
   };
 
   static USER_ALREADY_EXISTS: ExceptionObj = {
-    code: '00002',
+    code: '00003',
     message: '이미 가입된 이메일입니다.',
+  };
+
+  static USER_NOT_EXIST: ExceptionObj = {
+    code: '00003',
+    message: '가입되지 않은 이메일입니다.',
+  };
+
+  static REFRESH_TOKEN_EXIST: ExceptionObj = {
+    code: '00004',
+    message: '이미 존재하는 토큰입니다.',
   };
 }
