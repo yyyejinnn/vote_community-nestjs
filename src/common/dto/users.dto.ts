@@ -15,3 +15,12 @@ export class SignUpUserDto {
   @IsNotEmpty()
   checkPassword: string;
 }
+
+export class SignInUserDto {
+  @IsEmail()
+  @IsNotEmpty()
+  email: string;
+
+  @IsNotEmpty()
+  password: string;
+}

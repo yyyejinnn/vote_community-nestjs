@@ -3,8 +3,6 @@ import { PrismaClient, Users } from '@prisma/client';
 import { SignUpUserDto } from 'src/common/dto/users.dto';
 import * as bcrypt from 'bcrypt';
 
-type Keys = 'email' | 'nickname';
-
 @Injectable()
 export class UsersRepository {
   private readonly prisma = new PrismaClient();
