@@ -39,8 +39,13 @@ export class UsersException {
     message: '만료된 토큰입니다.',
   };
 
-  static UNVERIFIED_TOKEN: ExceptionObj = {
+  static UNVERIFIED_ACCESS_TOKEN: ExceptionObj = {
     code: '00000',
-    message: '유효하지 않은 토큰입니다.',
+    message: '유효하지 않은 Access 토큰입니다.',
+  };
+
+  static UNVERIFIED_REFRESH_TOKEN: ExceptionObj = {
+    code: '00000',
+    message: '유효하지 않은 Refresh 토큰입니다.',
   };
 }

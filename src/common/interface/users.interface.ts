@@ -3,6 +3,11 @@ type JwtPayload = {
   nickname: string;
 };
 
+type VerifiedToken = JwtPayload & {
+  iat: number;
+  exp: number;
+};
+
 interface SignUp {
   users: {
     id: number;

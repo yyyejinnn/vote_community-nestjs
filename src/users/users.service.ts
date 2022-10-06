@@ -1,11 +1,11 @@
 import { BadRequestException, HttpException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { PrismaClient, Users } from '@prisma/client';
+import { PrismaClient, RefreshTokens, Users } from '@prisma/client';
 import { SignUpUserDto, SignInUserDto } from 'src/common/dto/users.dto';
 import { UsersException } from 'src/common/interface/exception';
 import { CustomException } from 'src/common/middleware/http-exception.filter';
 import { UsersRepository } from './users.repository';
-import * as bcrpyt from 'bcrypt';
+import * as bcrypt from 'bcrypt';
 
 type ValidatePasswordType = 'signUp' | 'signIn';
 
@@ -56,11 +56,10 @@ export class UsersService {
     const payload: JwtPayload = { sub: user.id, nickname: user.nickname };
 
     const accessToken: string = this.tokenService.createAccessToken(payload);
-    const refreshToken: string = await this.tokenService.createRefreshToken(
-      payload,
-    );
+    const hashedRefreshToken: string =
+      await this.tokenService.createRefreshToken(payload);
 
-    return { accessToken, refreshToken };
+    return { accessToken, refreshToken: hashedRefreshToken };
   }
 
   private async _validatePassword(
@@ -72,7 +71,7 @@ export class UsersService {
       throw new CustomException(UsersException.NOT_MATCHED_PASSWORD);
     }
 
-    if (type == 'signIn' && !(await bcrpyt.compare(password, checkPassword))) {
+    if (type == 'signIn' && !(await bcrypt.compare(password, checkPassword))) {
       throw new CustomException(UsersException.NOT_MATCHED_PASSWORD);
     }
   }
@@ -92,12 +91,11 @@ export class UsersService {
       throw new CustomException(UsersException.TOKEN_NOT_EXISTS);
     }
 
-    const verifiedUser: Users = await this.tokenService.verifyRefreshToken(
-      refreshToken,
-    );
+    const verifiedUser: VerifiedToken =
+      await this.tokenService.verifyRefreshToken(refreshToken);
 
     const payload: JwtPayload = {
-      sub: verifiedUser.id,
+      sub: verifiedUser.sub,
       nickname: verifiedUser.nickname,
     };
 
@@ -128,15 +126,25 @@ class TokenService {
       expiresIn: '10m',
     });
 
-    // 암호화
-    await this.usersRepository.createRefreshToken(payload.sub, refreshToken);
-    return refreshToken;
+    const hashedToken: RefreshTokens =
+      await this.usersRepository.createRefreshToken(payload.sub, refreshToken);
+
+    return hashedToken.token;
   }
 
-  async verifyRefreshToken(refreshToken: string): Promise<Users> {
-    let verifiedToken;
+  async verifyRefreshToken(refreshToken: string): Promise<VerifiedToken> {
+    let verifiedToken: VerifiedToken;
+
+    const token: RefreshTokens = await this.usersRepository.findRefreshToken(
+      refreshToken, // 복호화X
+    );
+
+    if (!token) {
+      throw new CustomException(UsersException.UNVERIFIED_REFRESH_TOKEN);
+    }
 
     try {
+      // refreshToken 복호화
       verifiedToken = this.jwtService.verify(refreshToken, {
         secret: 'refresh-secret-key',
       });
@@ -145,20 +153,10 @@ class TokenService {
         case 'jwt expired':
           throw new CustomException(UsersException.EXPIRED_TOKEN);
         default:
-          throw new CustomException(UsersException.UNVERIFIED_TOKEN);
+          throw new CustomException(UsersException.UNVERIFIED_REFRESH_TOKEN);
       }
     }
 
-    const user: Users = await this.usersRepository.findUserById(
-      verifiedToken.sub,
-    );
-
-    // matches refreshToken in refreshToken model
-
-    if (!user) {
-      throw new CustomException(UsersException.USER_NOT_EXIST);
-    }
-
-    return user;
+    return verifiedToken;
   }
 }

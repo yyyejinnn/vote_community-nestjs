@@ -29,7 +29,7 @@ export class JwtAccessGuard extends AuthGuard('jwt-access-token') {
         case 'jwt expired':
           throw new CustomException(UsersException.EXPIRED_TOKEN);
         default:
-          throw new CustomException(UsersException.UNVERIFIED_TOKEN);
+          throw new CustomException(UsersException.UNVERIFIED_ACCESS_TOKEN);
       }
     }
 

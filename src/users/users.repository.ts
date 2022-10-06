@@ -43,11 +43,14 @@ export class UsersRepository {
     });
   }
 
-  async createRefreshToken(userId: number, refreshToken: string) {
+  async createRefreshToken(
+    userId: number,
+    refreshToken: string,
+  ): Promise<RefreshTokens> {
     try {
-      await this.prisma.refreshTokens.create({
+      return await this.prisma.refreshTokens.create({
         data: {
-          token: refreshToken, // 암호화
+          token: await bcrypt.hash(refreshToken, 10), // 양방향 암호화로 변경
           user: {
             connect: {
               id: userId,
@@ -58,6 +61,14 @@ export class UsersRepository {
     } catch (error) {
       throw new CustomException(UsersException.REFRESH_TOKEN_EXIST);
     }
+  }
+
+  async findRefreshToken(refreshToken: string): Promise<RefreshTokens> {
+    return await this.prisma.refreshTokens.findFirst({
+      where: {
+        token: refreshToken,
+      },
+    });
   }
 
   async getUser() {
