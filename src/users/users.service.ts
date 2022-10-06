@@ -11,9 +11,11 @@ type ValidatePasswordType = 'signUp' | 'signIn';
 
 @Injectable()
 export class UsersService {
-  private readonly tokenService = new TokenService();
+  private readonly tokenService;
 
-  constructor(private readonly usersRepository: UsersRepository) {}
+  constructor(private readonly usersRepository: UsersRepository) {
+    this.tokenService = new TokenService(usersRepository);
+  }
 
   async getUserProfile() {
     return await this.usersRepository.getUser();
@@ -51,7 +53,9 @@ export class UsersService {
     const payload: JwtPayload = { sub: user.id, nickname: user.nickname };
 
     const accessToken: string = this.tokenService.createAccessToken(payload);
-    const refreshToken: string = this.tokenService.createRefreshToken(payload);
+    const refreshToken: string = await this.tokenService.createRefreshToken(
+      payload,
+    );
 
     return { accessToken, refreshToken };
   }
@@ -71,7 +75,7 @@ export class UsersService {
   }
 
   private async _validateNickname(nickname: string) {
-    const user = await this.usersRepository.findUserByNickName(nickname);
+    const user: Users = await this.usersRepository.findUserByNickName(nickname);
 
     if (user) {
       throw new CustomException(UsersException.NICKNAME_ALREADY_EXISTS);
@@ -80,7 +84,11 @@ export class UsersService {
 }
 
 class TokenService {
-  private readonly jwtService = new JwtService();
+  private readonly jwtService;
+
+  constructor(private readonly usersRepository: UsersRepository) {
+    this.jwtService = new JwtService();
+  }
 
   createAccessToken(payload: JwtPayload): string {
     const accessToken: string = this.jwtService.sign(payload, {
@@ -91,14 +99,14 @@ class TokenService {
     return accessToken;
   }
 
-  createRefreshToken(payload: JwtPayload): string {
+  async createRefreshToken(payload: JwtPayload): Promise<string> {
     const refreshToken: string = this.jwtService.sign(payload, {
       secret: 'refresh-secret-key',
       expiresIn: '10m',
     });
 
     // 암호화
-    // db 저장
+    await this.usersRepository.createRefreshToken(payload.sub, refreshToken);
     return refreshToken;
   }
 }

@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaClient, Users } from '@prisma/client';
+import { PrismaClient, RefreshTokens, Users } from '@prisma/client';
 import { SignUpUserDto } from 'src/common/dto/users.dto';
 import * as bcrypt from 'bcrypt';
+import { UsersException } from 'src/common/interface/exception';
+import { CustomException } from 'src/common/middleware/http-exception.filter';
 
 @Injectable()
 export class UsersRepository {
@@ -31,6 +33,23 @@ export class UsersRepository {
         nickname,
       },
     });
+  }
+
+  async createRefreshToken(userId: number, refreshToken: string) {
+    try {
+      await this.prisma.refreshTokens.create({
+        data: {
+          token: refreshToken,
+          user: {
+            connect: {
+              id: userId,
+            },
+          },
+        },
+      });
+    } catch (error) {
+      throw new CustomException(UsersException.REFRESH_TOKEN_EXIST);
+    }
   }
 
   async getUser() {

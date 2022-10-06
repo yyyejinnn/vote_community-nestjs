@@ -23,4 +23,9 @@ export class UsersException {
     code: '00003',
     message: '가입되지 않은 이메일입니다.',
   };
+
+  static REFRESH_TOKEN_EXIST: ExceptionObj = {
+    code: '00004',
+    message: '이미 존재하는 토큰입니다.',
+  };
 }
