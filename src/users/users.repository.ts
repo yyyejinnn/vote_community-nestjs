@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaClient, RefreshTokens, Users } from '@prisma/client';
 import { SignUpUserDto } from 'src/common/dto/users.dto';
-import * as bcrypt from 'bcrypt';
 import { UsersException } from 'src/common/interface/exception';
 import { CustomException } from 'src/common/middleware/http-exception.filter';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersRepository {
@@ -45,12 +45,12 @@ export class UsersRepository {
 
   async createRefreshToken(
     userId: number,
-    refreshToken: string,
+    encryptedRefreshToken: string,
   ): Promise<RefreshTokens> {
     try {
       return await this.prisma.refreshTokens.create({
         data: {
-          token: await bcrypt.hash(refreshToken, 10), // 양방향 암호화로 변경
+          token: encryptedRefreshToken,
           user: {
             connect: {
               id: userId,
