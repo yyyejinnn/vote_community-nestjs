@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaClient, RefreshTokens, Users } from '@prisma/client';
 import { SignUpUserDto } from 'src/common/dto/users.dto';
-import * as bcrypt from 'bcrypt';
 import { UsersException } from 'src/common/interface/exception';
 import { CustomException } from 'src/common/middleware/http-exception.filter';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersRepository {
@@ -15,6 +15,14 @@ export class UsersRepository {
         email: data.email,
         nickname: data.nickname,
         password: await bcrypt.hash(data.password, 10),
+      },
+    });
+  }
+
+  async findUserById(id: number): Promise<Users> {
+    return await this.prisma.users.findFirst({
+      where: {
+        id,
       },
     });
   }
@@ -35,11 +43,14 @@ export class UsersRepository {
     });
   }
 
-  async createRefreshToken(userId: number, refreshToken: string) {
+  async createRefreshToken(
+    userId: number,
+    encryptedRefreshToken: string,
+  ): Promise<RefreshTokens> {
     try {
-      await this.prisma.refreshTokens.create({
+      return await this.prisma.refreshTokens.create({
         data: {
-          token: refreshToken,
+          token: encryptedRefreshToken,
           user: {
             connect: {
               id: userId,
@@ -50,6 +61,14 @@ export class UsersRepository {
     } catch (error) {
       throw new CustomException(UsersException.REFRESH_TOKEN_EXIST);
     }
+  }
+
+  async findRefreshToken(refreshToken: string): Promise<RefreshTokens> {
+    return await this.prisma.refreshTokens.findFirst({
+      where: {
+        token: refreshToken,
+      },
+    });
   }
 
   async getUser() {

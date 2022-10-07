@@ -20,12 +20,32 @@ export class UsersException {
   };
 
   static USER_NOT_EXIST: ExceptionObj = {
-    code: '00003',
-    message: '가입되지 않은 이메일입니다.',
+    code: '00004',
+    message: '존재하지 않는 사용자입니다.',
   };
 
   static REFRESH_TOKEN_EXIST: ExceptionObj = {
-    code: '00004',
+    code: '00005',
     message: '이미 존재하는 토큰입니다.',
+  };
+
+  static TOKEN_NOT_EXISTS: ExceptionObj = {
+    code: '00006',
+    message: '토큰이 없습니다.',
+  };
+
+  static EXPIRED_TOKEN: ExceptionObj = {
+    code: '00007',
+    message: '만료된 토큰입니다.',
+  };
+
+  static UNVERIFIED_ACCESS_TOKEN: ExceptionObj = {
+    code: '00008',
+    message: '유효하지 않은 Access 토큰입니다.',
+  };
+
+  static UNVERIFIED_REFRESH_TOKEN: ExceptionObj = {
+    code: '00009',
+    message: '유효하지 않은 Refresh 토큰입니다.',
   };
 }

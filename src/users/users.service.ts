@@ -1,17 +1,18 @@
 import { BadRequestException, HttpException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { PrismaClient, Users } from '@prisma/client';
+import { PrismaClient, RefreshTokens, Users } from '@prisma/client';
 import { SignUpUserDto, SignInUserDto } from 'src/common/dto/users.dto';
 import { UsersException } from 'src/common/interface/exception';
 import { CustomException } from 'src/common/middleware/http-exception.filter';
 import { UsersRepository } from './users.repository';
-import * as bcrpyt from 'bcrypt';
+import * as bcrypt from 'bcrypt';
+import * as crypto from 'crypto';
 
 type ValidatePasswordType = 'signUp' | 'signIn';
 
 @Injectable()
 export class UsersService {
-  private readonly tokenService;
+  private readonly tokenService: TokenService;
 
   constructor(private readonly usersRepository: UsersRepository) {
     this.tokenService = new TokenService(usersRepository);
@@ -22,33 +23,24 @@ export class UsersService {
   }
 
   async signUp(data: SignUpUserDto): Promise<SignUp> {
-    // 1. 이메일 중복 확인
     const user: Users = await this.usersRepository.findUserByEmail(data.email);
 
     if (user) {
       throw new CustomException(UsersException.USER_ALREADY_EXISTS);
     }
 
-    // 2. 비밀번호 일치 여부
     await this._validatePassword(data.password, data.checkPassword);
-
-    // 3. 중복 닉네임 확인
     await this._validateNickname(data.nickname);
 
-    const createdUser: Users = await this.usersRepository.createUser(data);
+    const { password, updatedAt, ...createdUser }: Users =
+      await this.usersRepository.createUser(data);
 
     return {
-      users: {
-        id: createdUser.id,
-        email: createdUser.email,
-        nickname: createdUser.nickname,
-        createdAt: createdUser.createdAt,
-      },
+      users: createdUser,
     };
   }
 
   async signIn(data: SignInUserDto): Promise<SignIn> {
-    // 1. 유효성 검사
     const user: Users = await this.usersRepository.findUserByEmail(data.email);
 
     if (!user) {
@@ -56,15 +48,33 @@ export class UsersService {
     }
     await this._validatePassword(data.password, user.password, 'signIn');
 
-    // 2. 토큰 생성
+    // 토큰 생성
     const payload: JwtPayload = { sub: user.id, nickname: user.nickname };
 
     const accessToken: string = this.tokenService.createAccessToken(payload);
-    const refreshToken: string = await this.tokenService.createRefreshToken(
-      payload,
-    );
+    const encryptRefreshToken: string =
+      await this.tokenService.createRefreshToken(payload);
 
-    return { accessToken, refreshToken };
+    return { accessToken, refreshToken: encryptRefreshToken };
+  }
+
+  async recreateAccessToken(
+    refreshToken: string,
+  ): Promise<RecreateAccessToken> {
+    if (!refreshToken) {
+      throw new CustomException(UsersException.TOKEN_NOT_EXISTS);
+    }
+
+    const verifiedUser: VerifiedToken =
+      await this.tokenService.verifyRefreshToken(refreshToken);
+
+    const payload: JwtPayload = {
+      sub: verifiedUser.sub,
+      nickname: verifiedUser.nickname,
+    };
+
+    const accessToken = this.tokenService.createAccessToken(payload);
+    return { accessToken };
   }
 
   private async _validatePassword(
@@ -76,7 +86,7 @@ export class UsersService {
       throw new CustomException(UsersException.NOT_MATCHED_PASSWORD);
     }
 
-    if (type == 'signIn' && !(await bcrpyt.compare(password, checkPassword))) {
+    if (type == 'signIn' && !(await bcrypt.compare(password, checkPassword))) {
       throw new CustomException(UsersException.NOT_MATCHED_PASSWORD);
     }
   }
@@ -91,7 +101,7 @@ export class UsersService {
 }
 
 class TokenService {
-  private readonly jwtService;
+  private readonly jwtService: JwtService;
 
   constructor(private readonly usersRepository: UsersRepository) {
     this.jwtService = new JwtService();
@@ -111,9 +121,62 @@ class TokenService {
       secret: 'refresh-secret-key',
       expiresIn: '10m',
     });
+    const encryptRefreshToken: string = this._encryptRefreshToken(refreshToken);
 
-    // 암호화
-    await this.usersRepository.createRefreshToken(payload.sub, refreshToken);
-    return refreshToken;
+    await this.usersRepository.createRefreshToken(
+      payload.sub,
+      encryptRefreshToken,
+    );
+
+    return encryptRefreshToken;
+  }
+
+  async verifyRefreshToken(
+    encryptRefreshToken: string,
+  ): Promise<VerifiedToken> {
+    let verifiedToken: VerifiedToken;
+
+    const token: RefreshTokens = await this.usersRepository.findRefreshToken(
+      encryptRefreshToken,
+    );
+
+    if (!token) {
+      throw new CustomException(UsersException.UNVERIFIED_REFRESH_TOKEN);
+    }
+
+    const decryptRefreshToken: string =
+      this._decryptRefreshToken(encryptRefreshToken);
+
+    try {
+      verifiedToken = this.jwtService.verify(decryptRefreshToken, {
+        secret: 'refresh-secret-key',
+      });
+    } catch (error) {
+      switch (error.message) {
+        case 'jwt expired':
+          throw new CustomException(UsersException.EXPIRED_TOKEN);
+        default:
+          throw new CustomException(UsersException.UNVERIFIED_REFRESH_TOKEN);
+      }
+    }
+
+    return verifiedToken;
+  }
+
+  private _encryptRefreshToken(refreshToken: string): string {
+    const encrypt = crypto.createCipher('des', 'crypto-key'); // 임시
+    const encryptResult =
+      encrypt.update(refreshToken, 'utf8', 'base64') + encrypt.final('base64');
+
+    return encryptResult;
+  }
+
+  private _decryptRefreshToken(encryptRefreshToken: string): string {
+    const decrypt = crypto.createDecipher('des', 'crypto-key'); // 임시
+    const decryptResult =
+      decrypt.update(encryptRefreshToken, 'base64', 'utf8') +
+      decrypt.final('utf8');
+
+    return decryptResult;
   }
 }
