@@ -1,27 +1,51 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Votes } from '@prisma/client';
 import { CreateVoteDto } from 'src/common/dto/votes.dto';
 
 @Injectable()
 export class VotesRepository {
   private readonly prisma = new PrismaClient();
 
-  async createVote(data: CreateVoteDto) {
-    const { voteOptions, ...vote } = data;
-    const voteOpsionsTitles = voteOptions.map((value) => ({
-      title: value,
-    }));
-
+  async createVote(data: CreateVoteDto, voteOpsionsArr: { title: string }[]) {
     await this.prisma.votes.create({
       data: {
-        title: vote.title,
+        title: data.title,
         user: {
           connect: {
-            id: vote.userId,
+            id: data.userId,
           },
         },
         voteOption: {
-          create: voteOpsionsTitles,
+          create: voteOpsionsArr,
+        },
+      },
+    });
+  }
+
+  async listVotes(): Promise<Votes[]> {
+    return await this.prisma.votes.findMany({
+      include: {
+        voteOption: {
+          select: {
+            id: true,
+            title: true,
+          },
+        },
+      },
+    });
+  }
+
+  async getVote(voteId: number): Promise<Votes> {
+    return await this.prisma.votes.findFirst({
+      where: {
+        id: voteId,
+      },
+      include: {
+        voteOption: {
+          select: {
+            id: true,
+            title: true,
+          },
         },
       },
     });
