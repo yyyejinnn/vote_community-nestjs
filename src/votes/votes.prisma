@@ -1,7 +1,7 @@
 model Votes {
     id        Int    @id @default(autoincrement())
     title     String
-    pollTotal Int
+    pollTotal Int    @default(0)
     user      Users  @relation(fields: [userId], references: [id])
     userId    Int
 
@@ -17,14 +17,14 @@ model Votes {
 model VoteOptions {
     id    Int    @id @default(autoincrement())
     title String
-    poll  Int
+    poll  Int    @default(0)
 
     vote   Votes @relation(fields: [voteId], references: [id])
-    voteId Int   @unique
+    voteId Int
 
     createdAt  DateTime     @default(now())
     updatedAt  DateTime     @updatedAt
-    VotedUsers VotedUsers[]
+    votedUsers VotedUsers[]
 
     @@map("vote-options")
 }

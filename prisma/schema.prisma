@@ -29,7 +29,7 @@ model RefreshTokens {
 model Votes {
 	id Int @id @default(autoincrement())
 	title String 
-	pollTotal Int 
+	pollTotal Int @default(0)
 	user Users @relation(name: "UsersToVotes", fields: [userId], references: [id])
 	userId Int 
 	createdAt DateTime @default(now())
@@ -41,12 +41,12 @@ model Votes {
 model VoteOptions {
 	id Int @id @default(autoincrement())
 	title String 
-	poll Int 
+	poll Int @default(0)
 	vote Votes @relation(name: "VoteOptionsToVotes", fields: [voteId], references: [id])
-	voteId Int @unique
+	voteId Int 
 	createdAt DateTime @default(now())
 	updatedAt DateTime @updatedAt
-	VotedUsers VotedUsers[] @relation(name: "VoteOptionsToVotedUsers")
+	votedUsers VotedUsers[] @relation(name: "VoteOptionsToVotedUsers")
 	@@map("vote-options")
 }
 model VotedUsers {
