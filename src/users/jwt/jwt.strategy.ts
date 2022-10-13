@@ -3,6 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Users } from '@prisma/client';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { UsersException } from 'src/common/interface/exception';
+import { JwtPayload } from 'src/common/interface/users.interface';
 import { CustomException } from 'src/common/middleware/http-exception.filter';
 import { UsersRepository } from '../users.repository';
 

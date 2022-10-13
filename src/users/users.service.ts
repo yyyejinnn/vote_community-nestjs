@@ -7,6 +7,13 @@ import { CustomException } from 'src/common/middleware/http-exception.filter';
 import { UsersRepository } from './users.repository';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
+import {
+  JwtPayload,
+  RecreateAccessToken,
+  SignIn,
+  SignUp,
+  VerifiedToken,
+} from 'src/common/interface/users.interface';
 
 type ValidatePasswordType = 'signUp' | 'signIn';
 
