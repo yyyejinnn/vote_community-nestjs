@@ -1,14 +1,14 @@
-type JwtPayload = {
+export type JwtPayload = {
   sub: number;
   nickname: string;
 };
 
-type VerifiedToken = JwtPayload & {
+export type VerifiedToken = JwtPayload & {
   iat: number;
   exp: number;
 };
 
-interface SignUp {
+export interface SignUp {
   users: {
     id: number;
     email: string;
@@ -17,11 +17,11 @@ interface SignUp {
   };
 }
 
-interface SignIn {
+export interface SignIn {
   accessToken: string;
   refreshToken: string;
 }
 
-interface RecreateAccessToken {
+export interface RecreateAccessToken {
   accessToken: string;
 }
