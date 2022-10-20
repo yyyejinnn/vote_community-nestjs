@@ -2,16 +2,23 @@ import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { Users } from '@prisma/client';
 import { SignInUserDto, SignUpUserDto } from 'src/common/dto/users.dto';
 import { SignIn, SignUp } from 'src/common/interface/users.interface';
+import { VotesRepository } from 'src/votes/votes.repository';
 import { JwtAccessGuard } from './jwt/jwt.guard';
+import { UsersRepository } from './users.repository';
 import { UsersService } from './users.service';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly usersRepository: UsersRepository,
+    private readonly voteRepository: VotesRepository,
+  ) {}
 
   @Get('profile')
   async getUserProfile() {
-    return this.usersService.getUserProfile();
+    const userId = 1; //임시
+    return this.usersRepository.findUserById(userId);
   }
 
   @Post('sign-up')

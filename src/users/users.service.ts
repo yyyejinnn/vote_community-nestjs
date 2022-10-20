@@ -25,10 +25,6 @@ export class UsersService {
     this.tokenService = new TokenService(usersRepository);
   }
 
-  async getUserProfile() {
-    return await this.usersRepository.getUser();
-  }
-
   async signUp(data: SignUpUserDto): Promise<SignUp> {
     const user: Users = await this.usersRepository.findUserByEmail(data.email);
 

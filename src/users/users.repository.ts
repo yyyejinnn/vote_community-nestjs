@@ -70,12 +70,4 @@ export class UsersRepository {
       },
     });
   }
-
-  async getUser() {
-    return this.prisma.users.findUnique({
-      where: {
-        id: 1, // 임시
-      },
-    });
-  }
 }
