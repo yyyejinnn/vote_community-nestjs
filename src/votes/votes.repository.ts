@@ -32,6 +32,12 @@ export class VotesRepository {
             title: true,
           },
         },
+        _count: {
+          select: {
+            // 좋아요 수
+            votedUsers: true,
+          },
+        },
       },
     });
   }
@@ -43,14 +49,18 @@ export class VotesRepository {
       },
       include: {
         voteChoices: {
-          select: {
-            id: true,
-            title: true,
+          include: {
+            _count: {
+              select: {
+                votedUsers: true,
+              },
+            },
           },
         },
-        votedUsers: {
+        _count: {
           select: {
-            userId: true,
+            // 좋아요 수
+            votedUsers: true,
           },
         },
       },
