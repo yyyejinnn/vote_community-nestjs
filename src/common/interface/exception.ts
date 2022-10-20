@@ -49,3 +49,10 @@ export class UsersException {
     message: '유효하지 않은 Refresh 토큰입니다.',
   };
 }
+
+export class VotesException {
+  static ALREADY_VOTED: ExceptionObj = {
+    code: '10001',
+    message: '이미 투표 했습니다.',
+  };
+}

@@ -13,3 +13,9 @@ export class CreateVoteDto {
   @Type(() => Number)
   userId: number;
 }
+
+export class CreateVotedUserDto {
+  votedId: number;
+  userId: number;
+  choicedVoteId: number;
+}
