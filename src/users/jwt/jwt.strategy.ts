@@ -27,6 +27,8 @@ export class JwtAccessStrategy extends PassportStrategy(
       throw new CustomException(UsersException.USER_NOT_EXIST);
     }
 
-    return user;
+    const { password, ...userInfo } = user;
+
+    return userInfo;
   }
 }
