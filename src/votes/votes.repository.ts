@@ -88,4 +88,18 @@ export class VotesRepository {
       },
     });
   }
+
+  async getVotedUsers(voteId: number) {
+    return await this.prisma.votedUsers.findMany({
+      where: { voteId: voteId },
+      select: {
+        user: {
+          select: {
+            id: true,
+            nickname: true,
+          },
+        },
+      },
+    });
+  }
 }

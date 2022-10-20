@@ -51,4 +51,9 @@ export class VotesController {
 
     return await this.votesService.choiceVote(data);
   }
+
+  @Get(':id/voted-users')
+  async getVotedUsers(@Param('id', ParseIntPipe) voteId: number) {
+    return this.votesRepository.getVotedUsers(voteId);
+  }
 }
