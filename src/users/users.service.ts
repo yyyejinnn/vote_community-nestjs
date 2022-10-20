@@ -13,6 +13,8 @@ import {
   SignIn,
   SignUp,
   VerifiedToken,
+  WhereOptionByUserEmail,
+  WhereOptionByUserNickName,
 } from 'src/common/interface/users.interface';
 
 type ValidatePasswordType = 'signUp' | 'signIn';
@@ -26,7 +28,12 @@ export class UsersService {
   }
 
   async signUp(data: SignUpUserDto): Promise<SignUp> {
-    const user: Users = await this.usersRepository.findUserByEmail(data.email);
+    const whereOption: WhereOptionByUserEmail = {
+      email: data.email,
+    };
+    const user: Users = await this.usersRepository.findUserByWhereOption(
+      whereOption,
+    );
 
     if (user) {
       throw new CustomException(UsersException.USER_ALREADY_EXISTS);
@@ -44,7 +51,12 @@ export class UsersService {
   }
 
   async signIn(data: SignInUserDto): Promise<SignIn> {
-    const user: Users = await this.usersRepository.findUserByEmail(data.email);
+    const whereOption: WhereOptionByUserEmail = {
+      email: data.email,
+    };
+    const user: Users = await this.usersRepository.findUserByWhereOption(
+      whereOption,
+    );
 
     if (!user) {
       throw new CustomException(UsersException.USER_NOT_EXIST);
@@ -95,7 +107,10 @@ export class UsersService {
   }
 
   private async _validateNickname(nickname: string) {
-    const user: Users = await this.usersRepository.findUserByNickName(nickname);
+    const whereOption: WhereOptionByUserNickName = { nickname };
+    const user: Users = await this.usersRepository.findUserByWhereOption(
+      whereOption,
+    );
 
     if (user) {
       throw new CustomException(UsersException.NICKNAME_ALREADY_EXISTS);

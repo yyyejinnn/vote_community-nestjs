@@ -5,6 +5,23 @@ import { UsersException } from 'src/common/interface/exception';
 import { CustomException } from 'src/common/middleware/http-exception.filter';
 import * as bcrypt from 'bcrypt';
 
+type WhereOptionByUserId = {
+  id: number;
+};
+
+type WhereOptionByUserEmail = {
+  email: string;
+};
+
+type WhereOptionByUserNickName = {
+  nickname: string;
+};
+
+type WhereOption =
+  | WhereOptionByUserId
+  | WhereOptionByUserEmail
+  | WhereOptionByUserNickName;
+
 @Injectable()
 export class UsersRepository {
   private readonly prisma = new PrismaClient();
@@ -19,27 +36,9 @@ export class UsersRepository {
     });
   }
 
-  async findUserById(id: number): Promise<Users> {
+  async findUserByWhereOption(whereOption: WhereOption) {
     return await this.prisma.users.findFirst({
-      where: {
-        id,
-      },
-    });
-  }
-
-  async findUserByEmail(email: string): Promise<Users> {
-    return await this.prisma.users.findFirst({
-      where: {
-        email,
-      },
-    });
-  }
-
-  async findUserByNickName(nickname: string): Promise<Users> {
-    return await this.prisma.users.findFirst({
-      where: {
-        nickname,
-      },
+      where: whereOption,
     });
   }
 

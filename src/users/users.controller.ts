@@ -1,7 +1,11 @@
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { Users } from '@prisma/client';
 import { SignInUserDto, SignUpUserDto } from 'src/common/dto/users.dto';
-import { SignIn, SignUp } from 'src/common/interface/users.interface';
+import {
+  SignIn,
+  SignUp,
+  WhereOptionByUserId,
+} from 'src/common/interface/users.interface';
 import { VotesRepository } from 'src/votes/votes.repository';
 import { JwtAccessGuard } from './jwt/jwt.guard';
 import { UsersRepository } from './users.repository';
@@ -18,7 +22,8 @@ export class UsersController {
   @Get('profile')
   async getUserProfile() {
     const userId = 1; //임시
-    return this.usersRepository.findUserById(userId);
+    const whereOption: WhereOptionByUserId = { id: userId };
+    return this.usersRepository.findUserByWhereOption(whereOption);
   }
 
   @Get('created-votes')
