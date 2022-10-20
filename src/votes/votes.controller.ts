@@ -21,7 +21,7 @@ export class VotesController {
   @Post()
   async createVote(@Body() data: CreateVoteDto) {
     data['userId'] = 2; //임시
-    return await this.votesService.createVote(data);
+    return await this.votesRepository.createVote(data);
   }
 
   @Get()
@@ -50,5 +50,10 @@ export class VotesController {
     };
 
     return await this.votesService.choiceVote(data);
+  }
+
+  @Get(':id/voted-users')
+  async getVotedUsers(@Param('id', ParseIntPipe) voteId: number) {
+    return this.votesRepository.getVotedUsers(voteId);
   }
 }

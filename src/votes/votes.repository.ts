@@ -32,6 +32,12 @@ export class VotesRepository {
             title: true,
           },
         },
+        _count: {
+          select: {
+            // 좋아요 수
+            votedUsers: true,
+          },
+        },
       },
     });
   }
@@ -43,14 +49,18 @@ export class VotesRepository {
       },
       include: {
         voteChoices: {
-          select: {
-            id: true,
-            title: true,
+          include: {
+            _count: {
+              select: {
+                votedUsers: true,
+              },
+            },
           },
         },
-        votedUsers: {
+        _count: {
           select: {
-            userId: true,
+            // 좋아요 수
+            votedUsers: true,
           },
         },
       },
@@ -73,6 +83,20 @@ export class VotesRepository {
         voteChoice: {
           connect: {
             id: data.choicedVoteId,
+          },
+        },
+      },
+    });
+  }
+
+  async getVotedUsers(voteId: number) {
+    return await this.prisma.votedUsers.findMany({
+      where: { voteId: voteId },
+      select: {
+        user: {
+          select: {
+            id: true,
+            nickname: true,
           },
         },
       },
