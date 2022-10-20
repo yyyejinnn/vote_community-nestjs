@@ -21,6 +21,12 @@ export class UsersController {
     return this.usersRepository.findUserById(userId);
   }
 
+  @Get('created-votes')
+  async getUserCreatedVotes() {
+    const userId = 1; //임시
+    return this.voteRepository.getAllVotesByUserId(userId);
+  }
+
   @Post('sign-up')
   async signUp(@Body() data: SignUpUserDto): Promise<SignUp> {
     return await this.usersService.signUp(data);

@@ -102,4 +102,12 @@ export class VotesRepository {
       },
     });
   }
+
+  async getAllVotesByUserId(userId: number) {
+    return await this.prisma.votes.findMany({
+      where: {
+        userId,
+      },
+    });
+  }
 }

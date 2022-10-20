@@ -1,6 +1,7 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
+import { VotesModule } from 'src/votes/votes.module';
 import { JwtAccessStrategy } from './jwt/jwt.strategy';
 import { UsersController } from './users.controller';
 import { UsersRepository } from './users.repository';
@@ -8,6 +9,7 @@ import { UsersService } from './users.service';
 
 @Module({
   imports: [
+    forwardRef(() => VotesModule),
     PassportModule.register({ defaultStrategy: 'jwt-access-token' }),
     JwtModule.register({
       secret: 'access-secret-key',
