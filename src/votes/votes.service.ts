@@ -9,10 +9,6 @@ import { VotesRepository } from './votes.repository';
 export class VotesService {
   constructor(private readonly votesRepository: VotesRepository) {}
 
-  async createVote(data: CreateVoteDto) {
-    return await this.votesRepository.createVote(data);
-  }
-
   async choiceVote(data: CreateVotedUserDto) {
     try {
       return await this.votesRepository.createVotedUser(data);
