@@ -3,7 +3,10 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Users } from '@prisma/client';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { UsersException } from 'src/common/interface/exception';
-import { JwtPayload } from 'src/common/interface/users.interface';
+import {
+  JwtPayload,
+  WhereOptionByUserId,
+} from 'src/common/interface/users.interface';
 import { CustomException } from 'src/common/middleware/http-exception.filter';
 import { UsersRepository } from '../users.repository';
 
@@ -21,7 +24,12 @@ export class JwtAccessStrategy extends PassportStrategy(
   }
 
   async validate(payload: JwtPayload) {
-    const user: Users = await this.usersRepository.findUserById(payload.sub);
+    const whereOption: WhereOptionByUserId = {
+      id: payload.sub,
+    };
+    const user: Users = await this.usersRepository.findUserByWhereOption(
+      whereOption,
+    );
 
     if (!user) {
       throw new CustomException(UsersException.USER_NOT_EXIST);
