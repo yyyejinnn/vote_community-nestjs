@@ -2,6 +2,9 @@ import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { Users } from '@prisma/client';
 import { SignInUserDto, SignUpUserDto } from 'src/common/dto/users.dto';
 import {
+  GetUserCreatedVotes,
+  GetUserProfile,
+  RecreateAccessToken,
   SignIn,
   SignUp,
   WhereOptionByUserId,
@@ -20,16 +23,18 @@ export class UsersController {
   ) {}
 
   @Get('profile')
-  async getUserProfile() {
+  async getUserProfile(): Promise<GetUserProfile> {
     const userId = 1; //임시
     const whereOption: WhereOptionByUserId = { id: userId };
-    return this.usersRepository.findUserByWhereOption(whereOption);
+    return {
+      users: await this.usersRepository.findUserByWhereOption(whereOption),
+    };
   }
 
   @Get('created-votes')
-  async getUserCreatedVotes() {
+  async getUserCreatedVotes(): Promise<GetUserCreatedVotes> {
     const userId = 1; //임시
-    return this.voteRepository.getAllVotesByUserId(userId);
+    return { votes: await this.voteRepository.getAllVotesByUserId(userId) };
   }
 
   @Post('sign-up')
@@ -44,7 +49,9 @@ export class UsersController {
 
   @UseGuards(JwtAccessGuard)
   @Post('recreate/access-token')
-  async recreateAccessToken(@Body('refreshToken') refreshToken: string) {
+  async recreateAccessToken(
+    @Body('refreshToken') refreshToken: string,
+  ): Promise<RecreateAccessToken> {
     return await this.usersService.recreateAccessToken(refreshToken);
   }
 

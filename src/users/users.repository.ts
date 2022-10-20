@@ -36,7 +36,7 @@ export class UsersRepository {
     });
   }
 
-  async findUserByWhereOption(whereOption: WhereOption) {
+  async findUserByWhereOption(whereOption: WhereOption): Promise<Users> {
     return await this.prisma.users.findFirst({
       where: whereOption,
     });

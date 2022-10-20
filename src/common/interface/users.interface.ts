@@ -1,3 +1,5 @@
+import { Users, Votes } from '@prisma/client';
+
 // type
 export type JwtPayload = {
   sub: number;
@@ -43,4 +45,12 @@ export interface SignIn {
 
 export interface RecreateAccessToken {
   accessToken: string;
+}
+
+export interface GetUserProfile {
+  users: Users;
+}
+
+export interface GetUserCreatedVotes {
+  votes: Votes[];
 }
