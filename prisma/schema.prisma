@@ -34,19 +34,19 @@ model Votes {
 	userId Int 
 	createdAt DateTime @default(now())
 	updatedAt DateTime @updatedAt
-	voteOption VoteOptions[] @relation(name: "VoteOptionsToVotes")
+	voteChoices VoteChoices[] @relation(name: "VoteChoicesToVotes")
 	votedUsers VotedUsers[] @relation(name: "VotedUsersToVotes")
 	@@map("votes")
 }
-model VoteOptions {
+model VoteChoices {
 	id Int @id @default(autoincrement())
 	title String 
 	poll Int @default(0)
-	vote Votes @relation(name: "VoteOptionsToVotes", fields: [voteId], references: [id])
+	vote Votes @relation(name: "VoteChoicesToVotes", fields: [voteId], references: [id])
 	voteId Int 
 	createdAt DateTime @default(now())
 	updatedAt DateTime @updatedAt
-	votedUsers VotedUsers[] @relation(name: "VoteOptionsToVotedUsers")
+	votedUsers VotedUsers[] @relation(name: "VoteChoicesToVotedUsers")
 	@@map("vote-options")
 }
 model VotedUsers {
@@ -54,8 +54,8 @@ model VotedUsers {
 	userId Int 
 	vote Votes @relation(name: "VotedUsersToVotes", fields: [voteId], references: [id])
 	voteId Int 
-	voteOptions VoteOptions @relation(name: "VoteOptionsToVotedUsers", fields: [voteOptionsId], references: [id])
-	voteOptionsId Int 
+	voteChoice VoteChoices @relation(name: "VoteChoicesToVotedUsers", fields: [voteChoiceId], references: [id])
+	voteChoiceId Int 
 	@@map("voted-users")
-	@@id([userId, voteOptionsId])
+	@@id([userId, voteChoiceId])
 }

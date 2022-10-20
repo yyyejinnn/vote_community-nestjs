@@ -8,11 +8,11 @@ export class VotesService {
   constructor(private readonly votesRepository: VotesRepository) {}
 
   async createVote(data: CreateVoteDto) {
-    const { voteOptions } = data;
-    const voteOpsionsArr = voteOptions.map((value) => ({
+    const { voteChoices } = data;
+    const voteChoicesArr = voteChoices.map((value) => ({
       title: value,
     }));
 
-    return await this.votesRepository.createVote(data, voteOpsionsArr);
+    return await this.votesRepository.createVote(data, voteChoicesArr);
   }
 }

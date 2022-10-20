@@ -8,13 +8,13 @@ model Votes {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
-    voteOption VoteOptions[]
-    votedUsers VotedUsers[]
+    voteChoices VoteChoices[]
+    votedUsers  VotedUsers[]
 
     @@map("votes")
 }
 
-model VoteOptions {
+model VoteChoices {
     id    Int    @id @default(autoincrement())
     title String
     poll  Int    @default(0)
@@ -36,10 +36,10 @@ model VotedUsers {
     vote   Votes @relation(fields: [voteId], references: [id])
     voteId Int
 
-    voteOptions   VoteOptions @relation(fields: [voteOptionsId], references: [id])
-    voteOptionsId Int
+    voteChoice   VoteChoices @relation(fields: [voteChoiceId], references: [id])
+    voteChoiceId Int
 
-    @@id([userId, voteOptionsId])
+    @@id([userId, voteChoiceId])
     @@map("voted-users")
 }
 

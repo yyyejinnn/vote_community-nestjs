@@ -27,11 +27,11 @@ export class VotesController {
 
   @Get()
   async listVotes(): Promise<ListVotes> {
-    return { votes: await this.votesRepository.listVotes() };
+    return { votes: await this.votesRepository.getAllVotes() };
   }
 
   @Get(':id')
   async getVote(@Param('id', ParseIntPipe) voteId: number): Promise<GetVote> {
-    return { vote: await this.votesRepository.getVote(voteId) };
+    return { vote: await this.votesRepository.getVoteById(voteId) };
   }
 }

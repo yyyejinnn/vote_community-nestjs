@@ -8,7 +8,7 @@ export class CreateVoteDto {
 
   @IsArray()
   @IsNotEmpty()
-  voteOptions: string[];
+  voteChoices: string[];
 
   @Type(() => Number)
   userId: number;

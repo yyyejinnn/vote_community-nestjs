@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaClient, Votes } from '@prisma/client';
+import { title } from 'process';
 import { CreateVoteDto } from 'src/common/dto/votes.dto';
 
 @Injectable()
@@ -15,17 +16,17 @@ export class VotesRepository {
             id: data.userId,
           },
         },
-        voteOption: {
+        voteChoices: {
           create: voteOpsionsArr,
         },
       },
     });
   }
 
-  async listVotes(): Promise<Votes[]> {
+  async getAllVotes(): Promise<Votes[]> {
     return await this.prisma.votes.findMany({
       include: {
-        voteOption: {
+        voteChoices: {
           select: {
             id: true,
             title: true,
@@ -35,16 +36,25 @@ export class VotesRepository {
     });
   }
 
-  async getVote(voteId: number): Promise<Votes> {
+  async getVoteById(voteId: number): Promise<Votes> {
     return await this.prisma.votes.findFirst({
       where: {
         id: voteId,
       },
       include: {
-        voteOption: {
+        voteChoices: {
           select: {
             id: true,
             title: true,
+          },
+        },
+        votedUsers: {
+          include: {
+            user: {
+              select: {
+                nickname: true,
+              },
+            },
           },
         },
       },
