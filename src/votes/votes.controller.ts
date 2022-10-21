@@ -6,8 +6,12 @@ import {
   ParseIntPipe,
   Post,
 } from '@nestjs/common';
-import { CreateVoteDto, CreateVotedUserDto } from 'src/common/dto/votes.dto';
-import { GetVote, ListVotes } from 'src/common/interface/votes.interface';
+import {
+  CreateVoteDto,
+  CreateVotedUserDto,
+  GetVote,
+  ListVotes,
+} from '@vote/common';
 import { VotesRepository } from './votes.repository';
 import { VotesService } from './votes.service';
 
