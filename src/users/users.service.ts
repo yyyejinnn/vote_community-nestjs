@@ -1,13 +1,9 @@
-import { BadRequestException, HttpException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { PrismaClient, RefreshTokens, Users } from '@prisma/client';
-import { SignUpUserDto, SignInUserDto } from 'src/common/dto/users.dto';
-import { UsersException } from 'src/common/interface/exception';
-import { CustomException } from 'src/common/middleware/http-exception.filter';
-import { UsersRepository } from './users.repository';
-import * as bcrypt from 'bcrypt';
-import * as crypto from 'crypto';
+import { RefreshTokens, Users } from '@prisma/client';
 import {
+  SignUpUserDto,
+  SignInUserDto,
   JwtPayload,
   RecreateAccessToken,
   SignIn,
@@ -15,7 +11,13 @@ import {
   VerifiedToken,
   WhereOptionByUserEmail,
   WhereOptionByUserNickName,
-} from 'src/common/interface/users.interface';
+  UsersException,
+} from '@vote/common';
+import { CustomException } from '@vote/middleware';
+import { UsersRepository } from './users.repository';
+
+import * as bcrypt from 'bcrypt';
+import * as crypto from 'crypto';
 
 type ValidatePasswordType = 'signUp' | 'signIn';
 

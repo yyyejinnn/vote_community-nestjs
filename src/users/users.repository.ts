@@ -1,26 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaClient, RefreshTokens, Users } from '@prisma/client';
-import { SignUpUserDto } from 'src/common/dto/users.dto';
-import { UsersException } from 'src/common/interface/exception';
-import { CustomException } from 'src/common/middleware/http-exception.filter';
+import { SignUpUserDto, UsersException, WhereOption } from '@vote/common';
+import { CustomException } from '@vote/middleware';
 import * as bcrypt from 'bcrypt';
-
-type WhereOptionByUserId = {
-  id: number;
-};
-
-type WhereOptionByUserEmail = {
-  email: string;
-};
-
-type WhereOptionByUserNickName = {
-  nickname: string;
-};
-
-type WhereOption =
-  | WhereOptionByUserId
-  | WhereOptionByUserEmail
-  | WhereOptionByUserNickName;
 
 @Injectable()
 export class UsersRepository {

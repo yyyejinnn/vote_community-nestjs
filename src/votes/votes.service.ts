@@ -1,8 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
-import { CreateVoteDto, CreateVotedUserDto } from 'src/common/dto/votes.dto';
-import { VotesException } from 'src/common/interface/exception';
-import { CustomException } from 'src/common/middleware/http-exception.filter';
+import { CreateVotedUserDto, VotesException } from '@vote/common';
+import { CustomException } from '@vote/middleware';
 import { VotesRepository } from './votes.repository';
 
 @Injectable()

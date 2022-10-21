@@ -1,14 +1,14 @@
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
-import { Users } from '@prisma/client';
-import { SignInUserDto, SignUpUserDto } from 'src/common/dto/users.dto';
 import {
   GetUserCreatedVotes,
   GetUserProfile,
   RecreateAccessToken,
   SignIn,
+  SignInUserDto,
   SignUp,
+  SignUpUserDto,
   WhereOptionByUserId,
-} from 'src/common/interface/users.interface';
+} from '@vote/common';
 import { VotesRepository } from 'src/votes/votes.repository';
 import { JwtAccessGuard } from './jwt/jwt.guard';
 import { UsersRepository } from './users.repository';
