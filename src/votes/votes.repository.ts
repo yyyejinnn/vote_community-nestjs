@@ -1,6 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaClient, Votes } from '@prisma/client';
-import { CreateVoteDto, CreateVotedUserDto } from '@vote/common';
+import { PrismaClient, VoteChoices, VoteComments, Votes } from '@prisma/client';
+import {
+  CreateVoteCommentDto,
+  CreateVoteDto,
+  CreateVotedUserDto,
+} from '@vote/common';
 
 @Injectable()
 export class VotesRepository {
@@ -106,6 +110,37 @@ export class VotesRepository {
     return await this.prisma.votes.findMany({
       where: {
         userId,
+      },
+    });
+  }
+}
+
+@Injectable()
+export class CommentsRepository {
+  private readonly prisma = new PrismaClient();
+
+  async getAllVotes(voteId: number): Promise<VoteComments[]> {
+    return await this.prisma.voteComments.findMany({
+      where: {
+        voteId,
+      },
+    });
+  }
+
+  async createVoteComment(data: CreateVoteCommentDto) {
+    return await this.prisma.voteComments.create({
+      data: {
+        content: data.content,
+        vote: {
+          connect: {
+            id: data.voteId,
+          },
+        },
+        user: {
+          connect: {
+            id: data.userId,
+          },
+        },
       },
     });
   }

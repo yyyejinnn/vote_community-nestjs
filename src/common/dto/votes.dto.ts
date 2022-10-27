@@ -19,3 +19,9 @@ export class CreateVotedUserDto {
   userId: number;
   choicedVoteId: number;
 }
+
+export class CreateVoteCommentDto {
+  voteId: number;
+  userId: number;
+  content: string;
+}
