@@ -7,13 +7,14 @@ import {
   Post,
 } from '@nestjs/common';
 import {
+  CreateVoteCommentDto,
   CreateVoteDto,
   CreateVotedUserDto,
   GetVote,
   ListVotes,
 } from '@vote/common';
-import { VotesRepository } from './votes.repository';
-import { VotesService } from './votes.service';
+import { CommentsRepository, VotesRepository } from './votes.repository';
+import { CommentsService, VotesService } from './votes.service';
 
 @Controller('votes')
 export class VotesController {
@@ -59,5 +60,34 @@ export class VotesController {
   @Get(':id/voted-users')
   async getVotedUsers(@Param('id', ParseIntPipe) voteId: number) {
     return this.votesRepository.getVotedUsers(voteId);
+  }
+}
+
+@Controller('votes/:id')
+export class CommentsController {
+  constructor(
+    private readonly commentsService: CommentsService,
+    private readonly commentsRepository: CommentsRepository,
+  ) {}
+
+  @Get('comments')
+  async getVoteComments(@Param('id', ParseIntPipe) voteId: number) {
+    return await this.commentsRepository.getAllVotes(voteId);
+  }
+
+  @Post('comments')
+  async createVoteComment(
+    @Param('id', ParseIntPipe) voteId: number,
+    @Body('content') content: string,
+  ) {
+    const userId = 1; //임시
+
+    const data: CreateVoteCommentDto = {
+      voteId,
+      userId,
+      content,
+    };
+
+    return await this.commentsService.createVoteComment(data);
   }
 }

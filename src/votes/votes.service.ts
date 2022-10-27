@@ -1,7 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { CreateVotedUserDto, VotesException } from '@vote/common';
+import {
+  CreateVoteCommentDto,
+  CreateVotedUserDto,
+  VotesException,
+} from '@vote/common';
 import { CustomException } from '@vote/middleware';
-import { VotesRepository } from './votes.repository';
+import { CommentsRepository, VotesRepository } from './votes.repository';
 
 @Injectable()
 export class VotesService {
@@ -13,5 +17,14 @@ export class VotesService {
     } catch (error) {
       throw new CustomException(VotesException.ALREADY_VOTED);
     }
+  }
+}
+
+@Injectable()
+export class CommentsService {
+  constructor(private readonly commentsRepository: CommentsRepository) {}
+
+  async createVoteComment(data: CreateVoteCommentDto) {
+    return await this.commentsRepository.createVoteComment(data);
   }
 }
