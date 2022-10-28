@@ -34,14 +34,16 @@ export class VotesController {
     return { votes: await this.votesRepository.getAllVotes() };
   }
 
-  @Get(':id')
-  async getVote(@Param('id', ParseIntPipe) voteId: number): Promise<GetVote> {
+  @Get(':voteId')
+  async getVote(
+    @Param('voteId', ParseIntPipe) voteId: number,
+  ): Promise<GetVote> {
     return { vote: await this.votesRepository.getVoteById(voteId) };
   }
 
-  @Post(':id/choice/vote')
+  @Post(':voteId/choice/vote')
   async choiceVote(
-    @Param('id', ParseIntPipe) votedId: number,
+    @Param('voteId', ParseIntPipe) votedId: number,
     @Body('choicedId') choicedVoteId: number,
   ) {
     const userId = 2; // 임시
@@ -57,27 +59,27 @@ export class VotesController {
     return await this.votesService.choiceVote(data);
   }
 
-  @Get(':id/voted-users')
+  @Get(':voteId/voted-users')
   async getVotedUsers(@Param('id', ParseIntPipe) voteId: number) {
     return this.votesRepository.getVotedUsers(voteId);
   }
 }
 
-@Controller('votes/:id')
+@Controller('votes/:voteId/comments')
 export class CommentsController {
   constructor(
     private readonly commentsService: CommentsService,
     private readonly commentsRepository: CommentsRepository,
   ) {}
 
-  @Get('comments')
-  async getVoteComments(@Param('id', ParseIntPipe) voteId: number) {
+  @Get()
+  async getVoteComments(@Param('voteId', ParseIntPipe) voteId: number) {
     return await this.commentsRepository.getAllVotes(voteId);
   }
 
-  @Post('comments')
+  @Post()
   async createVoteComment(
-    @Param('id', ParseIntPipe) voteId: number,
+    @Param('voteId', ParseIntPipe) voteId: number,
     @Body('content') content: string,
   ) {
     const userId = 1; //임시
