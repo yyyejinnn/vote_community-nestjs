@@ -78,7 +78,7 @@ model VotedUsers {
 }
 
 model VoteLikes {
-    isCliked  Boolean
+    isClicked Boolean  @default(false)
     vote      Votes    @relation(name: "VoteLikesToVotes", fields: [voteId], references: [id])
     voteId    Int
     user      Users    @relation(name: "UsersToVoteLikes", fields: [userId], references: [id])
@@ -105,7 +105,7 @@ model VoteComments {
 }
 
 model VoteCommentLikes {
-    isCliked      Boolean
+    isClicked     Boolean      @default(false)
     voteComment   VoteComments @relation(name: "VoteCommentLikesToVoteComments", fields: [voteCommentId], references: [id])
     voteCommentId Int
     user          Users        @relation(name: "UsersToVoteCommentLikes", fields: [userId], references: [id])
