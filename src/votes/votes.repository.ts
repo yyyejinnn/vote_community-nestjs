@@ -4,7 +4,7 @@ import {
   CreateVoteCommentDto,
   CreateVoteDto,
   CreateVotedUserDto,
-  LikeVoteDto,
+  LikesVoteDto,
 } from '@vote/common';
 
 @Injectable()
@@ -99,7 +99,7 @@ export class VotesRepository {
     });
   }
 
-  async createLikedUser(data: LikeVoteDto) {
+  async createLikedUser(data: LikesVoteDto) {
     await this.prisma.votes.update({
       where: {
         id: data.voteId,
@@ -107,6 +107,21 @@ export class VotesRepository {
       data: {
         likedUsers: {
           connect: {
+            id: data.userId,
+          },
+        },
+      },
+    });
+  }
+
+  async deleteLikedUser(data: LikesVoteDto) {
+    await this.prisma.votes.update({
+      where: {
+        id: data.voteId,
+      },
+      data: {
+        likedUsers: {
+          disconnect: {
             id: data.userId,
           },
         },
