@@ -11,7 +11,7 @@ import {
   CreateVoteDto,
   CreateVotedUserDto,
   GetVote,
-  LikeVoteDto,
+  LikesVoteDto,
   ListVotes,
 } from '@vote/common';
 import { CommentsRepository, VotesRepository } from './votes.repository';
@@ -64,7 +64,7 @@ export class VotesController {
   async likeVote(@Param('voteId', ParseIntPipe) voteId: number) {
     const userId = 1;
 
-    const data: LikeVoteDto = {
+    const data: LikesVoteDto = {
       voteId,
       userId,
     };
