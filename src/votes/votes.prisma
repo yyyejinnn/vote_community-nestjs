@@ -1,14 +1,14 @@
 model Votes {
-    id        Int      @id @default(autoincrement())
-    title     String
-    user      Users    @relation(fields: [userId], references: [id])
-    userId    Int
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    id         Int      @id @default(autoincrement())
+    title      String
+    writer     Users    @relation("VoteWriter", fields: [writerId], references: [id])
+    writerId   Int
+    likedUsers Users[]  @relation("LikedVoteUsers")
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
 
     voteChoices  VoteChoices[]
     votedUsers   VotedUsers[]
-    VoteLikes    VoteLikes[]
     VoteComments VoteComments[]
 
     @@map("votes")
@@ -41,19 +41,6 @@ model VotedUsers {
     @@map("voted-users")
 }
 
-model VoteLikes {
-    isClicked Boolean  @default(false)
-    vote      Votes    @relation(fields: [voteId], references: [id])
-    voteId    Int
-    user      Users    @relation(fields: [userId], references: [id])
-    userId    Int
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-
-    @@id([userId, voteId])
-    @@map("vote-likes")
-}
-
 model VoteComments {
     id               Int                @id @default(autoincrement())
     content          String
@@ -82,12 +69,14 @@ model VoteCommentLikes {
 }
 
 model Users {
-    id               Int                @id @default(autoincrement())
-    votes            Votes[]
-    votedUsers       VotedUsers[]
+    id         Int          @id @default(autoincrement())
+    votedUsers VotedUsers[]
+
     VoteComments     VoteComments[]
-    VoteLikes        VoteLikes[]
     VoteCommentLikes VoteCommentLikes[]
+
+    writtenVotes Votes[] @relation("VoteWriter")
+    likedVotes   Votes[] @relation("LikedVoteUsers")
 
     @@map("users")
 }

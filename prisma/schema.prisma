@@ -17,11 +17,11 @@ model Users {
     refreshToken     RefreshTokens?     @relation(name: "RefreshTokensToUsers")
     createdAt        DateTime           @default(now())
     updatedAt        DateTime           @updatedAt
-    votes            Votes[]            @relation(name: "UsersToVotes")
     votedUsers       VotedUsers[]       @relation(name: "UsersToVotedUsers")
     VoteComments     VoteComments[]     @relation(name: "UsersToVoteComments")
-    VoteLikes        VoteLikes[]        @relation(name: "UsersToVoteLikes")
     VoteCommentLikes VoteCommentLikes[] @relation(name: "UsersToVoteCommentLikes")
+    writtenVotes     Votes[]            @relation(name: "VoteWriter")
+    likedVotes       Votes[]            @relation(name: "LikedVoteUsers")
 
     @@map("users")
 }
@@ -39,13 +39,13 @@ model RefreshTokens {
 model Votes {
     id           Int            @id @default(autoincrement())
     title        String
-    user         Users          @relation(name: "UsersToVotes", fields: [userId], references: [id])
-    userId       Int
+    writer       Users          @relation(name: "VoteWriter", fields: [writerId], references: [id])
+    writerId     Int
+    likedUsers   Users[]        @relation(name: "LikedVoteUsers")
     createdAt    DateTime       @default(now())
     updatedAt    DateTime       @updatedAt
     voteChoices  VoteChoices[]  @relation(name: "VoteChoicesToVotes")
     votedUsers   VotedUsers[]   @relation(name: "VotedUsersToVotes")
-    VoteLikes    VoteLikes[]    @relation(name: "VoteLikesToVotes")
     VoteComments VoteComments[] @relation(name: "VoteCommentsToVotes")
 
     @@map("votes")
@@ -75,19 +75,6 @@ model VotedUsers {
 
     @@id([userId, voteChoiceId])
     @@map("voted-users")
-}
-
-model VoteLikes {
-    isClicked Boolean  @default(false)
-    vote      Votes    @relation(name: "VoteLikesToVotes", fields: [voteId], references: [id])
-    voteId    Int
-    user      Users    @relation(name: "UsersToVoteLikes", fields: [userId], references: [id])
-    userId    Int
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-
-    @@id([userId, voteId])
-    @@map("vote-likes")
 }
 
 model VoteComments {
