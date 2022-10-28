@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import {
   CreateVoteCommentDto,
   CreateVotedUserDto,
+  LikeVoteDto,
   VotesException,
 } from '@vote/common';
 import { CustomException } from '@vote/middleware';
@@ -17,6 +18,11 @@ export class VotesService {
     } catch (error) {
       throw new CustomException(VotesException.ALREADY_VOTED);
     }
+  }
+
+  async likeVote(data: LikeVoteDto) {
+    await this.votesRepository.createLikedUser(data);
+    return;
   }
 }
 

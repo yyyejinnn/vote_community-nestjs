@@ -25,3 +25,8 @@ export class CreateVoteCommentDto {
   userId: number;
   content: string;
 }
+
+export class LikeVoteDto {
+  voteId: number;
+  userId: number;
+}

@@ -11,6 +11,7 @@ import {
   CreateVoteDto,
   CreateVotedUserDto,
   GetVote,
+  LikeVoteDto,
   ListVotes,
 } from '@vote/common';
 import { CommentsRepository, VotesRepository } from './votes.repository';
@@ -57,6 +58,20 @@ export class VotesController {
     };
 
     return await this.votesService.choiceVote(data);
+  }
+
+  @Post(':voteId/like')
+  async likeVote(@Param('voteId', ParseIntPipe) voteId: number) {
+    const userId = 1;
+
+    const data: LikeVoteDto = {
+      voteId,
+      userId,
+    };
+
+    const t = await this.votesService.likeVote(data);
+    console.log(t);
+    return;
   }
 
   @Get(':voteId/voted-users')
