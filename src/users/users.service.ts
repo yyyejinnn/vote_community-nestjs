@@ -76,14 +76,15 @@ export class UsersService {
   }
 
   async recreateAccessToken(
-    refreshToken: string,
+    userId: number,
+    encryptRefreshToken: string,
   ): Promise<RecreateAccessToken> {
-    if (!refreshToken) {
+    if (!encryptRefreshToken) {
       throw new CustomException(UsersException.TOKEN_NOT_EXISTS);
     }
 
     const verifiedUser: VerifiedToken =
-      await this.tokenService.verifyRefreshToken(refreshToken);
+      await this.tokenService.verifyRefreshToken(userId, encryptRefreshToken);
 
     const payload: JwtPayload = {
       sub: verifiedUser.sub,
@@ -152,13 +153,16 @@ class TokenService {
   }
 
   async verifyRefreshToken(
+    userId: number,
     encryptRefreshToken: string,
   ): Promise<VerifiedToken> {
     let verifiedToken: VerifiedToken;
 
-    const token: RefreshTokens = await this.usersRepository.findRefreshToken(
-      encryptRefreshToken,
-    );
+    const token: RefreshTokens =
+      await this.usersRepository.findMatchedRefreshToken(
+        userId,
+        encryptRefreshToken,
+      );
 
     if (!token) {
       throw new CustomException(UsersException.UNVERIFIED_REFRESH_TOKEN);

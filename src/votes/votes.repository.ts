@@ -4,6 +4,7 @@ import {
   CreateVoteCommentDto,
   CreateVoteDto,
   CreateVotedUserDto,
+  LikesVoteDto,
 } from '@vote/common';
 
 @Injectable()
@@ -14,11 +15,7 @@ export class VotesRepository {
     await this.prisma.votes.create({
       data: {
         title: data.title,
-        user: {
-          connect: {
-            id: data.userId,
-          },
-        },
+        writerId: data.userId,
         voteChoices: {
           create: data.voteChoices.map((value) => ({ title: value })),
         },
@@ -73,21 +70,9 @@ export class VotesRepository {
   async createVotedUser(data: CreateVotedUserDto) {
     return await this.prisma.votedUsers.create({
       data: {
-        vote: {
-          connect: {
-            id: data.votedId,
-          },
-        },
-        user: {
-          connect: {
-            id: data.userId,
-          },
-        },
-        voteChoice: {
-          connect: {
-            id: data.choicedVoteId,
-          },
-        },
+        voteId: data.votedId,
+        userId: data.userId,
+        voteChoiceId: data.choicedVoteId,
       },
     });
   }
@@ -109,7 +94,37 @@ export class VotesRepository {
   async getAllVotesByUserId(userId: number): Promise<Votes[]> {
     return await this.prisma.votes.findMany({
       where: {
-        userId,
+        writerId: userId,
+      },
+    });
+  }
+
+  async createLikedUser(data: LikesVoteDto) {
+    await this.prisma.votes.update({
+      where: {
+        id: data.voteId,
+      },
+      data: {
+        likedUsers: {
+          connect: {
+            id: data.userId,
+          },
+        },
+      },
+    });
+  }
+
+  async deleteLikedUser(data: LikesVoteDto) {
+    await this.prisma.votes.update({
+      where: {
+        id: data.voteId,
+      },
+      data: {
+        likedUsers: {
+          disconnect: {
+            id: data.userId,
+          },
+        },
       },
     });
   }

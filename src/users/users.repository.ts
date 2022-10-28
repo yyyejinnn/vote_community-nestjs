@@ -44,10 +44,14 @@ export class UsersRepository {
     }
   }
 
-  async findRefreshToken(refreshToken: string): Promise<RefreshTokens> {
+  async findMatchedRefreshToken(
+    userId: number,
+    encryptRefreshToken: string,
+  ): Promise<RefreshTokens> {
     return await this.prisma.refreshTokens.findFirst({
       where: {
-        token: refreshToken,
+        userId: userId,
+        token: encryptRefreshToken,
       },
     });
   }

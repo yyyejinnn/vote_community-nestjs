@@ -1,4 +1,11 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  ParseIntPipe,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import {
   GetUserCreatedVotes,
   GetUserProfile,
@@ -10,6 +17,7 @@ import {
   WhereOptionByUserId,
 } from '@vote/common';
 import { VotesRepository } from 'src/votes/votes.repository';
+import { CurrUser } from './jwt/auth.decorator';
 import { JwtAccessGuard } from './jwt/jwt.guard';
 import { UsersRepository } from './users.repository';
 import { UsersService } from './users.service';
@@ -50,9 +58,13 @@ export class UsersController {
   @UseGuards(JwtAccessGuard)
   @Post('recreate/access-token')
   async recreateAccessToken(
-    @Body('refreshToken') refreshToken: string,
+    @CurrUser('id', ParseIntPipe) userId: number,
+    @Body('refreshToken') encryptRefreshToken: string,
   ): Promise<RecreateAccessToken> {
-    return await this.usersService.recreateAccessToken(refreshToken);
+    return await this.usersService.recreateAccessToken(
+      userId,
+      encryptRefreshToken,
+    );
   }
 
   @UseGuards(JwtAccessGuard)
