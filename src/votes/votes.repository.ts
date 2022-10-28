@@ -15,11 +15,7 @@ export class VotesRepository {
     await this.prisma.votes.create({
       data: {
         title: data.title,
-        user: {
-          connect: {
-            id: data.userId,
-          },
-        },
+        writerId: data.userId,
         voteChoices: {
           create: data.voteChoices.map((value) => ({ title: value })),
         },
@@ -74,21 +70,9 @@ export class VotesRepository {
   async createVotedUser(data: CreateVotedUserDto) {
     return await this.prisma.votedUsers.create({
       data: {
-        vote: {
-          connect: {
-            id: data.votedId,
-          },
-        },
-        user: {
-          connect: {
-            id: data.userId,
-          },
-        },
-        voteChoice: {
-          connect: {
-            id: data.choicedVoteId,
-          },
-        },
+        voteId: data.votedId,
+        userId: data.userId,
+        voteChoiceId: data.choicedVoteId,
       },
     });
   }
