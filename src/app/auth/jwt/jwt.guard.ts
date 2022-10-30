@@ -1,8 +1,7 @@
 import { ExecutionContext, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { AuthGuard } from '@nestjs/passport';
-import { UsersException } from '@vote/common';
-import { CustomException } from 'src/common/middleware/http-exception.filter';
+import { CustomException, UsersException } from '@vote/middleware';
 
 @Injectable()
 export class JwtAccessGuard extends AuthGuard('jwt-access-token') {

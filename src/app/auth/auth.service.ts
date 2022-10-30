@@ -11,18 +11,17 @@ import {
   VerifiedToken,
   WhereOptionByUserEmail,
   WhereOptionByUserNickName,
-  UsersException,
 } from '@vote/common';
-import { CustomException } from '@vote/middleware';
-import { UsersRepository } from './users.repository';
+import { CustomException, UsersException } from '@vote/middleware';
 
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
+import { UsersRepository } from '../users/users.repository';
 
 type ValidatePasswordType = 'signUp' | 'signIn';
 
 @Injectable()
-export class UsersService {
+export class AuthService {
   private readonly tokenService: TokenService;
 
   constructor(private readonly usersRepository: UsersRepository) {
@@ -144,10 +143,10 @@ class TokenService {
     });
     const encryptRefreshToken: string = this._encryptRefreshToken(refreshToken);
 
-    await this.usersRepository.createRefreshToken(
-      payload.sub,
-      encryptRefreshToken,
-    );
+    // await this.usersRepository.createRefreshToken(
+    //   payload.sub,
+    //   encryptRefreshToken,
+    // );
 
     return encryptRefreshToken;
   }

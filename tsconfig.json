@@ -19,7 +19,7 @@
     "noFallthroughCasesInSwitch": false,
     "paths": {
       "@vote/common": ["src/common"],
-      "@vote/middleware": ["src/common/middleware"]
+      "@vote/middleware": ["src/middleware"]
     }
   }
 }

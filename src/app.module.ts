@@ -1,15 +1,14 @@
 import { Module } from '@nestjs/common';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
+import { HttpExceptionFilter, ResponseInterceptor } from './middleware';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { HttpExceptionFilter } from './common/middleware/http-exception.filter';
-import { ResponseInterceptor } from './common/middleware/http-response.interceptor';
-import { UsersModule } from './users/users.module';
-import { VotesService } from './votes/votes.service';
-import { VotesModule } from './votes/votes.module';
+import { UsersModule } from './app/users/users.module';
+import { AuthModule } from './app/auth/auth.module';
+import { VotesModule } from './app/votes/votes.module';
 
 @Module({
-  imports: [UsersModule, VotesModule],
+  imports: [UsersModule, AuthModule, VotesModule],
   controllers: [AppController],
   providers: [
     AppService,

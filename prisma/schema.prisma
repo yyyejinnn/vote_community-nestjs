@@ -14,9 +14,9 @@ model Users {
     email            String             @unique
     password         String
     nickname         String
-    refreshToken     RefreshTokens?     @relation(name: "RefreshTokensToUsers")
     createdAt        DateTime           @default(now())
     updatedAt        DateTime           @updatedAt
+    refreshToken     RefreshTokens?     @relation(name: "RefreshTokensToUsers")
     votedUsers       VotedUsers[]       @relation(name: "UsersToVotedUsers")
     VoteComments     VoteComments[]     @relation(name: "UsersToVoteComments")
     VoteCommentLikes VoteCommentLikes[] @relation(name: "UsersToVoteCommentLikes")
