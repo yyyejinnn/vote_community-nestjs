@@ -13,10 +13,10 @@ import {
   WhereOptionByUserNickName,
 } from '@vote/common';
 import { CustomException, UsersException } from '@vote/middleware';
-import { UsersRepository } from 'src/users/users.repository';
 
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
+import { UsersRepository } from '../users/users.repository';
 
 type ValidatePasswordType = 'signUp' | 'signIn';
 

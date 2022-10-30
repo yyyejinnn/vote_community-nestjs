@@ -3,9 +3,9 @@ import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { HttpExceptionFilter, ResponseInterceptor } from './middleware';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UsersModule } from './users/users.module';
-import { VotesModule } from './votes/votes.module';
-import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './app/users/users.module';
+import { AuthModule } from './app/auth/auth.module';
+import { VotesModule } from './app/votes/votes.module';
 
 @Module({
   imports: [UsersModule, AuthModule, VotesModule],

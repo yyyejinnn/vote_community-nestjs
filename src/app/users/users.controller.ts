@@ -4,7 +4,7 @@ import {
   GetUserProfile,
   WhereOptionByUserId,
 } from '@vote/common';
-import { VotesRepository } from 'src/votes/votes.repository';
+import { VotesRepository } from '../votes/votes.repository';
 import { UsersRepository } from './users.repository';
 import { UsersService } from './users.service';
 

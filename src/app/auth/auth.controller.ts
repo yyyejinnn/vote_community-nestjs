@@ -13,8 +13,8 @@ import {
   SignUp,
   SignUpUserDto,
 } from '@vote/common';
-import { CurrUser } from 'src/users/jwt/auth.decorator';
-import { JwtAccessGuard } from 'src/users/jwt/jwt.guard';
+import { CurrUser } from 'src/app/users/jwt/auth.decorator';
+import { JwtAccessGuard } from '../users/jwt/jwt.guard';
 import { AuthService } from './auth.service';
 
 @Controller('auth')
