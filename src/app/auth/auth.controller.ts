@@ -7,13 +7,13 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import {
+  CurrUser,
   RecreateAccessToken,
   SignIn,
   SignInUserDto,
   SignUp,
   SignUpUserDto,
 } from '@vote/common';
-import { CurrUser } from 'src/app/users/jwt/auth.decorator';
 import { JwtAccessGuard } from '../users/jwt/jwt.guard';
 import { AuthService } from './auth.service';
 
