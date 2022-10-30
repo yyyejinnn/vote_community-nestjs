@@ -14,8 +14,8 @@ import {
   SignUp,
   SignUpUserDto,
 } from '@vote/common';
-import { JwtAccessGuard } from '../users/jwt/jwt.guard';
 import { AuthService } from './auth.service';
+import { JwtAccessGuard } from './jwt/jwt.guard';
 
 @Controller('auth')
 export class AuthController {

@@ -143,10 +143,10 @@ class TokenService {
     });
     const encryptRefreshToken: string = this._encryptRefreshToken(refreshToken);
 
-    await this.usersRepository.createRefreshToken(
-      payload.sub,
-      encryptRefreshToken,
-    );
+    // await this.usersRepository.createRefreshToken(
+    //   payload.sub,
+    //   encryptRefreshToken,
+    // );
 
     return encryptRefreshToken;
   }
