@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaClient, RefreshTokens, Users } from '@prisma/client';
-import { SignUpUserDto, UsersException, WhereOption } from '@vote/common';
-import { CustomException } from '@vote/middleware';
+import { SignUpUserDto, WhereOption } from '@vote/common';
 import * as bcrypt from 'bcrypt';
+import { CustomException, UsersException } from '@vote/middleware';
 
 @Injectable()
 export class UsersRepository {

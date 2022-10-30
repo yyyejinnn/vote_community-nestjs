@@ -11,9 +11,8 @@ import {
   VerifiedToken,
   WhereOptionByUserEmail,
   WhereOptionByUserNickName,
-  UsersException,
 } from '@vote/common';
-import { CustomException } from '@vote/middleware';
+import { CustomException, UsersException } from '@vote/middleware';
 import { UsersRepository } from './users.repository';
 
 import * as bcrypt from 'bcrypt';

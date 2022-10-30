@@ -1,14 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Users } from '@prisma/client';
-import { UsersException } from '@vote/common';
+import { JwtPayload, WhereOptionByUserId } from '@vote/common';
+import { CustomException, UsersException } from '@vote/middleware';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-
-import {
-  JwtPayload,
-  WhereOptionByUserId,
-} from 'src/common/interface/users.interface';
-import { CustomException } from 'src/common/middleware/http-exception.filter';
 import { UsersRepository } from '../users.repository';
 
 @Injectable()
