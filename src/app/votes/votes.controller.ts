@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
@@ -69,9 +70,19 @@ export class VotesController {
       userId,
     };
 
-    const t = await this.votesService.likeVote(data);
-    console.log(t);
-    return;
+    await this.votesService.likeVote(data);
+  }
+
+  @Post(':voteId/cancle/likes')
+  async cancleLikedVote(@Param('voteId', ParseIntPipe) voteId: number) {
+    const userId = 1;
+
+    const data: LikesVoteDto = {
+      voteId,
+      userId,
+    };
+
+    await this.votesService.cancleLikedVote(data);
   }
 
   @Get(':voteId/voted-users')

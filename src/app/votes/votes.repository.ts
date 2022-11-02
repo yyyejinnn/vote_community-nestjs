@@ -100,7 +100,7 @@ export class VotesRepository {
   }
 
   async createLikedUser(data: LikesVoteDto) {
-    await this.prisma.votes.update({
+    return await this.prisma.votes.update({
       where: {
         id: data.voteId,
       },
@@ -115,7 +115,7 @@ export class VotesRepository {
   }
 
   async deleteLikedUser(data: LikesVoteDto) {
-    await this.prisma.votes.update({
+    return await this.prisma.votes.update({
       where: {
         id: data.voteId,
       },
