@@ -42,41 +42,26 @@ model VotedUsers {
 }
 
 model VoteComments {
-    id               Int                @id @default(autoincrement())
-    content          String
-    user             Users              @relation(fields: [userId], references: [id])
-    userId           Int
-    vote             Votes              @relation(fields: [voteId], references: [id])
-    voteId           Int
-    createdAt        DateTime           @default(now())
-    updatedAt        DateTime           @updatedAt
-    VoteCommentLikes VoteCommentLikes[]
+    id         Int      @id @default(autoincrement())
+    content    String
+    writer     Users    @relation("VoteCommentWriter", fields: [writerId], references: [id])
+    writerId   Int
+    vote       Votes    @relation(fields: [voteId], references: [id])
+    voteId     Int
+    likedUsers Users[]  @relation(name: "LikedVoteCommentUsers")
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
 
     @@map("vote-comments")
 }
 
-model VoteCommentLikes {
-    isClicked     Boolean      @default(false)
-    voteComment   VoteComments @relation(fields: [voteCommentId], references: [id])
-    voteCommentId Int
-    user          Users        @relation(fields: [userId], references: [id])
-    userId        Int
-    createdAt     DateTime     @default(now())
-    updatedAt     DateTime     @updatedAt
-
-    @@id([userId, voteCommentId])
-    @@map("vote-comments-likes")
-}
-
 model Users {
-    id         Int          @id @default(autoincrement())
-    votedUsers VotedUsers[]
-
-    VoteComments     VoteComments[]
-    VoteCommentLikes VoteCommentLikes[]
-
-    writtenVotes Votes[] @relation("VoteWriter")
-    likedVotes   Votes[] @relation("LikedVoteUsers")
+    id                  Int            @id @default(autoincrement())
+    votedUsers          VotedUsers[]
+    writtenVotes        Votes[]        @relation("VoteWriter")
+    likedVotes          Votes[]        @relation("LikedVoteUsers")
+    writtenVoteComments VoteComments[] @relation("VoteCommentWriter")
+    likedVoteComments   VoteComments[] @relation(name: "LikedVoteCommentUsers")
 
     @@map("users")
 }
