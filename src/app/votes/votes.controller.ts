@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
@@ -11,6 +12,7 @@ import {
   CreateVoteDto,
   CreateVotedUserDto,
   GetVote,
+  LikesVoteCommentDto,
   LikesVoteDto,
   ListVotes,
 } from '@vote/common';
@@ -69,9 +71,19 @@ export class VotesController {
       userId,
     };
 
-    const t = await this.votesService.likeVote(data);
-    console.log(t);
-    return;
+    await this.votesService.likeVote(data);
+  }
+
+  @Post(':voteId/cancle/likes')
+  async cancleLikedVote(@Param('voteId', ParseIntPipe) voteId: number) {
+    const userId = 1;
+
+    const data: LikesVoteDto = {
+      voteId,
+      userId,
+    };
+
+    await this.votesService.cancleLikedVote(data);
   }
 
   @Get(':voteId/voted-users')
@@ -89,7 +101,7 @@ export class CommentsController {
 
   @Get()
   async getVoteComments(@Param('voteId', ParseIntPipe) voteId: number) {
-    return await this.commentsRepository.getAllVotes(voteId);
+    return await this.commentsRepository.getAllVoteComments(voteId);
   }
 
   @Post()
@@ -106,5 +118,31 @@ export class CommentsController {
     };
 
     return await this.commentsService.createVoteComment(data);
+  }
+
+  @Post(':commentId/like')
+  async likeVoteComment(@Param('commentId', ParseIntPipe) commentId: number) {
+    const userId = 1;
+
+    const data: LikesVoteCommentDto = {
+      commentId,
+      userId,
+    };
+
+    await this.commentsService.likeVoteComment(data);
+  }
+
+  @Post(':commentId/cancle/likes')
+  async cancleLikedVoteComment(
+    @Param('voteId', ParseIntPipe) commentId: number,
+  ) {
+    const userId = 1;
+
+    const data: LikesVoteCommentDto = {
+      commentId,
+      userId,
+    };
+
+    await this.commentsService.cancleLikedVoteComment(data);
   }
 }

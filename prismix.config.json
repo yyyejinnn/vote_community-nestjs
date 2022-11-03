@@ -3,9 +3,9 @@
     {
       "input": [
         "prisma/base.prisma",
-        "./src/users/users.prisma",
-        "./src/auth/auth.prisma",
-        "./src/votes/votes.prisma"
+        "./src/app/users/users.prisma",
+        "./src/app/auth/auth.prisma",
+        "./src/app/votes/votes.prisma"
       ],
       "output": "prisma/schema.prisma"
     }

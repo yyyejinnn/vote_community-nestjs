@@ -55,4 +55,9 @@ export class VotesException {
     code: '10001',
     message: '이미 투표 했습니다.',
   };
+
+  static EMPTY_COMMENT_CONTENT: ExceptionObj = {
+    code: '10002',
+    message: '댓글 내용이 없습니다.',
+  };
 }

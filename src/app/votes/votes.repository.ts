@@ -4,6 +4,7 @@ import {
   CreateVoteCommentDto,
   CreateVoteDto,
   CreateVotedUserDto,
+  LikesVoteCommentDto,
   LikesVoteDto,
 } from '@vote/common';
 
@@ -34,8 +35,8 @@ export class VotesRepository {
         },
         _count: {
           select: {
-            // 좋아요 수
             votedUsers: true,
+            likedUsers: true,
           },
         },
       },
@@ -59,8 +60,8 @@ export class VotesRepository {
         },
         _count: {
           select: {
-            // 좋아요 수
             votedUsers: true,
+            likedUsers: true,
           },
         },
       },
@@ -100,7 +101,7 @@ export class VotesRepository {
   }
 
   async createLikedUser(data: LikesVoteDto) {
-    await this.prisma.votes.update({
+    return await this.prisma.votes.update({
       where: {
         id: data.voteId,
       },
@@ -115,7 +116,7 @@ export class VotesRepository {
   }
 
   async deleteLikedUser(data: LikesVoteDto) {
-    await this.prisma.votes.update({
+    return await this.prisma.votes.update({
       where: {
         id: data.voteId,
       },
@@ -134,10 +135,17 @@ export class VotesRepository {
 export class CommentsRepository {
   private readonly prisma = new PrismaClient();
 
-  async getAllVotes(voteId: number): Promise<VoteComments[]> {
+  async getAllVoteComments(voteId: number): Promise<VoteComments[]> {
     return await this.prisma.voteComments.findMany({
       where: {
         voteId,
+      },
+      include: {
+        _count: {
+          select: {
+            likedUsers: true,
+          },
+        },
       },
     });
   }
@@ -146,13 +154,35 @@ export class CommentsRepository {
     return await this.prisma.voteComments.create({
       data: {
         content: data.content,
-        vote: {
+        voteId: data.voteId,
+        writerId: data.userId,
+      },
+    });
+  }
+
+  async createLikedUser(data: LikesVoteCommentDto) {
+    return await this.prisma.voteComments.update({
+      where: {
+        id: data.commentId,
+      },
+      data: {
+        likedUsers: {
           connect: {
-            id: data.voteId,
+            id: data.userId,
           },
         },
-        user: {
-          connect: {
+      },
+    });
+  }
+
+  async deleteLikedUser(data: LikesVoteCommentDto) {
+    return await this.prisma.voteComments.update({
+      where: {
+        id: data.commentId,
+      },
+      data: {
+        likedUsers: {
+          disconnect: {
             id: data.userId,
           },
         },
