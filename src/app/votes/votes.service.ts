@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import {
   CreateVoteCommentDto,
   CreateVotedUserDto,
+  LikesVoteCommentDto,
   LikesVoteDto,
 } from '@vote/common';
 import { CustomException, VotesException } from '@vote/middleware';
@@ -33,6 +34,9 @@ export class CommentsService {
   constructor(private readonly commentsRepository: CommentsRepository) {}
 
   async createVoteComment(data: CreateVoteCommentDto) {
+    if (data.content === '') {
+      throw new CustomException(VotesException.EMPTY_COMMENT_CONTENT);
+    }
     return await this.commentsRepository.createVoteComment(data);
   }
 
