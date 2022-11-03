@@ -1,10 +1,11 @@
 import { Controller, Get } from '@nestjs/common';
 import {
-  GetUserCreatedVotes,
   GetUserProfile,
+  GetUserWrittenComments,
+  GetUserWrittenVotes,
   WhereOptionByUserId,
 } from '@vote/common';
-import { VotesRepository } from '../votes/votes.repository';
+import { CommentsRepository, VotesRepository } from '../votes/votes.repository';
 import { UsersRepository } from './users.repository';
 import { UsersService } from './users.service';
 
@@ -13,7 +14,8 @@ export class UsersController {
   constructor(
     private readonly usersService: UsersService,
     private readonly usersRepository: UsersRepository,
-    private readonly voteRepository: VotesRepository,
+    private readonly votesRepository: VotesRepository,
+    private readonly commentsRepository: CommentsRepository,
   ) {}
 
   @Get('profile')
@@ -25,9 +27,17 @@ export class UsersController {
     };
   }
 
-  @Get('created-votes')
-  async getUserCreatedVotes(): Promise<GetUserCreatedVotes> {
+  @Get('written-votes')
+  async getWrittenVotes(): Promise<GetUserWrittenVotes> {
     const userId = 1; //임시
-    return { votes: await this.voteRepository.getAllVotesByUserId(userId) };
+    return { votes: await this.votesRepository.getAllVotesByUserId(userId) };
+  }
+
+  @Get('written-comments')
+  async getWrittenComments(): Promise<GetUserWrittenComments> {
+    const userId = 1;
+    return {
+      comments: await this.commentsRepository.getAllCommentsByUserId(userId),
+    };
   }
 }

@@ -13,6 +13,6 @@ import { CommentsService, VotesService } from './votes.service';
     CommentsService,
     CommentsRepository,
   ],
-  exports: [VotesRepository],
+  exports: [VotesRepository, CommentsRepository],
 })
 export class VotesModule {}

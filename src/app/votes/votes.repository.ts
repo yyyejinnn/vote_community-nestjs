@@ -150,6 +150,14 @@ export class CommentsRepository {
     });
   }
 
+  async getAllCommentsByUserId(userId: number): Promise<VoteComments[]> {
+    return await this.prisma.voteComments.findMany({
+      where: {
+        writerId: userId,
+      },
+    });
+  }
+
   async createVoteComment(data: CreateVoteCommentDto) {
     return await this.prisma.voteComments.create({
       data: {
