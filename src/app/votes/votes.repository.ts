@@ -35,8 +35,8 @@ export class VotesRepository {
         },
         _count: {
           select: {
-            // 좋아요 수
             votedUsers: true,
+            likedUsers: true,
           },
         },
       },
@@ -60,8 +60,8 @@ export class VotesRepository {
         },
         _count: {
           select: {
-            // 좋아요 수
             votedUsers: true,
+            likedUsers: true,
           },
         },
       },
@@ -135,10 +135,17 @@ export class VotesRepository {
 export class CommentsRepository {
   private readonly prisma = new PrismaClient();
 
-  async getAllVotes(voteId: number): Promise<VoteComments[]> {
+  async getAllVoteComments(voteId: number): Promise<VoteComments[]> {
     return await this.prisma.voteComments.findMany({
       where: {
         voteId,
+      },
+      include: {
+        _count: {
+          select: {
+            likedUsers: true,
+          },
+        },
       },
     });
   }

@@ -101,7 +101,7 @@ export class CommentsController {
 
   @Get()
   async getVoteComments(@Param('voteId', ParseIntPipe) voteId: number) {
-    return await this.commentsRepository.getAllVotes(voteId);
+    return await this.commentsRepository.getAllVoteComments(voteId);
   }
 
   @Post()
