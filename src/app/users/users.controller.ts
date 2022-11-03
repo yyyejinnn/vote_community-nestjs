@@ -40,4 +40,20 @@ export class UsersController {
       comments: await this.commentsRepository.getAllCommentsByUserId(userId),
     };
   }
+
+  @Get('liked-votes')
+  async getLikedVotes() {
+    const userId = 1;
+    return {
+      votes: await this.votesRepository.getAllVotesByUserId(userId),
+    };
+  }
+
+  @Get('liked-comments')
+  async getLikedComments() {
+    const userId = 1;
+    return {
+      comments: await this.commentsRepository.getLikedCommentsByUserId(userId),
+    };
+  }
 }
