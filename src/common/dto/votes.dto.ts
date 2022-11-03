@@ -30,3 +30,8 @@ export class LikesVoteDto {
   voteId: number;
   userId: number;
 }
+
+export class LikesVoteCommentDto {
+  commentId: number;
+  userId: number;
+}

@@ -4,6 +4,7 @@ import {
   CreateVoteCommentDto,
   CreateVoteDto,
   CreateVotedUserDto,
+  LikesVoteCommentDto,
   LikesVoteDto,
 } from '@vote/common';
 
@@ -146,13 +147,35 @@ export class CommentsRepository {
     return await this.prisma.voteComments.create({
       data: {
         content: data.content,
-        vote: {
+        voteId: data.voteId,
+        writerId: data.userId,
+      },
+    });
+  }
+
+  async createLikedUser(data: LikesVoteCommentDto) {
+    return await this.prisma.voteComments.update({
+      where: {
+        id: data.commentId,
+      },
+      data: {
+        likedUsers: {
           connect: {
-            id: data.voteId,
+            id: data.userId,
           },
         },
-        user: {
-          connect: {
+      },
+    });
+  }
+
+  async deleteLikedUser(data: LikesVoteCommentDto) {
+    return await this.prisma.voteComments.update({
+      where: {
+        id: data.commentId,
+      },
+      data: {
+        likedUsers: {
+          disconnect: {
             id: data.userId,
           },
         },

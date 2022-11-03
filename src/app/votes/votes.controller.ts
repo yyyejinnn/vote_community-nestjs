@@ -12,6 +12,7 @@ import {
   CreateVoteDto,
   CreateVotedUserDto,
   GetVote,
+  LikesVoteCommentDto,
   LikesVoteDto,
   ListVotes,
 } from '@vote/common';
@@ -117,5 +118,31 @@ export class CommentsController {
     };
 
     return await this.commentsService.createVoteComment(data);
+  }
+
+  @Post(':commentId/like')
+  async likeVoteComment(@Param('commentId', ParseIntPipe) commentId: number) {
+    const userId = 1;
+
+    const data: LikesVoteCommentDto = {
+      commentId,
+      userId,
+    };
+
+    await this.commentsService.likeVoteComment(data);
+  }
+
+  @Post(':commentId/cancle/likes')
+  async cancleLikedVoteComment(
+    @Param('voteId', ParseIntPipe) commentId: number,
+  ) {
+    const userId = 1;
+
+    const data: LikesVoteCommentDto = {
+      commentId,
+      userId,
+    };
+
+    await this.commentsService.cancleLikedVoteComment(data);
   }
 }

@@ -35,4 +35,12 @@ export class CommentsService {
   async createVoteComment(data: CreateVoteCommentDto) {
     return await this.commentsRepository.createVoteComment(data);
   }
+
+  async likeVoteComment(data: LikesVoteCommentDto) {
+    await this.commentsRepository.createLikedUser(data);
+  }
+
+  async cancleLikedVoteComment(data: LikesVoteCommentDto) {
+    await this.commentsRepository.deleteLikedUser(data);
+  }
 }
