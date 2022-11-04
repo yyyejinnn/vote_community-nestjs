@@ -17,7 +17,7 @@ export class VotesService {
     const endDate = new Date(data.endDate);
     const now = new Date();
 
-    if (now >= new Date(endDate)) {
+    if (now >= endDate) {
       throw new CustomException(VotesException.END_DATE_LTE_TO_NOW);
     }
 

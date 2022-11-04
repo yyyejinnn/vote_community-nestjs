@@ -63,6 +63,6 @@ export class VotesException {
 
   static END_DATE_LTE_TO_NOW: ExceptionObj = {
     code: '10003',
-    message: '투표 종료일이 현재 시간보다 작거나 같습니다.',
+    message: '투표 종료일이 오늘 날짜와 같거나 작습니다.',
   };
 }
