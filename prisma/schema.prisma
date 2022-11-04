@@ -39,6 +39,8 @@ model RefreshTokens {
 model Votes {
     id           Int            @id @default(autoincrement())
     title        String
+    startDate    DateTime       @default(now())
+    endDate      DateTime
     writer       Users          @relation(name: "VoteWriter", fields: [writerId], references: [id])
     writerId     Int
     likedUsers   Users[]        @relation(name: "LikedVoteUsers")

@@ -1,6 +1,8 @@
 model Votes {
     id         Int      @id @default(autoincrement())
     title      String
+    startDate  DateTime @default(now())
+    endDate    DateTime
     writer     Users    @relation("VoteWriter", fields: [writerId], references: [id])
     writerId   Int
     likedUsers Users[]  @relation("LikedVoteUsers")
