@@ -11,6 +11,7 @@ import {
   VerifiedToken,
   WhereOptionByUserEmail,
   WhereOptionByUserNickName,
+  SignOutUserDto,
 } from '@vote/common';
 import { CustomException, UsersException } from '@vote/middleware';
 
@@ -72,6 +73,10 @@ export class AuthService {
       await this.tokenService.createRefreshToken(payload);
 
     return { accessToken, refreshToken: encryptRefreshToken };
+  }
+
+  async signOut(data: SignOutUserDto) {
+    return await this.usersRepository.deleteRefreshToken(data.userId);
   }
 
   async recreateAccessToken(

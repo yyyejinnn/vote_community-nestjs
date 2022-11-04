@@ -24,3 +24,7 @@ export class SignInUserDto {
   @IsNotEmpty()
   password: string;
 }
+
+export class SignOutUserDto {
+  userId: number;
+}

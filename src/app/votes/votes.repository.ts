@@ -1,5 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaClient, VoteChoices, VoteComments, Votes } from '@prisma/client';
+import {
+  PrismaClient,
+  Users,
+  VoteChoices,
+  VoteComments,
+  Votes,
+} from '@prisma/client';
 import {
   CreateVoteCommentDto,
   CreateVoteDto,
@@ -129,6 +135,14 @@ export class VotesRepository {
       },
     });
   }
+
+  async getLikedVoteByUserId(userId: number): Promise<Votes[]> {
+    return this.prisma.votes.findMany({
+      where: {
+        writerId: userId,
+      },
+    });
+  }
 }
 
 @Injectable()
@@ -146,6 +160,14 @@ export class CommentsRepository {
             likedUsers: true,
           },
         },
+      },
+    });
+  }
+
+  async getAllCommentsByUserId(userId: number): Promise<VoteComments[]> {
+    return await this.prisma.voteComments.findMany({
+      where: {
+        writerId: userId,
       },
     });
   }
@@ -186,6 +208,14 @@ export class CommentsRepository {
             id: data.userId,
           },
         },
+      },
+    });
+  }
+
+  async getLikedCommentsByUserId(userId: number): Promise<VoteComments[]> {
+    return this.prisma.voteComments.findMany({
+      where: {
+        writerId: userId,
       },
     });
   }

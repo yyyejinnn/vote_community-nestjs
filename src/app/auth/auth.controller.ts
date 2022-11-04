@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   ParseIntPipe,
   Post,
@@ -11,6 +12,7 @@ import {
   RecreateAccessToken,
   SignIn,
   SignInUserDto,
+  SignOutUserDto,
   SignUp,
   SignUpUserDto,
 } from '@vote/common';
@@ -41,6 +43,17 @@ export class AuthController {
       userId,
       encryptRefreshToken,
     );
+  }
+
+  @Delete('sign-out')
+  async signOut() {
+    const userId = 1;
+
+    const data: SignOutUserDto = {
+      userId,
+    };
+
+    return await this.authService.signOut(data);
   }
 
   @UseGuards(JwtAccessGuard)

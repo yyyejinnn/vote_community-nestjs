@@ -1,4 +1,4 @@
-import { Users, Votes } from '@prisma/client';
+import { Users, VoteComments, Votes } from '@prisma/client';
 
 // type
 export type JwtPayload = {
@@ -51,6 +51,10 @@ export interface GetUserProfile {
   users: Users;
 }
 
-export interface GetUserCreatedVotes {
+export interface GetUserWrittenVotes {
   votes: Votes[];
+}
+
+export interface GetUserWrittenComments {
+  comments: VoteComments[];
 }
