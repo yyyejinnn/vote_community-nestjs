@@ -1,6 +1,7 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import {
   CreateVoteCommentDto,
+  CreateVoteDto,
   CreateVotedUserDto,
   LikesVoteCommentDto,
   LikesVoteDto,
@@ -11,6 +12,17 @@ import { CommentsRepository, VotesRepository } from './votes.repository';
 @Injectable()
 export class VotesService {
   constructor(private readonly votesRepository: VotesRepository) {}
+
+  async createVote(data: CreateVoteDto) {
+    const endDate = new Date(data.endDate);
+    const now = new Date();
+
+    if (now >= endDate) {
+      throw new CustomException(VotesException.END_DATE_LTE_TO_NOW);
+    }
+
+    return await this.votesRepository.createVote(data);
+  }
 
   async choiceVote(data: CreateVotedUserDto) {
     try {

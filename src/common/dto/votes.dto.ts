@@ -6,6 +6,9 @@ export class CreateVoteDto {
   @IsNotEmpty()
   title: string;
 
+  @IsNotEmpty()
+  endDate: Date;
+
   @IsArray()
   @IsNotEmpty()
   voteChoices: string[];

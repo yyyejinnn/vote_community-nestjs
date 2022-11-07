@@ -60,4 +60,9 @@ export class VotesException {
     code: '10002',
     message: '댓글 내용이 없습니다.',
   };
+
+  static END_DATE_LTE_TO_NOW: ExceptionObj = {
+    code: '10003',
+    message: '투표 종료일이 오늘 날짜와 같거나 작습니다.',
+  };
 }

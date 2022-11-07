@@ -22,6 +22,7 @@ export class VotesRepository {
     await this.prisma.votes.create({
       data: {
         title: data.title,
+        endDate: data.endDate,
         writerId: data.userId,
         voteChoices: {
           create: data.voteChoices.map((value) => ({ title: value })),
