@@ -1,4 +1,5 @@
 import { ValidationPipe } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { MyLogger } from './app/logger/logger.service';
@@ -9,9 +10,12 @@ async function bootstrap() {
   //   logger: false,
   // });
 
+  const configService = app.get(ConfigService);
+  const host = configService.get('PORT') || 3000;
+
   app.useGlobalPipes(new ValidationPipe());
   app.useLogger(app.get(MyLogger));
 
-  await app.listen(3000);
+  await app.listen(host);
 }
 bootstrap();

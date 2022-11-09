@@ -7,9 +7,22 @@ import { UsersModule } from './app/users/users.module';
 import { AuthModule } from './app/auth/auth.module';
 import { VotesModule } from './app/votes/votes.module';
 import { LoggerModule } from './app/logger/logger.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [UsersModule, AuthModule, VotesModule, LoggerModule],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath:
+        process.env.NODE_ENV == 'production'
+          ? '.env.production'
+          : '.env.development',
+    }),
+    UsersModule,
+    AuthModule,
+    VotesModule,
+    LoggerModule,
+  ],
   controllers: [AppController],
   providers: [
     AppService,
