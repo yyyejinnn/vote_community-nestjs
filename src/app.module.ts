@@ -8,11 +8,13 @@ import { AuthModule } from './app/auth/auth.module';
 import { VotesModule } from './app/votes/votes.module';
 import { LoggerModule } from './app/logger/logger.module';
 import { ConfigModule } from '@nestjs/config';
+import configuration from './config/configuration';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      load: [configuration],
       envFilePath:
         process.env.NODE_ENV == 'production'
           ? '.env.production'
