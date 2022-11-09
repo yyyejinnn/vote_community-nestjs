@@ -6,9 +6,32 @@ import { AppService } from './app.service';
 import { UsersModule } from './app/users/users.module';
 import { AuthModule } from './app/auth/auth.module';
 import { VotesModule } from './app/votes/votes.module';
+import { LoggerModule } from './app/logger/logger.module';
+import { ConfigModule } from '@nestjs/config';
+import configuration from './config/configuration';
+import * as Joi from 'joi';
 
 @Module({
-  imports: [UsersModule, AuthModule, VotesModule],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [configuration],
+      envFilePath:
+        process.env.NODE_ENV == 'production'
+          ? '.env.production'
+          : '.env.development',
+      validationSchema: Joi.object({
+        NODE_ENV: Joi.string()
+          .valid('development', 'production')
+          .default('development'),
+        PORT: Joi.number().default(3000),
+      }),
+    }),
+    UsersModule,
+    AuthModule,
+    VotesModule,
+    LoggerModule,
+  ],
   controllers: [AppController],
   providers: [
     AppService,
