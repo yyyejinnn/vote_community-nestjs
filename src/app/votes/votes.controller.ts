@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
 } from '@nestjs/common';
 import {
@@ -15,6 +16,7 @@ import {
   LikesVoteCommentDto,
   LikesVoteDto,
   ListVotes,
+  UpdateVoteDto,
 } from '@vote/common';
 import { CommentsRepository, VotesRepository } from './votes.repository';
 import { CommentsService, VotesService } from './votes.service';
@@ -42,6 +44,24 @@ export class VotesController {
     @Param('voteId', ParseIntPipe) voteId: number,
   ): Promise<GetVote> {
     return { vote: await this.votesRepository.getVoteById(voteId) };
+  }
+
+  @Patch(':voteId')
+  async updateVote(
+    @Param('voteId', ParseIntPipe) voteId: number,
+    @Body() body: Omit<UpdateVoteDto, 'userId' | 'voteId'>,
+  ) {
+    const data: UpdateVoteDto = {
+      ...body,
+      voteId,
+    };
+
+    return { votes: await this.votesService.updateVote(data) };
+  }
+
+  @Delete(':voteId')
+  async deleteVote(@Param('voteId', ParseIntPipe) voteId: number) {
+    return await this.votesRepository.deleteVote(voteId);
   }
 
   @Post(':voteId/choice/vote')

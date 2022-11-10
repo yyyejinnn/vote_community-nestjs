@@ -12,6 +12,7 @@ import {
   CreateVotedUserDto,
   LikesVoteCommentDto,
   LikesVoteDto,
+  UpdateVoteDto,
 } from '@vote/common';
 
 @Injectable()
@@ -71,6 +72,29 @@ export class VotesRepository {
             likedUsers: true,
           },
         },
+      },
+    });
+  }
+
+  async updateVote(dto: UpdateVoteDto) {
+    const { voteId, voteChoices, ...data } = dto;
+
+    const updateVoteOperation = await this.prisma.votes.update({
+      where: {
+        id: voteId,
+      },
+      data: {
+        ...data,
+      },
+    });
+
+    return updateVoteOperation;
+  }
+
+  async deleteVote(voteId: number) {
+    return await this.prisma.votes.delete({
+      where: {
+        id: voteId,
       },
     });
   }
@@ -169,6 +193,13 @@ export class CommentsRepository {
     return await this.prisma.voteComments.findMany({
       where: {
         writerId: userId,
+      },
+      include: {
+        _count: {
+          select: {
+            likedUsers: true,
+          },
+        },
       },
     });
   }

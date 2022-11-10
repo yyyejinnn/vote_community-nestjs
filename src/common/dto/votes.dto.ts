@@ -1,3 +1,4 @@
+import { OmitType, PartialType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsArray, IsNotEmpty, IsString } from 'class-validator';
 
@@ -15,6 +16,12 @@ export class CreateVoteDto {
 
   @Type(() => Number)
   userId: number;
+}
+
+export class UpdateVoteDto extends PartialType(
+  OmitType(CreateVoteDto, ['userId']),
+) {
+  voteId: number;
 }
 
 export class CreateVotedUserDto {

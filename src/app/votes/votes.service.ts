@@ -5,6 +5,7 @@ import {
   CreateVotedUserDto,
   LikesVoteCommentDto,
   LikesVoteDto,
+  UpdateVoteDto,
 } from '@vote/common';
 import { CustomException, VotesException } from '@vote/middleware';
 import { CommentsRepository, VotesRepository } from './votes.repository';
@@ -14,14 +15,17 @@ export class VotesService {
   constructor(private readonly votesRepository: VotesRepository) {}
 
   async createVote(data: CreateVoteDto) {
-    const endDate = new Date(data.endDate);
-    const now = new Date();
-
-    if (now >= endDate) {
-      throw new CustomException(VotesException.END_DATE_LTE_TO_NOW);
-    }
+    const { endDate } = data;
+    this._compareDates(endDate);
 
     return await this.votesRepository.createVote(data);
+  }
+
+  async updateVote(data: UpdateVoteDto) {
+    const { endDate } = data;
+    this._compareDates(endDate);
+
+    return await this.votesRepository.updateVote(data);
   }
 
   async choiceVote(data: CreateVotedUserDto) {
@@ -38,6 +42,15 @@ export class VotesService {
 
   async cancleLikedVote(data: LikesVoteDto) {
     await this.votesRepository.deleteLikedUser(data);
+  }
+
+  private _compareDates(endDate: Date | string) {
+    const date = new Date(endDate);
+    const now = new Date();
+
+    if (now >= date) {
+      throw new CustomException(VotesException.END_DATE_LTE_TO_NOW);
+    }
   }
 }
 
