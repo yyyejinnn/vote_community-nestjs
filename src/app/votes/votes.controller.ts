@@ -59,6 +59,11 @@ export class VotesController {
     return { votes: await this.votesService.updateVote(data) };
   }
 
+  @Delete(':voteId')
+  async deleteVote(@Param('voteId', ParseIntPipe) voteId: number) {
+    return await this.votesRepository.deleteVote(voteId);
+  }
+
   @Post(':voteId/choice/vote')
   async choiceVote(
     @Param('voteId', ParseIntPipe) votedId: number,

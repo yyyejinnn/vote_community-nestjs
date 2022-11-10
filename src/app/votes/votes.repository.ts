@@ -87,6 +87,16 @@ export class VotesRepository {
         ...data,
       },
     });
+
+    return updateVoteOperation;
+  }
+
+  async deleteVote(voteId: number) {
+    return await this.prisma.votes.delete({
+      where: {
+        id: voteId,
+      },
+    });
   }
 
   async createVotedUser(data: CreateVotedUserDto) {

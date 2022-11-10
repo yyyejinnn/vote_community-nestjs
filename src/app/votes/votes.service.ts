@@ -25,7 +25,7 @@ export class VotesService {
     const { endDate } = data;
     this._compareDates(endDate);
 
-    return this.votesRepository.updateVote(data);
+    return await this.votesRepository.updateVote(data);
   }
 
   async choiceVote(data: CreateVotedUserDto) {
