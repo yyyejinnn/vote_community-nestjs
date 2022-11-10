@@ -39,6 +39,15 @@ export class VotesService {
   async cancleLikedVote(data: LikesVoteDto) {
     await this.votesRepository.deleteLikedUser(data);
   }
+
+  private _compareDates(endDate: Date | string) {
+    const date = new Date(endDate);
+    const now = new Date();
+
+    if (now >= date) {
+      throw new CustomException(VotesException.END_DATE_LTE_TO_NOW);
+    }
+  }
 }
 
 @Injectable()
