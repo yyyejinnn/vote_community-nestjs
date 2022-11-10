@@ -56,7 +56,7 @@ model Votes {
 model VoteChoices {
     id         Int          @id @default(autoincrement())
     title      String
-    vote       Votes        @relation(name: "VoteChoicesToVotes", fields: [voteId], references: [id])
+    vote       Votes        @relation(name: "VoteChoicesToVotes", fields: [voteId], references: [id], onDelete: Cascade)
     voteId     Int
     createdAt  DateTime     @default(now())
     updatedAt  DateTime     @updatedAt
@@ -69,9 +69,9 @@ model VotedUsers {
     id           Int         @id @default(autoincrement())
     user         Users       @relation(name: "UsersToVotedUsers", fields: [userId], references: [id])
     userId       Int
-    vote         Votes       @relation(name: "VotedUsersToVotes", fields: [voteId], references: [id])
+    vote         Votes       @relation(name: "VotedUsersToVotes", fields: [voteId], references: [id], onDelete: Cascade)
     voteId       Int
-    voteChoice   VoteChoices @relation(name: "VoteChoicesToVotedUsers", fields: [voteChoiceId], references: [id])
+    voteChoice   VoteChoices @relation(name: "VoteChoicesToVotedUsers", fields: [voteChoiceId], references: [id], onDelete: Cascade)
     voteChoiceId Int
     createdAt    DateTime    @default(now())
     updatedAt    DateTime    @updatedAt
@@ -86,7 +86,7 @@ model VoteComments {
     content    String
     writer     Users    @relation(name: "VoteCommentWriter", fields: [writerId], references: [id])
     writerId   Int
-    vote       Votes    @relation(name: "VoteCommentsToVotes", fields: [voteId], references: [id])
+    vote       Votes    @relation(name: "VoteCommentsToVotes", fields: [voteId], references: [id], onDelete: Cascade)
     voteId     Int
     likedUsers Users[]  @relation(name: "LikedVoteCommentUsers")
     createdAt  DateTime @default(now())
