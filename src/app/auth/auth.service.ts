@@ -102,6 +102,15 @@ export class AuthService {
 
   async resetPassword(data: ResetPasswordDto) {
     const { userId, password, checkPassword } = data;
+
+    const { password: currPassword } =
+      await this.usersRepository.findUserByWhereOption({
+        id: userId,
+      });
+
+    if (await bcrypt.compare(password, currPassword)) {
+      throw new CustomException(UsersException.SAME_CURR_PASSWORD);
+    }
     await this._validatePassword(password, checkPassword);
 
     return await this.usersRepository.updatePassword(userId, password);

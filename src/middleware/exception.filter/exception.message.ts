@@ -48,6 +48,11 @@ export class UsersException {
     code: '00009',
     message: '유효하지 않은 Refresh 토큰입니다.',
   };
+
+  static SAME_CURR_PASSWORD: ExceptionObj = {
+    code: '00010',
+    message: '현재 비밀번호와 동일합니다.',
+  };
 }
 
 export class VotesException {
