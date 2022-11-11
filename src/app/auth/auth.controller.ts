@@ -4,12 +4,14 @@ import {
   Delete,
   Get,
   ParseIntPipe,
+  Patch,
   Post,
   UseGuards,
 } from '@nestjs/common';
 import {
   CurrUser,
   RecreateAccessToken,
+  ResetPasswordDto,
   SignIn,
   SignInUserDto,
   SignOutUserDto,
@@ -54,6 +56,18 @@ export class AuthController {
     };
 
     return await this.authService.signOut(data);
+  }
+
+  @Patch('reset/password')
+  async resetPassword(@Body() body: Omit<ResetPasswordDto, 'userId'>) {
+    const userId = 1;
+
+    const data: ResetPasswordDto = {
+      ...body,
+      userId,
+    };
+
+    return await this.authService.resetPassword(data);
   }
 
   @UseGuards(JwtAccessGuard)
