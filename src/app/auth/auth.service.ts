@@ -64,7 +64,11 @@ export class AuthService {
     if (!user) {
       throw new CustomException(UsersException.USER_NOT_EXIST);
     }
-    await this._validatePassword(data.password, user.password, 'clearPassword');
+    await this._validatePassword(
+      data.password,
+      user.password,
+      'hashedPassword',
+    );
 
     // 토큰 생성
     const payload: JwtPayload = { sub: user.id, nickname: user.nickname };
