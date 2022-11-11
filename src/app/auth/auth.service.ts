@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Type } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { RefreshTokens, Users } from '@prisma/client';
 import {
@@ -12,6 +12,7 @@ import {
   WhereOptionByUserEmail,
   WhereOptionByUserNickName,
   SignOutUserDto,
+  ResetPasswordDto,
 } from '@vote/common';
 import { CustomException, UsersException } from '@vote/middleware';
 
@@ -19,7 +20,7 @@ import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import { UsersRepository } from '../users/users.repository';
 
-type ValidatePasswordType = 'signUp' | 'signIn';
+type ValidatePasswordType = 'clearPassword' | 'hashedPassword';
 
 @Injectable()
 export class AuthService {
@@ -63,7 +64,7 @@ export class AuthService {
     if (!user) {
       throw new CustomException(UsersException.USER_NOT_EXIST);
     }
-    await this._validatePassword(data.password, user.password, 'signIn');
+    await this._validatePassword(data.password, user.password, 'clearPassword');
 
     // 토큰 생성
     const payload: JwtPayload = { sub: user.id, nickname: user.nickname };
@@ -99,16 +100,26 @@ export class AuthService {
     return { accessToken };
   }
 
+  async resetPassword(data: ResetPasswordDto) {
+    const { userId, password, checkPassword } = data;
+    await this._validatePassword(password, checkPassword);
+
+    return await this.usersRepository.updatePassword(userId, password);
+  }
+
   private async _validatePassword(
     password: string,
     checkPassword: string,
-    type: ValidatePasswordType = 'signUp',
+    type: ValidatePasswordType = 'clearPassword',
   ) {
-    if (type == 'signUp' && password !== checkPassword) {
+    if (type == 'clearPassword' && password !== checkPassword) {
       throw new CustomException(UsersException.NOT_MATCHED_PASSWORD);
     }
 
-    if (type == 'signIn' && !(await bcrypt.compare(password, checkPassword))) {
+    if (
+      type == 'hashedPassword' &&
+      !(await bcrypt.compare(password, checkPassword))
+    ) {
       throw new CustomException(UsersException.NOT_MATCHED_PASSWORD);
     }
   }
