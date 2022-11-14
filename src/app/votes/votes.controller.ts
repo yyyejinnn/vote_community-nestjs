@@ -16,6 +16,7 @@ import {
   LikesVoteCommentDto,
   LikesVoteDto,
   ListVotes,
+  UpdateVoteCommentDto,
   UpdateVoteDto,
 } from '@vote/common';
 import { CommentsRepository, VotesRepository } from './votes.repository';
@@ -140,6 +141,23 @@ export class CommentsController {
     return await this.commentsService.createVoteComment(data);
   }
 
+  @Patch(':commentId')
+  async updateVote(
+    @Param('commentId', ParseIntPipe) commentId: number,
+    @Body() body: Omit<UpdateVoteCommentDto, 'commentId'>,
+  ) {
+    const data: UpdateVoteCommentDto = {
+      ...body,
+      commentId,
+    };
+
+    return { votes: await this.commentsService.updateVoteComment(data) };
+  }
+
+  @Delete(':commentId')
+  async deleteVoteComment(@Param('commentId', ParseIntPipe) commentId: number) {
+    return await this.commentsRepository.deleteVoteComment(commentId);
+  }
   @Post(':commentId/like')
   async likeVoteComment(@Param('commentId', ParseIntPipe) commentId: number) {
     const userId = 1;
