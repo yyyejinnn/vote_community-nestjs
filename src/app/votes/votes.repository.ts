@@ -214,6 +214,14 @@ export class CommentsRepository {
     });
   }
 
+  async deleteVoteComment(commentId: number) {
+    return await this.prisma.voteComments.delete({
+      where: {
+        id: commentId,
+      },
+    });
+  }
+
   async createLikedUser(data: LikesVoteCommentDto) {
     return await this.prisma.voteComments.update({
       where: {

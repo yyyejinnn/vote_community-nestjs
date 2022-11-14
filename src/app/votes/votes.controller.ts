@@ -140,6 +140,10 @@ export class CommentsController {
     return await this.commentsService.createVoteComment(data);
   }
 
+  @Delete(':commentId')
+  async deleteVoteComment(@Param('commentId', ParseIntPipe) commentId: number) {
+    return await this.commentsRepository.deleteVoteComment(commentId);
+  }
   @Post(':commentId/like')
   async likeVoteComment(@Param('commentId', ParseIntPipe) commentId: number) {
     const userId = 1;
