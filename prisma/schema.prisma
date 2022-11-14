@@ -89,6 +89,7 @@ model VoteComments {
     vote       Votes    @relation(name: "VoteCommentsToVotes", fields: [voteId], references: [id], onDelete: Cascade)
     voteId     Int
     likedUsers Users[]  @relation(name: "LikedVoteCommentUsers")
+    isUpdated  Boolean  @default(false)
     createdAt  DateTime @default(now())
     updatedAt  DateTime @updatedAt
 
