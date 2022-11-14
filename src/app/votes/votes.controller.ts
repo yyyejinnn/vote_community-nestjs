@@ -142,7 +142,7 @@ export class CommentsController {
   }
 
   @Patch(':commentId')
-  async updateVote(
+  async updateVoteComment(
     @Param('commentId', ParseIntPipe) commentId: number,
     @Body() body: Omit<UpdateVoteCommentDto, 'commentId'>,
   ) {
@@ -151,13 +151,14 @@ export class CommentsController {
       commentId,
     };
 
-    return { votes: await this.commentsService.updateVoteComment(data) };
+    return { comments: await this.commentsService.updateVoteComment(data) };
   }
 
   @Delete(':commentId')
   async deleteVoteComment(@Param('commentId', ParseIntPipe) commentId: number) {
     return await this.commentsRepository.deleteVoteComment(commentId);
   }
+
   @Post(':commentId/like')
   async likeVoteComment(@Param('commentId', ParseIntPipe) commentId: number) {
     const userId = 1;
