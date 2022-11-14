@@ -5,6 +5,7 @@ import {
   CreateVotedUserDto,
   LikesVoteCommentDto,
   LikesVoteDto,
+  UpdateVoteCommentDto,
   UpdateVoteDto,
 } from '@vote/common';
 import { CustomException, VotesException } from '@vote/middleware';
@@ -63,6 +64,10 @@ export class CommentsService {
       throw new CustomException(VotesException.EMPTY_COMMENT_CONTENT);
     }
     return await this.commentsRepository.createVoteComment(data);
+  }
+
+  async updateVoteComment(data: UpdateVoteCommentDto) {
+    return await this.commentsRepository.updateVoteComment(data);
   }
 
   async likeVoteComment(data: LikesVoteCommentDto) {

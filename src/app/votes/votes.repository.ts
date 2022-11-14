@@ -1,17 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import {
-  PrismaClient,
-  Users,
-  VoteChoices,
-  VoteComments,
-  Votes,
-} from '@prisma/client';
+import { PrismaClient, VoteComments, Votes } from '@prisma/client';
 import {
   CreateVoteCommentDto,
   CreateVoteDto,
   CreateVotedUserDto,
   LikesVoteCommentDto,
   LikesVoteDto,
+  UpdateVoteCommentDto,
   UpdateVoteDto,
 } from '@vote/common';
 
@@ -210,6 +205,20 @@ export class CommentsRepository {
         content: data.content,
         voteId: data.voteId,
         writerId: data.userId,
+      },
+    });
+  }
+
+  async updateVoteComment(dto: UpdateVoteCommentDto) {
+    const { commentId, content } = dto;
+
+    return await this.prisma.voteComments.update({
+      where: {
+        id: commentId,
+      },
+      data: {
+        content,
+        isUpdated: true,
       },
     });
   }

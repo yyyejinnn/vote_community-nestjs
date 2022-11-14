@@ -36,6 +36,12 @@ export class CreateVoteCommentDto {
   content: string;
 }
 
+export class UpdateVoteCommentDto extends PartialType(
+  OmitType(CreateVoteCommentDto, ['userId', 'voteId']),
+) {
+  commentId: number;
+}
+
 export class LikesVoteDto {
   voteId: number;
   userId: number;
