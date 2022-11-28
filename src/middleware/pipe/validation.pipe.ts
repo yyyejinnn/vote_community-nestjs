@@ -21,16 +21,22 @@ export class CustomValidationPipe extends NestValidationPipe {
 
   protected getExceptionObj(validationErrors: ValidationError[]): ExceptionObj {
     const error = validationErrors[0];
-    const errorCode = error.contexts;
-    const errorMessage = error.constraints;
 
-    if (!errorCode) {
+    // get code
+    const errorCode = error.contexts;
+    const key = errorCode ? Object.keys(errorCode)[0] : undefined;
+    const code = errorCode?.[key]['code'];
+
+    if (code === undefined) {
       throw new CustomException(OthersException.NOT_VALIDATION_ERROR_CODE);
     }
-    const key = Object.keys(errorCode)[0];
+
+    // get message
+    const message = error.constraints?.[key];
+
     return {
-      code: errorCode[key]['code'],
-      message: errorMessage[key],
+      code,
+      message,
     };
   }
 }
