@@ -4,7 +4,8 @@ import {
   ValidationPipe as NestValidationPipe,
 } from '@nestjs/common';
 import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
-import { ExceptionObj } from '../exception.filter/exception.message';
+import { ExceptionObj, OthersException } from '@vote/middleware';
+import { CustomException } from '../exception.filter/http-exception.filter';
 
 export class CustomValidationPipe extends NestValidationPipe {
   public createExceptionFactory() {
@@ -24,13 +25,7 @@ export class CustomValidationPipe extends NestValidationPipe {
     const errorMessage = error.constraints;
 
     if (!errorCode) {
-      throw new HttpException(
-        {
-          code: '12345', // 임시
-          message: 'error code가 정의되지 않았습니다.',
-        },
-        400,
-      );
+      throw new CustomException(OthersException.NOT_VALIDATION_ERROR_CODE);
     }
     const key = Object.keys(errorCode)[0];
     return {
