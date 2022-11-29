@@ -60,9 +60,6 @@ export class CommentsService {
   constructor(private readonly commentsRepository: CommentsRepository) {}
 
   async createVoteComment(dto: CreateVoteCommentDto) {
-    if (data.content === '') {
-      throw new CustomException(VotesException.EMPTY_COMMENT_CONTENT);
-    }
     return await this.commentsRepository.createVoteComment(dto);
   }
 

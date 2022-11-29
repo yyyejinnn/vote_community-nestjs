@@ -3,41 +3,93 @@ import { Type } from 'class-transformer';
 import { IsArray, IsDate, IsNotEmpty, IsString } from 'class-validator';
 
 class VotesDto {
-  @IsNotEmpty()
+  @IsNotEmpty({
+    context: {
+      code: 'EMPTY_VOTE_ID',
+    },
+  })
   @Type(() => Number)
   voteId: number;
 
-  @IsString()
-  @IsNotEmpty()
+  @IsString({
+    context: {
+      code: 'MUST_STRING_TYPE',
+    },
+  })
+  @IsNotEmpty({
+    context: {
+      code: 'EMPTY_TITLE',
+    },
+  })
   title: string;
 
-  @IsDate()
-  @IsNotEmpty()
+  @IsDate({
+    context: {
+      code: 'MUST_DATE_TYPE',
+    },
+  })
+  @IsNotEmpty({
+    context: {
+      code: 'EMPTY_END_DATE',
+    },
+  })
   endDate: Date;
 
-  @IsArray()
-  @IsNotEmpty()
+  @IsArray({
+    context: {
+      code: 'MUST_ARRAY_TYPE',
+    },
+  })
+  @IsNotEmpty({
+    context: {
+      code: 'EMPTY_VOTE_CHOICES',
+    },
+  })
   voteChoices: string[];
 
-  @IsNotEmpty()
+  @IsNotEmpty({
+    context: {
+      code: 'EMPTY_USER_ID',
+    },
+  })
   @Type(() => Number)
   userId: number;
 }
 
 class VoteCommentsDto {
-  @IsNotEmpty()
+  @IsNotEmpty({
+    context: {
+      code: 'EMPTY_NICKNAME',
+    },
+  })
   @Type(() => Number)
   commentId: number;
 
-  @IsString()
-  @IsNotEmpty()
+  @IsString({
+    context: {
+      code: 'MUST_STRING_TYPE',
+    },
+  })
+  @IsNotEmpty({
+    context: {
+      code: 'EMPTY_CONTENT',
+    },
+  })
   content: string;
 
-  @IsNotEmpty()
+  @IsNotEmpty({
+    context: {
+      code: 'EMPTY_USER_ID',
+    },
+  })
   @Type(() => Number)
   userId: number;
 
-  @IsNotEmpty()
+  @IsNotEmpty({
+    context: {
+      code: 'EMPTY_VOTE_ID',
+    },
+  })
   @Type(() => Number)
   voteId: number;
 }
@@ -52,7 +104,11 @@ export class CreateVotedUserDto extends PickType(VotesDto, [
   'voteId',
   'userId',
 ]) {
-  @IsNotEmpty()
+  @IsNotEmpty({
+    context: {
+      code: 'EMPTY_CHOICED_VOTE_ID',
+    },
+  })
   @Type(() => Number)
   choicedVoteId: number;
 }
