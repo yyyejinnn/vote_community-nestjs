@@ -97,7 +97,7 @@ export class VotesRepository {
   async createVotedUser(data: CreateVotedUserDto) {
     return await this.prisma.votedUsers.create({
       data: {
-        voteId: data.votedId,
+        voteId: data.voteId,
         userId: data.userId,
         voteChoiceId: data.choicedVoteId,
       },
