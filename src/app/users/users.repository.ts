@@ -8,12 +8,16 @@ import { CustomException, UsersException } from '@vote/middleware';
 export class UsersRepository {
   private readonly prisma = new PrismaClient();
 
-  async createUser(data: SignUpUserDto): Promise<Users> {
+  async createUser({
+    email,
+    nickname,
+    password,
+  }: SignUpUserDto): Promise<Users> {
     return await this.prisma.users.create({
       data: {
-        email: data.email,
-        nickname: data.nickname,
-        password: await bcrypt.hash(data.password, 10),
+        email,
+        nickname,
+        password: await bcrypt.hash(password, 10),
       },
     });
   }

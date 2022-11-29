@@ -22,27 +22,27 @@ export class VotesService {
     return await this.votesRepository.createVote(data);
   }
 
-  async updateVote(data: UpdateVoteDto) {
-    const { endDate } = data;
+  async updateVote(dto: UpdateVoteDto) {
+    const { endDate } = dto;
     this._compareDates(endDate);
 
-    return await this.votesRepository.updateVote(data);
+    return await this.votesRepository.updateVote(dto);
   }
 
-  async choiceVote(data: CreateVotedUserDto) {
+  async choiceVote(dto: CreateVotedUserDto) {
     try {
-      return await this.votesRepository.createVotedUser(data);
+      return await this.votesRepository.createVotedUser(dto);
     } catch (error) {
       throw new CustomException(VotesException.ALREADY_VOTED);
     }
   }
 
-  async likeVote(data: LikesVoteDto) {
-    await this.votesRepository.createLikedUser(data);
+  async likeVote(dto: LikesVoteDto) {
+    await this.votesRepository.createLikedUser(dto);
   }
 
-  async cancleLikedVote(data: LikesVoteDto) {
-    await this.votesRepository.deleteLikedUser(data);
+  async cancleLikedVote(dto: LikesVoteDto) {
+    await this.votesRepository.deleteLikedUser(dto);
   }
 
   private _compareDates(endDate: Date | string) {
@@ -59,22 +59,19 @@ export class VotesService {
 export class CommentsService {
   constructor(private readonly commentsRepository: CommentsRepository) {}
 
-  async createVoteComment(data: CreateVoteCommentDto) {
-    if (data.content === '') {
-      throw new CustomException(VotesException.EMPTY_COMMENT_CONTENT);
-    }
-    return await this.commentsRepository.createVoteComment(data);
+  async createVoteComment(dto: CreateVoteCommentDto) {
+    return await this.commentsRepository.createVoteComment(dto);
   }
 
-  async updateVoteComment(data: UpdateVoteCommentDto) {
-    return await this.commentsRepository.updateVoteComment(data);
+  async updateVoteComment(dto: UpdateVoteCommentDto) {
+    return await this.commentsRepository.updateVoteComment(dto);
   }
 
-  async likeVoteComment(data: LikesVoteCommentDto) {
-    await this.commentsRepository.createLikedUser(data);
+  async likeVoteComment(dto: LikesVoteCommentDto) {
+    await this.commentsRepository.createLikedUser(dto);
   }
 
-  async cancleLikedVoteComment(data: LikesVoteCommentDto) {
-    await this.commentsRepository.deleteLikedUser(data);
+  async cancleLikedVoteComment(dto: LikesVoteCommentDto) {
+    await this.commentsRepository.deleteLikedUser(dto);
   }
 }

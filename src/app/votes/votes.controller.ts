@@ -71,7 +71,7 @@ export class VotesController {
     @Body('choicedId') choicedVoteId: number,
   ) {
     const userId = 2; // 임시
-    console.log(votedId);
+    console.log(voteId);
     console.log(choicedVoteId);
 
     const data: CreateVotedUserDto = {

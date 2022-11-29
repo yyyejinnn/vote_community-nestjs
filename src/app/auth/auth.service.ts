@@ -30,9 +30,11 @@ export class AuthService {
     this.tokenService = new TokenService(usersRepository);
   }
 
-  async signUp(data: SignUpUserDto): Promise<SignUp> {
+  async signUp(dto: SignUpUserDto): Promise<SignUp> {
+    const { email, password, checkPassword, nickname } = dto;
+
     const whereOption: WhereOptionByUserEmail = {
-      email: data.email,
+      email: email,
     };
     const user: Users = await this.usersRepository.findUserByWhereOption(
       whereOption,
@@ -42,36 +44,33 @@ export class AuthService {
       throw new CustomException(UsersException.USER_ALREADY_EXISTS);
     }
 
-    await this._validatePassword(data.password, data.checkPassword);
-    await this._validateNickname(data.nickname);
+    await this._validatePassword(password, checkPassword);
+    await this._validateNickname(nickname);
 
-    const { password, updatedAt, ...createdUser }: Users =
-      await this.usersRepository.createUser(data);
+    const createdUser: Users = await this.usersRepository.createUser(dto);
+    const { password: pw, updatedAt, ...userRes } = createdUser;
 
     return {
-      users: createdUser,
+      users: userRes,
     };
   }
 
-  async signIn(data: SignInUserDto): Promise<SignIn> {
+  async signIn({ email, password }: SignInUserDto): Promise<SignIn> {
     const whereOption: WhereOptionByUserEmail = {
-      email: data.email,
+      email: email,
     };
     const user: Users = await this.usersRepository.findUserByWhereOption(
       whereOption,
     );
+    const { password: userPw, id, nickname } = user;
 
     if (!user) {
       throw new CustomException(UsersException.USER_NOT_EXIST);
     }
-    await this._validatePassword(
-      data.password,
-      user.password,
-      'hashedPassword',
-    );
+    await this._validatePassword(password, userPw, 'hashedPassword');
 
     // 토큰 생성
-    const payload: JwtPayload = { sub: user.id, nickname: user.nickname };
+    const payload: JwtPayload = { sub: id, nickname };
 
     const accessToken: string = this.tokenService.createAccessToken(payload);
     const encryptRefreshToken: string =
@@ -80,8 +79,8 @@ export class AuthService {
     return { accessToken, refreshToken: encryptRefreshToken };
   }
 
-  async signOut(data: SignOutUserDto) {
-    return await this.usersRepository.deleteRefreshToken(data.userId);
+  async signOut({ userId }: SignOutUserDto) {
+    return await this.usersRepository.deleteRefreshToken(userId);
   }
 
   async recreateAccessToken(
@@ -92,20 +91,20 @@ export class AuthService {
       throw new CustomException(UsersException.TOKEN_NOT_EXISTS);
     }
 
-    const verifiedUser: VerifiedToken =
+    const { sub, nickname }: VerifiedToken =
       await this.tokenService.verifyRefreshToken(userId, encryptRefreshToken);
 
     const payload: JwtPayload = {
-      sub: verifiedUser.sub,
-      nickname: verifiedUser.nickname,
+      sub,
+      nickname,
     };
 
     const accessToken = this.tokenService.createAccessToken(payload);
     return { accessToken };
   }
 
-  async resetPassword(data: ResetPasswordDto) {
-    const { userId, password, checkPassword } = data;
+  async resetPassword(dto: ResetPasswordDto) {
+    const { userId, password, checkPassword } = dto;
 
     const { password: currPassword } =
       await this.usersRepository.findUserByWhereOption({
@@ -172,10 +171,10 @@ class TokenService {
     });
     const encryptRefreshToken: string = this._encryptRefreshToken(refreshToken);
 
-    // await this.usersRepository.createRefreshToken(
-    //   payload.sub,
-    //   encryptRefreshToken,
-    // );
+    await this.usersRepository.createRefreshToken(
+      payload.sub,
+      encryptRefreshToken,
+    );
 
     return encryptRefreshToken;
   }

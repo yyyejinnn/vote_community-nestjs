@@ -14,14 +14,16 @@ import {
 export class VotesRepository {
   private readonly prisma = new PrismaClient();
 
-  async createVote(data: CreateVoteDto) {
+  async createVote(dto: CreateVoteDto) {
+    const { title, endDate, userId, voteChoices } = dto;
+
     await this.prisma.votes.create({
       data: {
-        title: data.title,
-        endDate: data.endDate,
-        writerId: data.userId,
+        title,
+        endDate,
+        writerId: userId,
         voteChoices: {
-          create: data.voteChoices.map((value) => ({ title: value })),
+          create: voteChoices.map((value) => ({ title: value })),
         },
       },
     });
@@ -94,12 +96,12 @@ export class VotesRepository {
     });
   }
 
-  async createVotedUser(data: CreateVotedUserDto) {
+  async createVotedUser({ voteId, userId, choicedVoteId }: CreateVotedUserDto) {
     return await this.prisma.votedUsers.create({
       data: {
-        voteId: data.voteId,
-        userId: data.userId,
-        voteChoiceId: data.choicedVoteId,
+        voteId,
+        userId,
+        voteChoiceId: choicedVoteId,
       },
     });
   }
@@ -126,30 +128,30 @@ export class VotesRepository {
     });
   }
 
-  async createLikedUser(data: LikesVoteDto) {
+  async createLikedUser({ voteId, userId }: LikesVoteDto) {
     return await this.prisma.votes.update({
       where: {
-        id: data.voteId,
+        id: voteId,
       },
       data: {
         likedUsers: {
           connect: {
-            id: data.userId,
+            id: userId,
           },
         },
       },
     });
   }
 
-  async deleteLikedUser(data: LikesVoteDto) {
+  async deleteLikedUser({ voteId, userId }: LikesVoteDto) {
     return await this.prisma.votes.update({
       where: {
-        id: data.voteId,
+        id: voteId,
       },
       data: {
         likedUsers: {
           disconnect: {
-            id: data.userId,
+            id: userId,
           },
         },
       },
@@ -199,19 +201,17 @@ export class CommentsRepository {
     });
   }
 
-  async createVoteComment(data: CreateVoteCommentDto) {
+  async createVoteComment({ content, voteId, userId }: CreateVoteCommentDto) {
     return await this.prisma.voteComments.create({
       data: {
-        content: data.content,
-        voteId: data.voteId,
-        writerId: data.userId,
+        content,
+        voteId,
+        writerId: userId,
       },
     });
   }
 
-  async updateVoteComment(dto: UpdateVoteCommentDto) {
-    const { commentId, content } = dto;
-
+  async updateVoteComment({ commentId, content }: UpdateVoteCommentDto) {
     return await this.prisma.voteComments.update({
       where: {
         id: commentId,
@@ -231,30 +231,30 @@ export class CommentsRepository {
     });
   }
 
-  async createLikedUser(data: LikesVoteCommentDto) {
+  async createLikedUser({ commentId, userId }: LikesVoteCommentDto) {
     return await this.prisma.voteComments.update({
       where: {
-        id: data.commentId,
+        id: commentId,
       },
       data: {
         likedUsers: {
           connect: {
-            id: data.userId,
+            id: userId,
           },
         },
       },
     });
   }
 
-  async deleteLikedUser(data: LikesVoteCommentDto) {
+  async deleteLikedUser({ commentId, userId }: LikesVoteCommentDto) {
     return await this.prisma.voteComments.update({
       where: {
-        id: data.commentId,
+        id: commentId,
       },
       data: {
         likedUsers: {
           disconnect: {
-            id: data.userId,
+            id: userId,
           },
         },
       },
