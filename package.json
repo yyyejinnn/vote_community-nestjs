@@ -19,10 +19,12 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "migrate:dev": "dotenv -e .env.development -- npx prisma migrate dev --name postgres-init",
-    "migrate:prod": "dotenv -e .env.production -- npx prisma migrate --name postgres-init",
-    "push:dev": "dotenv -e .env.development -- npx prisma db push dev",
-    "push:prod": "dotenv -e .env.production -- npx prisma db push"
+    "prismix": "dotenv -e .env.development yarn prismix && prisma format",
+    "migrate:dev": "dotenv -e .env.development -- yarn prisma migrate dev --name postgres-init",
+    "migrate:prod": "dotenv -e .env.production -- yarn prisma migrate --name postgres-init",
+    "push:dev": "dotenv -e .env.development -- yarn prisma db push dev",
+    "push:prod": "dotenv -e .env.production -- yarn prisma db push",
+    "studio:dev": "dotenv -e .env.development -- yarn prisma studio"
   },
   "dependencies": {
     "@nestjs/common": "^9.0.0",

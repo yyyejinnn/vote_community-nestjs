@@ -67,7 +67,7 @@ export class VotesController {
 
   @Post(':voteId/choice/vote')
   async choiceVote(
-    @Param('voteId', ParseIntPipe) votedId: number,
+    @Param('voteId', ParseIntPipe) voteId: number,
     @Body('choicedId') choicedVoteId: number,
   ) {
     const userId = 2; // 임시
@@ -75,8 +75,8 @@ export class VotesController {
     console.log(choicedVoteId);
 
     const data: CreateVotedUserDto = {
-      votedId: votedId,
-      userId: userId,
+      voteId,
+      userId,
       choicedVoteId: choicedVoteId,
     };
 
