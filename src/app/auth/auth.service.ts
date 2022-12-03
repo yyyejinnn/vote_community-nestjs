@@ -57,16 +57,16 @@ export class AuthService {
 
   async signIn({ email, password }: SignInUserDto): Promise<SignIn> {
     const whereOption: WhereOptionByUserEmail = {
-      email: email,
+      email,
     };
     const user: Users = await this.usersRepository.findUserByWhereOption(
       whereOption,
     );
-    const { password: userPw, id, nickname } = user;
 
     if (!user) {
       throw new CustomException(UsersException.USER_NOT_EXIST);
     }
+    const { password: userPw, id, nickname } = user;
     await this._validatePassword(password, userPw, 'hashedPassword');
 
     // 토큰 생성
