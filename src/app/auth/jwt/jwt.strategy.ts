@@ -5,13 +5,14 @@ import { JwtPayload, WhereOptionByUserId } from '@vote/common';
 import { CustomException, UsersException } from '@vote/middleware';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { UsersRepository } from 'src/app/users/users.repository';
+import { UsersService } from 'src/app/users/users.service';
 
 @Injectable()
 export class JwtAccessStrategy extends PassportStrategy(
   Strategy,
   'jwt-access-token',
 ) {
-  constructor(private readonly usersRepository: UsersRepository) {
+  constructor(private readonly usersService: UsersService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
@@ -23,7 +24,7 @@ export class JwtAccessStrategy extends PassportStrategy(
     const whereOption: WhereOptionByUserId = {
       id: payload.sub,
     };
-    const user: Users = await this.usersRepository.findUserByWhereOption(
+    const user: Users = await this.usersService.findUserByWhereOption(
       whereOption,
     );
 

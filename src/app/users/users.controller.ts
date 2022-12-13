@@ -1,4 +1,5 @@
 import { Controller, Get } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import {
   GetUserProfile,
   GetUserWrittenComments,
@@ -13,18 +14,15 @@ import { UsersService } from './users.service';
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
-    private readonly usersRepository: UsersRepository,
     private readonly votesRepository: VotesRepository,
     private readonly commentsRepository: CommentsRepository,
   ) {}
 
   @Get('profile')
-  async getUserProfile(): Promise<GetUserProfile> {
+  async getUserProfile() {
     const userId = 1; //임시
     const whereOption: WhereOptionByUserId = { id: userId };
-    return {
-      users: await this.usersRepository.findUserByWhereOption(whereOption),
-    };
+    return await this.usersService.findUserByWhereOption(whereOption);
   }
 
   @Get('written-votes')

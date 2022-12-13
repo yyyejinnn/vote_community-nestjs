@@ -1,5 +1,6 @@
 import { Injectable, Type } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { InjectRepository } from '@nestjs/typeorm';
 import { RefreshTokens, Users } from '@prisma/client';
 import {
   SignUpUserDto,
@@ -13,12 +14,14 @@ import {
   WhereOptionByUserNickName,
   SignOutUserDto,
   ResetPasswordDto,
+  UsersEntity,
 } from '@vote/common';
 import { CustomException, UsersException } from '@vote/middleware';
 
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import { UsersRepository } from '../users/users.repository';
+import { UsersService } from '../users/users.service';
 
 type ValidatePasswordType = 'clearPassword' | 'hashedPassword';
 
@@ -26,17 +29,17 @@ type ValidatePasswordType = 'clearPassword' | 'hashedPassword';
 export class AuthService {
   private readonly tokenService: TokenService;
 
-  constructor(private readonly usersRepository: UsersRepository) {
-    this.tokenService = new TokenService(usersRepository);
+  constructor(private readonly usersService: UsersService) {
+    this.tokenService = new TokenService(usersService);
   }
 
-  async signUp(dto: SignUpUserDto): Promise<SignUp> {
+  async signUp(dto: SignUpUserDto) {
     const { email, password, checkPassword, nickname } = dto;
 
     const whereOption: WhereOptionByUserEmail = {
       email: email,
     };
-    const user: Users = await this.usersRepository.findUserByWhereOption(
+    const user: Users = await this.usersService.findUserByWhereOption(
       whereOption,
     );
 
@@ -47,7 +50,7 @@ export class AuthService {
     await this._validatePassword(password, checkPassword);
     await this._validateNickname(nickname);
 
-    const createdUser: Users = await this.usersRepository.createUser(dto);
+    const createdUser: UsersEntity = await this.usersService.createUser(dto);
     const { password: pw, updatedAt, ...userRes } = createdUser;
 
     return {
@@ -55,11 +58,11 @@ export class AuthService {
     };
   }
 
-  async signIn({ email, password }: SignInUserDto): Promise<SignIn> {
+  async signIn({ email, password }: SignInUserDto) {
     const whereOption: WhereOptionByUserEmail = {
       email,
     };
-    const user: Users = await this.usersRepository.findUserByWhereOption(
+    const user: Users = await this.usersService.findUserByWhereOption(
       whereOption,
     );
 
@@ -138,7 +141,7 @@ export class AuthService {
 
   private async _validateNickname(nickname: string) {
     const whereOption: WhereOptionByUserNickName = { nickname };
-    const user: Users = await this.usersRepository.findUserByWhereOption(
+    const user: Users = await this.usersService.findUserByWhereOption(
       whereOption,
     );
 
@@ -151,7 +154,7 @@ export class AuthService {
 class TokenService {
   private readonly jwtService: JwtService;
 
-  constructor(private readonly usersRepository: UsersRepository) {
+  constructor(private readonly usersService: UsersService) {
     this.jwtService = new JwtService();
   }
 
