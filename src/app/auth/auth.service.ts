@@ -15,6 +15,7 @@ import {
   SignOutUserDto,
   ResetPasswordDto,
   UsersEntity,
+  RefreshTokensEntity,
 } from '@vote/common';
 import { CustomException, UsersException } from '@vote/middleware';
 
@@ -83,7 +84,7 @@ export class AuthService {
   }
 
   async signOut({ userId }: SignOutUserDto) {
-    return await this.usersRepository.deleteRefreshToken(userId);
+    return await this.usersService.signOut(userId);
   }
 
   async recreateAccessToken(
@@ -110,7 +111,7 @@ export class AuthService {
     const { userId, password, checkPassword } = dto;
 
     const { password: currPassword } =
-      await this.usersRepository.findUserByWhereOption({
+      await this.usersService.findUserByWhereOption({
         id: userId,
       });
 
@@ -188,11 +189,10 @@ class TokenService {
   ): Promise<VerifiedToken> {
     let verifiedToken: VerifiedToken;
 
-    const token: RefreshTokens =
-      await this.usersRepository.findMatchedRefreshToken(
-        userId,
-        encryptRefreshToken,
-      );
+    const token: UsersEntity = await this.usersService.findMatchedRefreshToken(
+      userId,
+      encryptRefreshToken,
+    );
 
     if (!token) {
       throw new CustomException(UsersException.UNVERIFIED_REFRESH_TOKEN);
