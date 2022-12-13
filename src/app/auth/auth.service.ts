@@ -158,7 +158,7 @@ class TokenService {
   createAccessToken(payload: JwtPayload): string {
     const accessToken: string = this.jwtService.sign(payload, {
       secret: 'access-secret-key', // 임시
-      expiresIn: '3m', // 임시
+      expiresIn: '1h', // 임시
     });
 
     return accessToken;
@@ -167,7 +167,7 @@ class TokenService {
   async createRefreshToken(payload: JwtPayload): Promise<string> {
     const refreshToken: string = this.jwtService.sign(payload, {
       secret: 'refresh-secret-key',
-      expiresIn: '10m',
+      expiresIn: '1d',
     });
     const encryptRefreshToken: string = this._encryptRefreshToken(refreshToken);
 

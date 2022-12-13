@@ -14,10 +14,10 @@ import {
 export class VotesRepository {
   private readonly prisma = new PrismaClient();
 
-  async createVote(dto: CreateVoteDto) {
+  async createVote(dto) {
     const { title, endDate, userId, voteChoices } = dto;
 
-    await this.prisma.votes.create({
+    return await this.prisma.votes.create({
       data: {
         title,
         endDate,
@@ -54,6 +54,11 @@ export class VotesRepository {
         id: voteId,
       },
       include: {
+        votedUsers: {
+          select: {
+            userId: true,
+          },
+        },
         voteChoices: {
           include: {
             _count: {

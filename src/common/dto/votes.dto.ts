@@ -23,11 +23,6 @@ class VotesDto {
   })
   title: string;
 
-  @IsDate({
-    context: {
-      code: 'MUST_DATE_TYPE',
-    },
-  })
   @IsNotEmpty({
     context: {
       code: 'EMPTY_END_DATE',

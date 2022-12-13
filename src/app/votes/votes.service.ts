@@ -38,7 +38,7 @@ export class VotesService {
   }
 
   async likeVote(dto: LikesVoteDto) {
-    await this.votesRepository.createLikedUser(dto);
+    return await this.votesRepository.createLikedUser(dto);
   }
 
   async cancleLikedVote(dto: LikesVoteDto) {
