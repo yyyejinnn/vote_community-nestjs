@@ -1,24 +1,9 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaClient, RefreshTokens, Users } from '@prisma/client';
-import {
-  RefreshTokensEntity,
-  SignInUserDto,
-  SignUpUserDto,
-  UsersEntity,
-  WhereOption,
-} from '@vote/common';
+import { RefreshTokensEntity, SignUpUserDto, UsersEntity } from '@vote/common';
 import * as bcrypt from 'bcrypt';
-import { CustomException, UsersException } from '@vote/middleware';
 import { EntityRepository, Repository } from 'typeorm';
 
 @EntityRepository(UsersEntity)
 export class UsersRepository extends Repository<UsersEntity> {
-  async findUserByWhereOption(whereOption: WhereOption): Promise<UsersEntity> {
-    return await this.findOne({
-      where: whereOption,
-    });
-  }
-
   async createUser(dto: SignUpUserDto): Promise<UsersEntity> {
     const { email, nickname, password } = dto;
     const userEntity = this.create({

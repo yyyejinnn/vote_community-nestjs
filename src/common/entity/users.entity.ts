@@ -1,12 +1,4 @@
-import {
-  AfterInsert,
-  Column,
-  Entity,
-  JoinColumn,
-  OneToOne,
-  PrimaryGeneratedColumn,
-  RelationId,
-} from 'typeorm';
+import { AfterInsert, Column, Entity, OneToOne } from 'typeorm';
 import { RefreshTokensEntity } from './auth.entity';
 import { CommonEntity } from './base.entity';
 

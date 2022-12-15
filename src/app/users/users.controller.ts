@@ -1,13 +1,10 @@
 import { Controller, Get } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 import {
-  GetUserProfile,
   GetUserWrittenComments,
   GetUserWrittenVotes,
   WhereOptionByUserId,
 } from '@vote/common';
 import { CommentsRepository, VotesRepository } from '../votes/votes.repository';
-import { UsersRepository } from './users.repository';
 import { UsersService } from './users.service';
 
 @Controller('users')

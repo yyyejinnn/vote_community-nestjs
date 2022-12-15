@@ -1,11 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import {
-  RefreshTokensEntity,
-  SignUpUserDto,
-  UsersEntity,
-  WhereOption,
-} from '@vote/common';
+import { SignUpUserDto, UsersEntity, WhereOption } from '@vote/common';
 import { RefreshTokensRepository, UsersRepository } from './users.repository';
 
 @Injectable()
@@ -13,7 +8,6 @@ export class UsersService {
   constructor(
     @InjectRepository(UsersRepository)
     private readonly usersRepository: UsersRepository,
-
     @InjectRepository(RefreshTokensRepository)
     private readonly refreshTokenRepository: RefreshTokensRepository,
   ) {}
@@ -23,7 +17,9 @@ export class UsersService {
   }
 
   async findUserByWhereOption(whereOption: WhereOption): Promise<UsersEntity> {
-    return await this.usersRepository.findUserByWhereOption(whereOption);
+    return await this.usersRepository.findOne({
+      where: whereOption,
+    });
   }
 
   async findMatchedRefreshToken(userId: number, encryptRefreshToken: string) {

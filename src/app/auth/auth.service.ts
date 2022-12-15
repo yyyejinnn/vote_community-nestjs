@@ -1,6 +1,5 @@
-import { Injectable, Type } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { RefreshTokens, Users } from '@prisma/client';
 import {
   SignUpUserDto,
   SignInUserDto,
@@ -12,13 +11,11 @@ import {
   SignOutUserDto,
   ResetPasswordDto,
   UsersEntity,
-  RefreshTokensEntity,
 } from '@vote/common';
 import { CustomException, UsersException } from '@vote/middleware';
 
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
-import { UsersRepository } from '../users/users.repository';
 import { UsersService } from '../users/users.service';
 
 type ValidatePasswordType = 'clearPassword' | 'hashedPassword';
@@ -37,9 +34,7 @@ export class AuthService {
     const whereOption: WhereOptionByUserEmail = {
       email: email,
     };
-    const user: Users = await this.usersService.findUserByWhereOption(
-      whereOption,
-    );
+    const user = await this.usersService.findUserByWhereOption(whereOption);
 
     if (user) {
       throw new CustomException(UsersException.USER_ALREADY_EXISTS);
@@ -60,9 +55,7 @@ export class AuthService {
     const whereOption: WhereOptionByUserEmail = {
       email,
     };
-    const user: Users = await this.usersService.findUserByWhereOption(
-      whereOption,
-    );
+    const user = await this.usersService.findUserByWhereOption(whereOption);
 
     if (!user) {
       throw new CustomException(UsersException.USER_NOT_EXIST);
@@ -139,9 +132,7 @@ export class AuthService {
 
   private async _validateNickname(nickname: string) {
     const whereOption: WhereOptionByUserNickName = { nickname };
-    const user: Users = await this.usersService.findUserByWhereOption(
-      whereOption,
-    );
+    const user = await this.usersService.findUserByWhereOption(whereOption);
 
     if (user) {
       throw new CustomException(UsersException.NICKNAME_ALREADY_EXISTS);

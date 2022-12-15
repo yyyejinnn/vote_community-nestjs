@@ -15,9 +15,7 @@ import {
   SignIn,
   SignInUserDto,
   SignOutUserDto,
-  SignUp,
   SignUpUserDto,
-  UsersEntity,
 } from '@vote/common';
 import { AuthService } from './auth.service';
 import { JwtAccessGuard } from './jwt/jwt.guard';
