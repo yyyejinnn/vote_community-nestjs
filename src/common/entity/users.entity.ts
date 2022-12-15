@@ -1,6 +1,7 @@
-import { AfterInsert, Column, Entity, OneToOne } from 'typeorm';
+import { AfterInsert, Column, Entity, OneToMany, OneToOne } from 'typeorm';
 import { RefreshTokensEntity } from './auth.entity';
 import { CommonEntity } from './base.entity';
+import { VotesEntity } from './votes.entity';
 
 @Entity({ name: 'users' })
 export class UsersEntity extends CommonEntity {
@@ -15,6 +16,9 @@ export class UsersEntity extends CommonEntity {
 
   @OneToOne(() => RefreshTokensEntity, (refreshToken) => refreshToken.user)
   refreshToken: RefreshTokensEntity;
+
+  @OneToMany(() => VotesEntity, (writtenVotes) => writtenVotes.writer)
+  writtenVotes: VotesEntity[];
 
   @AfterInsert()
   async createRefreshToken() {

@@ -8,7 +8,12 @@ import {
   LikesVoteDto,
   UpdateVoteCommentDto,
   UpdateVoteDto,
+  VotesEntity,
 } from '@vote/common';
+import { EntityRepository, Repository } from 'typeorm';
+
+@EntityRepository(VotesEntity)
+export class VotesRepository_ extends Repository<VotesEntity> {}
 
 @Injectable()
 export class VotesRepository {

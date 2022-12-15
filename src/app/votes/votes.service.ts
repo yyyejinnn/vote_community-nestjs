@@ -1,4 +1,5 @@
 import { HttpException, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import {
   CreateVoteCommentDto,
   CreateVoteDto,
@@ -9,11 +10,19 @@ import {
   UpdateVoteDto,
 } from '@vote/common';
 import { CustomException, VotesException } from '@vote/middleware';
-import { CommentsRepository, VotesRepository } from './votes.repository';
+import {
+  CommentsRepository,
+  VotesRepository,
+  VotesRepository_,
+} from './votes.repository';
 
 @Injectable()
 export class VotesService {
-  constructor(private readonly votesRepository: VotesRepository) {}
+  constructor(
+    @InjectRepository(VotesRepository_)
+    private readonly votesRepository_: VotesRepository_,
+    private readonly votesRepository: VotesRepository,
+  ) {}
 
   async createVote(data: CreateVoteDto) {
     const { endDate } = data;
