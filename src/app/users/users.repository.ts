@@ -28,6 +28,12 @@ export class UsersRepository extends Repository<UsersEntity> {
     });
     return await this.save(userEntity);
   }
+
+  async updatePassword(userId: number, password: string) {
+    const user = await this.findOne(userId);
+    user.password = await bcrypt.hash(password, 10);
+    return await this.save(user);
+  }
 }
 
 @EntityRepository(RefreshTokensEntity)
@@ -40,21 +46,5 @@ export class RefreshTokensRepository extends Repository<RefreshTokensEntity> {
     });
     refreshToken.token = encryptedRefreshToken;
     return await this.save(refreshToken);
-  }
-}
-
-@Injectable()
-export class UsersRepository_ {
-  private readonly prisma = new PrismaClient();
-
-  async updatePassword(userId: number, password: string) {
-    return await this.prisma.users.update({
-      where: {
-        id: userId,
-      },
-      data: {
-        password: await bcrypt.hash(password, 10),
-      },
-    });
   }
 }

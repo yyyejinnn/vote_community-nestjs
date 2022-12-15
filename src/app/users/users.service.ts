@@ -53,4 +53,8 @@ export class UsersService {
       throw new NotFoundException('존재하지 않은 레코드');
     }
   }
+
+  async updatePassword(userId: number, password: string) {
+    return await this.usersRepository.updatePassword(userId, password);
+  }
 }

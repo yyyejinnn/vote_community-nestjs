@@ -117,7 +117,7 @@ export class AuthService {
     }
     await this._validatePassword(password, checkPassword);
 
-    return await this.usersRepository.updatePassword(userId, password);
+    return await this.usersService.updatePassword(userId, password);
   }
 
   private async _validatePassword(
