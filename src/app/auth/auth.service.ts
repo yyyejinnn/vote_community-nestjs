@@ -1,14 +1,11 @@
 import { Injectable, Type } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { InjectRepository } from '@nestjs/typeorm';
 import { RefreshTokens, Users } from '@prisma/client';
 import {
   SignUpUserDto,
   SignInUserDto,
   JwtPayload,
   RecreateAccessToken,
-  SignIn,
-  SignUp,
   VerifiedToken,
   WhereOptionByUserEmail,
   WhereOptionByUserNickName,
@@ -175,7 +172,7 @@ class TokenService {
     });
     const encryptRefreshToken: string = this._encryptRefreshToken(refreshToken);
 
-    await this.usersRepository.createRefreshToken(
+    await this.usersService.createRefreshToken(
       payload.sub,
       encryptRefreshToken,
     );
