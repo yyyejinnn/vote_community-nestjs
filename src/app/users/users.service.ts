@@ -1,19 +1,31 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { SignUpUserDto, UsersEntity, WhereOption } from '@vote/common';
-import { RefreshTokensRepository, UsersRepository } from './users.repository';
+import {
+  RefreshTokensEntity,
+  SignUpUserDto,
+  UsersEntity,
+  WhereOption,
+} from '@vote/common';
+
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(UsersRepository)
-    private readonly usersRepository: UsersRepository,
-    @InjectRepository(RefreshTokensRepository)
-    private readonly refreshTokenRepository: RefreshTokensRepository,
+    @InjectRepository(UsersEntity)
+    private readonly usersRepository,
+    @InjectRepository(RefreshTokensEntity)
+    private readonly refreshTokenRepository,
   ) {}
 
   async createUser(dto: SignUpUserDto) {
-    return await this.usersRepository.createUser(dto);
+    const { email, nickname, password } = dto;
+    const userEntity = this.usersRepository.create({
+      email,
+      nickname,
+      password: await bcrypt.hash(password, 10),
+    });
+    return await this.usersRepository.save(userEntity);
   }
 
   async findUserByWhereOption(whereOption: WhereOption): Promise<UsersEntity> {
@@ -33,11 +45,14 @@ export class UsersService {
     });
   }
 
-  async createRefreshToken(userId: number, encryptRefreshToken: string) {
-    return await this.refreshTokenRepository.createRefreshToken(
-      userId,
-      encryptRefreshToken,
-    );
+  async createRefreshToken(userId: number, encryptedRefreshToken: string) {
+    const refreshToken = await this.refreshTokenRepository.findOne({
+      where: {
+        userId,
+      },
+    });
+    refreshToken.token = encryptedRefreshToken;
+    return await this.refreshTokenRepository.save(refreshToken);
   }
 
   async signOut(userId: number) {
@@ -51,6 +66,8 @@ export class UsersService {
   }
 
   async updatePassword(userId: number, password: string) {
-    return await this.usersRepository.updatePassword(userId, password);
+    const user = await this.usersRepository.findOne(userId);
+    user.password = await bcrypt.hash(password, 10);
+    return await this.usersRepository.save(user);
   }
 }
