@@ -3,6 +3,7 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
+  JoinTable,
   ManyToOne,
   OneToMany,
 } from 'typeorm';
@@ -27,21 +28,27 @@ export class VotesEntity extends CommonEntity {
   @Column()
   writerId: number;
 
-  @OneToMany(() => VoteChoicesEntity, (voteChoices) => voteChoices.vote)
+  @OneToMany(() => VoteChoicesEntity, (voteChoices) => voteChoices.vote, {
+    eager: true,
+    nullable: true,
+  })
+  @JoinTable()
   voteChoices: VoteChoicesEntity[];
 
-  // id         Int      @id @default(autoincrement())
   // likedUsers Users[]  @relation("LikedVoteUsers")
-  // voteChoices  VoteChoices[]
   // votedUsers   VotedUsers[]
   // VoteComments VoteComments[]
 }
 
 @Entity({ name: 'vote-options' })
 export class VoteChoicesEntity extends CommonEntity {
-  @ManyToOne(() => VotesEntity, (vote) => vote.voteChoices)
+  @ManyToOne(() => VotesEntity, (vote) => vote.voteChoices, {
+    onDelete: 'CASCADE',
+  })
   vote: VotesEntity;
 
-  // title     String
+  @Column()
+  title: string;
+
   // votedUsers VotedUsers[]
 }

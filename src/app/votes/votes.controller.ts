@@ -30,9 +30,9 @@ export class VotesController {
   ) {}
 
   @Post()
-  async createVote(@Body() data: CreateVoteDto) {
-    data['userId'] = 2; //임시
-    return await this.votesRepository.createVote(data);
+  async createVote(@Body() dto) {
+    dto['userId'] = 2; //임시
+    return await this.votesService.createVote(dto);
   }
 
   @Get()

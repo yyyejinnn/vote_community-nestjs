@@ -8,8 +8,11 @@ import {
   LikesVoteDto,
   UpdateVoteCommentDto,
   UpdateVoteDto,
+  VoteChoicesEntity,
+  VotesEntity,
 } from '@vote/common';
 import { CustomException, VotesException } from '@vote/middleware';
+import { UsersService } from '../users/users.service';
 import {
   CommentsRepository,
   VotesRepository,
@@ -19,16 +22,35 @@ import {
 @Injectable()
 export class VotesService {
   constructor(
-    @InjectRepository(VotesRepository_)
-    private readonly votesRepository_: VotesRepository_,
-    private readonly votesRepository: VotesRepository,
+    @InjectRepository(VotesEntity)
+    private readonly votesRepository, // private readonly votesRepository: VotesRepository,
+    @InjectRepository(VoteChoicesEntity)
+    private readonly votesChoicesRepository,
+    private readonly usersService: UsersService,
   ) {}
 
-  async createVote(data: CreateVoteDto) {
-    const { endDate } = data;
+  async createVote(dto: CreateVoteDto) {
+    const { title, endDate, userId, voteChoices } = dto;
     this._compareDates(endDate);
 
-    return await this.votesRepository.createVote(data);
+    const writer = await this.usersService.findUserByWhereOption({
+      id: userId,
+    });
+
+    const voteEntity: VotesEntity = this.votesRepository.create({
+      title,
+      endDate,
+      writer,
+      voteChoices: await Promise.all(
+        voteChoices.map(async (value) => {
+          const choice = new VoteChoicesEntity();
+          choice.title = value;
+          return await choice.save();
+        }),
+      ),
+    });
+
+    return await voteEntity.save();
   }
 
   async updateVote(dto: UpdateVoteDto) {
