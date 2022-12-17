@@ -1,6 +1,7 @@
 import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
+  ChoicedUsersEntity,
   CreateVoteCommentDto,
   CreateVoteDto,
   CreateVotedUserDto,
@@ -8,7 +9,9 @@ import {
   LikesVoteDto,
   UpdateVoteCommentDto,
   UpdateVoteDto,
+  UsersEntity,
   VoteChoicesEntity,
+  VotedUsersEntity,
   VotesEntity,
 } from '@vote/common';
 import { CustomException, VotesException } from '@vote/middleware';
@@ -25,7 +28,7 @@ export class VotesService {
     @InjectRepository(VotesEntity)
     private readonly votesRepository, // private readonly votesRepository: VotesRepository,
     @InjectRepository(VoteChoicesEntity)
-    private readonly votesChoicesRepository,
+    private readonly ChoicesRepository,
     private readonly usersService: UsersService,
   ) {}
 
@@ -34,7 +37,18 @@ export class VotesService {
   }
 
   async getVoteById(voteId: number) {
-    return await this.votesRepository.findOne(voteId);
+    return await this.votesRepository.findOne({
+      relations: {
+        voteChoices: {
+          choiced: {
+            user: true,
+          },
+        },
+      },
+      where: {
+        id: voteId,
+      },
+    });
   }
 
   async createVote(dto: CreateVoteDto) {
@@ -79,11 +93,30 @@ export class VotesService {
   }
 
   async choiceVote(dto: CreateVotedUserDto) {
-    try {
-      return await this.votesRepository.createVotedUser(dto);
-    } catch (error) {
-      throw new CustomException(VotesException.ALREADY_VOTED);
-    }
+    const { voteId, userId, choicedVoteId } = dto;
+
+    const user: UsersEntity = await this.usersService.findUserByWhereOption({
+      id: userId,
+    });
+
+    // voted 생성
+    const vote: VotesEntity = await this.getVoteById(voteId);
+    const voted = new VotedUsersEntity();
+    voted.vote = vote;
+    voted.user = user;
+    await voted.save();
+
+    // choiced 생성
+    const choice: VoteChoicesEntity = await this.ChoicesRepository.findOne({
+      where: {
+        id: choicedVoteId,
+      },
+    });
+
+    const choiced = new ChoicedUsersEntity();
+    choiced.choice = choice;
+    choiced.user = user;
+    await choiced.save();
   }
 
   async likeVote(dto: LikesVoteDto) {

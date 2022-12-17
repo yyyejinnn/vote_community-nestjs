@@ -1,7 +1,19 @@
-import { AfterInsert, Column, Entity, OneToMany, OneToOne } from 'typeorm';
+import {
+  AfterInsert,
+  Column,
+  Entity,
+  ManyToMany,
+  OneToMany,
+  OneToOne,
+} from 'typeorm';
 import { RefreshTokensEntity } from './auth.entity';
 import { CommonEntity } from './base.entity';
-import { VotesEntity } from './votes.entity';
+import {
+  ChoicedUsersEntity,
+  VoteChoicesEntity,
+  VotedUsersEntity,
+  VotesEntity,
+} from './votes.entity';
 
 @Entity({ name: 'users' })
 export class UsersEntity extends CommonEntity {
@@ -19,6 +31,16 @@ export class UsersEntity extends CommonEntity {
 
   @OneToMany(() => VotesEntity, (writtenVotes) => writtenVotes.writer)
   writtenVotes: VotesEntity[];
+
+  @OneToMany(() => VotedUsersEntity, (votedUsers) => votedUsers.user, {
+    onDelete: 'CASCADE',
+  })
+  votedUsers: VotedUsersEntity[];
+
+  @OneToMany(() => ChoicedUsersEntity, (choicedUser) => choicedUser.user, {
+    onDelete: 'CASCADE',
+  })
+  choicedUsers: ChoicedUsersEntity[];
 
   @AfterInsert()
   async createRefreshToken() {

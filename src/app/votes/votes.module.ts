@@ -1,6 +1,11 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { VoteChoicesEntity, VotesEntity } from '@vote/common';
+import {
+  ChoicedUsersEntity,
+  VoteChoicesEntity,
+  VotedUsersEntity,
+  VotesEntity,
+} from '@vote/common';
 import { UsersModule } from '../users/users.module';
 import { CommentsController, VotesController } from './votes.controller';
 import { CommentsRepository, VotesRepository } from './votes.repository';
@@ -9,7 +14,12 @@ import { CommentsService, VotesService } from './votes.service';
 @Module({
   imports: [
     forwardRef(() => UsersModule),
-    TypeOrmModule.forFeature([VotesEntity, VoteChoicesEntity]),
+    TypeOrmModule.forFeature([
+      VotesEntity,
+      VoteChoicesEntity,
+      VotedUsersEntity,
+      ChoicedUsersEntity,
+    ]),
   ],
   controllers: [VotesController, CommentsController],
   providers: [
