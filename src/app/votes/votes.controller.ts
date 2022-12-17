@@ -36,15 +36,13 @@ export class VotesController {
   }
 
   @Get()
-  async listVotes(): Promise<ListVotes> {
-    return { votes: await this.votesRepository.getAllVotes() };
+  async listVotes() {
+    return { votes: await this.votesService.listVotes() };
   }
 
   @Get(':voteId')
-  async getVote(
-    @Param('voteId', ParseIntPipe) voteId: number,
-  ): Promise<GetVote> {
-    return { vote: await this.votesRepository.getVoteById(voteId) };
+  async getVote(@Param('voteId', ParseIntPipe) voteId: number) {
+    return { vote: await this.votesService.getVoteById(voteId) };
   }
 
   @Patch(':voteId')

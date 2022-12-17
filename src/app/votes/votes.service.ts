@@ -29,6 +29,14 @@ export class VotesService {
     private readonly usersService: UsersService,
   ) {}
 
+  async listVotes() {
+    return await this.votesRepository.find();
+  }
+
+  async getVoteById(voteId: number) {
+    return await this.votesRepository.findOne(voteId);
+  }
+
   async createVote(dto: CreateVoteDto) {
     const { title, endDate, userId, voteChoices } = dto;
     this._compareDates(endDate);
