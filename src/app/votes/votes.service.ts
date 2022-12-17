@@ -1,4 +1,4 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   CreateVoteCommentDto,
@@ -61,11 +61,21 @@ export class VotesService {
     return await voteEntity.save();
   }
 
-  async updateVote(dto: UpdateVoteDto) {
+  async updateVote(voteId: number, dto: UpdateVoteDto) {
     const { endDate } = dto;
     this._compareDates(endDate);
 
-    return await this.votesRepository.updateVote(dto);
+    await this.votesRepository.update(voteId, {
+      endDate,
+    });
+  }
+
+  async deleteVote(voteId: number) {
+    const result = await this.votesRepository.delete(voteId);
+
+    if (result.affected === 0) {
+      throw new NotFoundException('존재하지 않은 레코드');
+    }
   }
 
   async choiceVote(dto: CreateVotedUserDto) {

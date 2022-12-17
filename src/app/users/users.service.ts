@@ -66,8 +66,8 @@ export class UsersService {
   }
 
   async updatePassword(userId: number, password: string) {
-    const user = await this.usersRepository.findOne(userId);
-    user.password = await bcrypt.hash(password, 10);
-    return await this.usersRepository.save(user);
+    await this.usersRepository.update(userId, {
+      password: await bcrypt.hash(password, 10),
+    });
   }
 }
