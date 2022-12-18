@@ -10,12 +10,9 @@ import {
 } from '@nestjs/common';
 import {
   CreateVoteCommentDto,
-  CreateVoteDto,
   CreateVotedUserDto,
-  GetVote,
   LikesVoteCommentDto,
   LikesVoteDto,
-  ListVotes,
   UpdateVoteCommentDto,
   UpdateVoteDto,
 } from '@vote/common';

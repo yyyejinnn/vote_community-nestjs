@@ -1,9 +1,5 @@
 import { Controller, Get } from '@nestjs/common';
-import {
-  GetUserWrittenComments,
-  GetUserWrittenVotes,
-  WhereOptionByUserId,
-} from '@vote/common';
+import { WhereOptionByUserId } from '@vote/common';
 import { CommentsService, VotesService } from '../votes/votes.service';
 import { UsersService } from './users.service';
 

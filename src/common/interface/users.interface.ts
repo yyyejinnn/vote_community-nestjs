@@ -1,5 +1,3 @@
-import { Users, VoteComments, Votes } from '@prisma/client';
-
 // type
 export type JwtPayload = {
   sub: number;
@@ -47,14 +45,14 @@ export interface RecreateAccessToken {
   accessToken: string;
 }
 
-export interface GetUserProfile {
-  users: Users;
-}
+// export interface GetUserProfile {
+//   users: Users;
+// }
 
-export interface GetUserWrittenVotes {
-  votes: Votes[];
-}
+// export interface GetUserWrittenVotes {
+//   votes: Votes[];
+// }
 
-export interface GetUserWrittenComments {
-  comments: VoteComments[];
-}
+// export interface GetUserWrittenComments {
+//   comments: VoteComments[];
+// }
