@@ -24,7 +24,7 @@ export class VotesController {
   @Post()
   async createVote(@Body() dto: CreateVoteDto) {
     const userId = 2; //임시
-    return await this.votesService.createVote(userId, dto);
+    return { votes: await this.votesService.createVote(userId, dto) };
   }
 
   @Get()
@@ -34,7 +34,7 @@ export class VotesController {
 
   @Get(':voteId')
   async getVote(@Param('voteId', ParseIntPipe) voteId: number) {
-    return { vote: await this.votesService.getVoteById(voteId) };
+    return { votes: await this.votesService.getVoteById(voteId) };
   }
 
   @Patch(':voteId')
@@ -47,7 +47,7 @@ export class VotesController {
 
   @Delete(':voteId')
   async deleteVote(@Param('voteId', ParseIntPipe) voteId: number) {
-    return await this.votesService.deleteVote(voteId);
+    await this.votesService.deleteVote(voteId);
   }
 
   @Post(':voteId/choice/vote')
@@ -59,13 +59,12 @@ export class VotesController {
     console.log(voteId);
     console.log(body);
 
-    return await this.votesService.choiceVote(voteId, userId, body);
+    await this.votesService.choiceVote(voteId, userId, body);
   }
 
   @Post(':voteId/like')
   async likeVote(@Param('voteId', ParseIntPipe) voteId: number) {
     const userId = 2;
-
     await this.votesService.likeVote(voteId, userId);
   }
 
@@ -82,7 +81,7 @@ export class CommentsController {
 
   @Get()
   async getVoteComments(@Param('voteId', ParseIntPipe) voteId: number) {
-    return await this.commentsService.getAllVoteComments(voteId);
+    return { comments: await this.commentsService.getAllVoteComments(voteId) };
   }
 
   @Post()
@@ -91,7 +90,13 @@ export class CommentsController {
     @Body() body: CreateVoteCommentDto,
   ) {
     const userId = 1; //임시
-    return await this.commentsService.createVoteComment(voteId, userId, body);
+    return {
+      comments: await this.commentsService.createVoteComment(
+        voteId,
+        userId,
+        body,
+      ),
+    };
   }
 
   @Patch(':commentId')
@@ -106,7 +111,7 @@ export class CommentsController {
 
   @Delete(':commentId')
   async deleteVoteComment(@Param('commentId', ParseIntPipe) commentId: number) {
-    return await this.commentsService.deleteVoteComment(commentId);
+    await this.commentsService.deleteVoteComment(commentId);
   }
 
   @Post(':commentId/like')

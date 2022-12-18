@@ -76,10 +76,7 @@ export class AuthService {
     return await this.usersService.signOut(userId);
   }
 
-  async recreateAccessToken(
-    userId: number,
-    encryptRefreshToken: string,
-  ): Promise<RecreateAccessToken> {
+  async recreateAccessToken(userId: number, encryptRefreshToken: string) {
     if (!encryptRefreshToken) {
       throw new CustomException(UsersException.TOKEN_NOT_EXISTS);
     }
@@ -92,8 +89,7 @@ export class AuthService {
       nickname,
     };
 
-    const accessToken = this.tokenService.createAccessToken(payload);
-    return { accessToken };
+    return this.tokenService.createAccessToken(payload);
   }
 
   async resetPassword(
@@ -109,8 +105,7 @@ export class AuthService {
       throw new CustomException(UsersException.SAME_CURR_PASSWORD);
     }
     await this._validatePassword(password, checkPassword);
-
-    return await this.usersService.updatePassword(userId, password);
+    await this.usersService.updatePassword(userId, password);
   }
 
   private async _validatePassword(

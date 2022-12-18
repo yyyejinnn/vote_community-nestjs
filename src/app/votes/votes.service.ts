@@ -77,8 +77,7 @@ export class VotesService {
     return await voteEntity.save();
   }
 
-  async updateVote(voteId: number, dto: UpdateVoteDto) {
-    const { endDate } = dto;
+  async updateVote(voteId: number, { endDate }: UpdateVoteDto) {
     this._compareDates(endDate);
 
     await this.votesRepository.update(voteId, {
@@ -135,7 +134,7 @@ export class VotesService {
     });
     vote.likedUsers.push(likedUser);
 
-    return await vote.save();
+    await vote.save();
   }
 
   async cancleLikedVote(voteId: number, userId: number) {
@@ -188,8 +187,8 @@ export class CommentsService {
   }
 
   async createVoteComment(
-    userId: number,
     voteId: number,
+    userId: number,
     { content }: CreateVoteCommentDto,
   ) {
     const user = await this.usersService.findUserByWhereOption({ id: userId });
@@ -233,7 +232,7 @@ export class CommentsService {
     });
     comment.likedUsers.push(likedUser);
 
-    return await comment.save();
+    await comment.save();
   }
 
   async cancleLikedVoteComment(commentId: number, userId: number) {
