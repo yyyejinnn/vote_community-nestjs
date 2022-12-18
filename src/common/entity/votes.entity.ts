@@ -8,9 +8,9 @@ import {
   ManyToMany,
   ManyToOne,
   OneToMany,
-  Unique,
 } from 'typeorm';
 import { CommonEntity } from './base.entity';
+import { CommentsEntity } from './comments.entity';
 import { UsersEntity } from './users.entity';
 
 @Entity({ name: 'votes' })
@@ -47,7 +47,10 @@ export class VotesEntity extends CommonEntity {
   @JoinTable({ name: 'liked_votes' })
   likedUsers: UsersEntity[];
 
-  // VoteComments VoteComments[]
+  @OneToMany(() => CommentsEntity, (comments) => comments.vote, {
+    eager: true,
+  })
+  comments: CommentsEntity[];
 }
 
 @Entity({ name: 'vote-options' })

@@ -1,3 +1,4 @@
+import { CommentsService } from 'src/app/votes/votes.service';
 import {
   AfterInsert,
   Column,
@@ -9,9 +10,9 @@ import {
 } from 'typeorm';
 import { RefreshTokensEntity } from './auth.entity';
 import { CommonEntity } from './base.entity';
+import { CommentsEntity } from './comments.entity';
 import {
   ChoicedUsersEntity,
-  VoteChoicesEntity,
   VotedUsersEntity,
   VotesEntity,
 } from './votes.entity';
@@ -45,6 +46,19 @@ export class UsersEntity extends CommonEntity {
 
   @ManyToMany(() => VotesEntity, (likedVotes) => likedVotes.likedUsers)
   likedVotes: VotesEntity[];
+
+  @OneToMany(() => CommentsEntity, (writtenComments) => writtenComments.writer)
+  writtenComments: CommentsEntity[];
+
+  @ManyToMany(
+    () => CommentsEntity,
+    (likedComments) => likedComments.likedUsers,
+    {
+      onDelete: 'CASCADE',
+    },
+  )
+  @JoinTable({ name: 'liked_votes' })
+  likedComments: CommentsService[];
 
   @AfterInsert()
   async createRefreshToken() {
