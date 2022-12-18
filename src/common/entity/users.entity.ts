@@ -2,6 +2,7 @@ import {
   AfterInsert,
   Column,
   Entity,
+  JoinTable,
   ManyToMany,
   OneToMany,
   OneToOne,
@@ -41,6 +42,9 @@ export class UsersEntity extends CommonEntity {
     onDelete: 'CASCADE',
   })
   choicedUsers: ChoicedUsersEntity[];
+
+  @ManyToMany(() => VotesEntity, (likedVotes) => likedVotes.likedUsers)
+  likedVotes: VotesEntity[];
 
   @AfterInsert()
   async createRefreshToken() {

@@ -15,6 +15,7 @@ import {
   VotesEntity,
 } from '@vote/common';
 import { CustomException, VotesException } from '@vote/middleware';
+import { Repository } from 'typeorm';
 import { UsersService } from '../users/users.service';
 import {
   CommentsRepository,
@@ -26,9 +27,9 @@ import {
 export class VotesService {
   constructor(
     @InjectRepository(VotesEntity)
-    private readonly votesRepository, // private readonly votesRepository: VotesRepository,
+    private readonly votesRepository: Repository<VotesEntity>, // private readonly votesRepository: VotesRepository,
     @InjectRepository(VoteChoicesEntity)
-    private readonly ChoicesRepository,
+    private readonly ChoicesRepository: Repository<VoteChoicesEntity>,
     private readonly usersService: UsersService,
   ) {}
 
@@ -59,7 +60,7 @@ export class VotesService {
       id: userId,
     });
 
-    const voteEntity: VotesEntity = this.votesRepository.create({
+    const voteEntity = this.votesRepository.create({
       title,
       endDate,
       writer,
@@ -95,19 +96,19 @@ export class VotesService {
   async choiceVote(dto: CreateVotedUserDto) {
     const { voteId, userId, choicedVoteId } = dto;
 
-    const user: UsersEntity = await this.usersService.findUserByWhereOption({
+    const user = await this.usersService.findUserByWhereOption({
       id: userId,
     });
 
     // voted 생성
-    const vote: VotesEntity = await this.getVoteById(voteId);
+    const vote = await this.getVoteById(voteId);
     const voted = new VotedUsersEntity();
     voted.vote = vote;
     voted.user = user;
     await voted.save();
 
     // choiced 생성
-    const choice: VoteChoicesEntity = await this.ChoicesRepository.findOne({
+    const choice = await this.ChoicesRepository.findOne({
       where: {
         id: choicedVoteId,
       },
@@ -119,12 +120,33 @@ export class VotesService {
     await choiced.save();
   }
 
-  async likeVote(dto: LikesVoteDto) {
-    return await this.votesRepository.createLikedUser(dto);
+  async likeVote({ userId, voteId }: LikesVoteDto) {
+    const likedUser = await this.usersService.findUserByWhereOption({
+      id: userId,
+    });
+
+    const vote = await this.votesRepository.findOne({
+      where: {
+        id: voteId,
+      },
+    });
+    vote.likedUsers.push(likedUser);
+
+    return await vote.save();
   }
 
-  async cancleLikedVote(dto: LikesVoteDto) {
-    await this.votesRepository.deleteLikedUser(dto);
+  async cancleLikedVote({ userId, voteId }: LikesVoteDto) {
+    const vote = await this.votesRepository.findOne({
+      where: {
+        id: voteId,
+      },
+    });
+
+    vote.likedUsers = vote.likedUsers.filter((user) => {
+      return user.id !== userId;
+    });
+
+    await vote.save();
   }
 
   private _compareDates(endDate: Date | string) {

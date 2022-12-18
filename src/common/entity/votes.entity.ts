@@ -40,7 +40,13 @@ export class VotesEntity extends CommonEntity {
   @OneToMany(() => VotedUsersEntity, (voted) => voted.vote)
   voted: VotedUsersEntity[];
 
-  // likedUsers Users[]  @relation("LikedVoteUsers")
+  @ManyToMany(() => UsersEntity, (likedUsers) => likedUsers.likedVotes, {
+    onDelete: 'CASCADE',
+    eager: true,
+  })
+  @JoinTable({ name: 'liked_votes' })
+  likedUsers: UsersEntity[];
+
   // VoteComments VoteComments[]
 }
 
