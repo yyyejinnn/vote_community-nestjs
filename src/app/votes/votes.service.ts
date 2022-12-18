@@ -195,6 +195,7 @@ export class CommentsService {
       isUpdate: true,
     });
   }
+
   async deleteVoteComment(commentId: number) {
     const result = await this.commentsRepository.delete(commentId);
 
@@ -203,11 +204,31 @@ export class CommentsService {
     }
   }
 
-  async likeVoteComment(dto: LikesVoteCommentDto) {
-    // await this.commentsRepository.createLikedUser(dto);
+  async likeVoteComment({ userId, commentId }: LikesVoteCommentDto) {
+    const likedUser = await this.usersService.findUserByWhereOption({
+      id: userId,
+    });
+
+    const comment = await this.commentsRepository.findOne({
+      where: {
+        id: commentId,
+      },
+    });
+    comment.likedUsers.push(likedUser);
+
+    return await comment.save();
   }
 
-  async cancleLikedVoteComment(dto: LikesVoteCommentDto) {
-    // await this.commentsRepository.deleteLikedUser(dto);
+  async cancleLikedVoteComment({ userId, commentId }: LikesVoteCommentDto) {
+    const comment = await this.commentsRepository.findOne({
+      where: {
+        id: commentId,
+      },
+    });
+    comment.likedUsers = comment.likedUsers.filter((user) => {
+      return user.id !== userId;
+    });
+
+    await comment.save();
   }
 }
