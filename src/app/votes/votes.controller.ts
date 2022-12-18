@@ -83,7 +83,7 @@ export class VotesController {
 
   @Post(':voteId/like')
   async likeVote(@Param('voteId', ParseIntPipe) voteId: number) {
-    const userId = 1;
+    const userId = 2;
 
     const data: LikesVoteDto = {
       voteId,
@@ -120,7 +120,7 @@ export class CommentsController {
 
   @Get()
   async getVoteComments(@Param('voteId', ParseIntPipe) voteId: number) {
-    return await this.commentsRepository.getAllVoteComments(voteId);
+    return await this.commentsService.getAllVoteComments(voteId);
   }
 
   @Post()
@@ -154,7 +154,7 @@ export class CommentsController {
 
   @Delete(':commentId')
   async deleteVoteComment(@Param('commentId', ParseIntPipe) commentId: number) {
-    return await this.commentsRepository.deleteVoteComment(commentId);
+    return await this.commentsService.deleteVoteComment(commentId);
   }
 
   @Post(':commentId/like')

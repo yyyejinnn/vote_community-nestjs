@@ -28,7 +28,11 @@ export class CommentsEntity extends CommonEntity {
   @ManyToOne(() => VotesEntity, (vote) => vote.comments, {
     onDelete: 'CASCADE',
   })
+  @JoinColumn({ name: 'voteId' })
   vote: VotesEntity;
+
+  @Column()
+  voteId: number;
 
   @Column({
     default: false,
@@ -42,8 +46,9 @@ export class CommentsEntity extends CommonEntity {
   @JoinTable({ name: 'liked_comments' })
   likedUsers: UsersEntity[];
 
-  @AfterUpdate()
-  updateIsUpdate() {
-    this.isUpdate = true;
-  }
+  // 안됨
+  //   @AfterUpdate()
+  //   updateIsUpdate() {
+  //     this.isUpdate = true;
+  //   }
 }
