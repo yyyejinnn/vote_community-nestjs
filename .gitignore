@@ -41,3 +41,6 @@ lerna-debug.log*
 # prisma
 */migrations
 dev.*
+
+# sqlite
+vote-database

@@ -19,32 +19,26 @@ import {
   UpdateVoteCommentDto,
   UpdateVoteDto,
 } from '@vote/common';
-import { CommentsRepository, VotesRepository } from './votes.repository';
 import { CommentsService, VotesService } from './votes.service';
 
 @Controller('votes')
 export class VotesController {
-  constructor(
-    private readonly votesService: VotesService,
-    private readonly votesRepository: VotesRepository,
-  ) {}
+  constructor(private readonly votesService: VotesService) {}
 
   @Post()
-  async createVote(@Body() data: CreateVoteDto) {
-    data['userId'] = 2; //임시
-    return await this.votesRepository.createVote(data);
+  async createVote(@Body() dto) {
+    dto['userId'] = 2; //임시
+    return await this.votesService.createVote(dto);
   }
 
   @Get()
-  async listVotes(): Promise<ListVotes> {
-    return { votes: await this.votesRepository.getAllVotes() };
+  async listVotes() {
+    return { votes: await this.votesService.listVotes() };
   }
 
   @Get(':voteId')
-  async getVote(
-    @Param('voteId', ParseIntPipe) voteId: number,
-  ): Promise<GetVote> {
-    return { vote: await this.votesRepository.getVoteById(voteId) };
+  async getVote(@Param('voteId', ParseIntPipe) voteId: number) {
+    return { vote: await this.votesService.getVoteById(voteId) };
   }
 
   @Patch(':voteId')
@@ -57,12 +51,12 @@ export class VotesController {
       voteId,
     };
 
-    return { votes: await this.votesService.updateVote(data) };
+    return { votes: await this.votesService.updateVote(voteId, data) };
   }
 
   @Delete(':voteId')
   async deleteVote(@Param('voteId', ParseIntPipe) voteId: number) {
-    return await this.votesRepository.deleteVote(voteId);
+    return await this.votesService.deleteVote(voteId);
   }
 
   @Post(':voteId/choice/vote')
@@ -85,7 +79,7 @@ export class VotesController {
 
   @Post(':voteId/like')
   async likeVote(@Param('voteId', ParseIntPipe) voteId: number) {
-    const userId = 1;
+    const userId = 2;
 
     const data: LikesVoteDto = {
       voteId,
@@ -106,23 +100,15 @@ export class VotesController {
 
     await this.votesService.cancleLikedVote(data);
   }
-
-  @Get(':voteId/voted-users')
-  async getVotedUsers(@Param('id', ParseIntPipe) voteId: number) {
-    return this.votesRepository.getVotedUsers(voteId);
-  }
 }
 
 @Controller('votes/:voteId/comments')
 export class CommentsController {
-  constructor(
-    private readonly commentsService: CommentsService,
-    private readonly commentsRepository: CommentsRepository,
-  ) {}
+  constructor(private readonly commentsService: CommentsService) {}
 
   @Get()
   async getVoteComments(@Param('voteId', ParseIntPipe) voteId: number) {
-    return await this.commentsRepository.getAllVoteComments(voteId);
+    return await this.commentsService.getAllVoteComments(voteId);
   }
 
   @Post()
@@ -156,7 +142,7 @@ export class CommentsController {
 
   @Delete(':commentId')
   async deleteVoteComment(@Param('commentId', ParseIntPipe) commentId: number) {
-    return await this.commentsRepository.deleteVoteComment(commentId);
+    return await this.commentsService.deleteVoteComment(commentId);
   }
 
   @Post(':commentId/like')

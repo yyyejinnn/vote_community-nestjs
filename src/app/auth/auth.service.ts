@@ -1,24 +1,22 @@
-import { Injectable, Type } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { RefreshTokens, Users } from '@prisma/client';
 import {
   SignUpUserDto,
   SignInUserDto,
   JwtPayload,
   RecreateAccessToken,
-  SignIn,
-  SignUp,
   VerifiedToken,
   WhereOptionByUserEmail,
   WhereOptionByUserNickName,
   SignOutUserDto,
   ResetPasswordDto,
+  UsersEntity,
 } from '@vote/common';
 import { CustomException, UsersException } from '@vote/middleware';
 
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
-import { UsersRepository } from '../users/users.repository';
+import { UsersService } from '../users/users.service';
 
 type ValidatePasswordType = 'clearPassword' | 'hashedPassword';
 
@@ -26,19 +24,17 @@ type ValidatePasswordType = 'clearPassword' | 'hashedPassword';
 export class AuthService {
   private readonly tokenService: TokenService;
 
-  constructor(private readonly usersRepository: UsersRepository) {
-    this.tokenService = new TokenService(usersRepository);
+  constructor(private readonly usersService: UsersService) {
+    this.tokenService = new TokenService(usersService);
   }
 
-  async signUp(dto: SignUpUserDto): Promise<SignUp> {
+  async signUp(dto: SignUpUserDto) {
     const { email, password, checkPassword, nickname } = dto;
 
     const whereOption: WhereOptionByUserEmail = {
       email: email,
     };
-    const user: Users = await this.usersRepository.findUserByWhereOption(
-      whereOption,
-    );
+    const user = await this.usersService.findUserByWhereOption(whereOption);
 
     if (user) {
       throw new CustomException(UsersException.USER_ALREADY_EXISTS);
@@ -47,7 +43,7 @@ export class AuthService {
     await this._validatePassword(password, checkPassword);
     await this._validateNickname(nickname);
 
-    const createdUser: Users = await this.usersRepository.createUser(dto);
+    const createdUser: UsersEntity = await this.usersService.createUser(dto);
     const { password: pw, updatedAt, ...userRes } = createdUser;
 
     return {
@@ -55,13 +51,11 @@ export class AuthService {
     };
   }
 
-  async signIn({ email, password }: SignInUserDto): Promise<SignIn> {
+  async signIn({ email, password }: SignInUserDto) {
     const whereOption: WhereOptionByUserEmail = {
       email,
     };
-    const user: Users = await this.usersRepository.findUserByWhereOption(
-      whereOption,
-    );
+    const user = await this.usersService.findUserByWhereOption(whereOption);
 
     if (!user) {
       throw new CustomException(UsersException.USER_NOT_EXIST);
@@ -80,7 +74,7 @@ export class AuthService {
   }
 
   async signOut({ userId }: SignOutUserDto) {
-    return await this.usersRepository.deleteRefreshToken(userId);
+    return await this.usersService.signOut(userId);
   }
 
   async recreateAccessToken(
@@ -107,7 +101,7 @@ export class AuthService {
     const { userId, password, checkPassword } = dto;
 
     const { password: currPassword } =
-      await this.usersRepository.findUserByWhereOption({
+      await this.usersService.findUserByWhereOption({
         id: userId,
       });
 
@@ -116,7 +110,7 @@ export class AuthService {
     }
     await this._validatePassword(password, checkPassword);
 
-    return await this.usersRepository.updatePassword(userId, password);
+    return await this.usersService.updatePassword(userId, password);
   }
 
   private async _validatePassword(
@@ -138,9 +132,7 @@ export class AuthService {
 
   private async _validateNickname(nickname: string) {
     const whereOption: WhereOptionByUserNickName = { nickname };
-    const user: Users = await this.usersRepository.findUserByWhereOption(
-      whereOption,
-    );
+    const user = await this.usersService.findUserByWhereOption(whereOption);
 
     if (user) {
       throw new CustomException(UsersException.NICKNAME_ALREADY_EXISTS);
@@ -151,14 +143,14 @@ export class AuthService {
 class TokenService {
   private readonly jwtService: JwtService;
 
-  constructor(private readonly usersRepository: UsersRepository) {
+  constructor(private readonly usersService: UsersService) {
     this.jwtService = new JwtService();
   }
 
   createAccessToken(payload: JwtPayload): string {
     const accessToken: string = this.jwtService.sign(payload, {
       secret: 'access-secret-key', // 임시
-      expiresIn: '3m', // 임시
+      expiresIn: '1h', // 임시
     });
 
     return accessToken;
@@ -167,11 +159,11 @@ class TokenService {
   async createRefreshToken(payload: JwtPayload): Promise<string> {
     const refreshToken: string = this.jwtService.sign(payload, {
       secret: 'refresh-secret-key',
-      expiresIn: '10m',
+      expiresIn: '1d',
     });
     const encryptRefreshToken: string = this._encryptRefreshToken(refreshToken);
 
-    await this.usersRepository.createRefreshToken(
+    await this.usersService.createRefreshToken(
       payload.sub,
       encryptRefreshToken,
     );
@@ -185,11 +177,10 @@ class TokenService {
   ): Promise<VerifiedToken> {
     let verifiedToken: VerifiedToken;
 
-    const token: RefreshTokens =
-      await this.usersRepository.findMatchedRefreshToken(
-        userId,
-        encryptRefreshToken,
-      );
+    const token: UsersEntity = await this.usersService.findMatchedRefreshToken(
+      userId,
+      encryptRefreshToken,
+    );
 
     if (!token) {
       throw new CustomException(UsersException.UNVERIFIED_REFRESH_TOKEN);

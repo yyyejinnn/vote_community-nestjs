@@ -15,7 +15,6 @@ import {
   SignIn,
   SignInUserDto,
   SignOutUserDto,
-  SignUp,
   SignUpUserDto,
 } from '@vote/common';
 import { AuthService } from './auth.service';
@@ -26,13 +25,13 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('sign-up')
-  async signUp(@Body() data: SignUpUserDto): Promise<SignUp> {
-    return await this.authService.signUp(data);
+  async signUp(@Body() dto: SignUpUserDto) {
+    return await this.authService.signUp(dto);
   }
 
   @Post('sign-in')
-  async signIn(@Body() data: SignInUserDto): Promise<SignIn> {
-    return await this.authService.signIn(data);
+  async signIn(@Body() dto: SignInUserDto): Promise<SignIn> {
+    return await this.authService.signIn(dto);
   }
 
   @UseGuards(JwtAccessGuard)
