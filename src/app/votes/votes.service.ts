@@ -5,8 +5,6 @@ import {
   CreateVoteCommentDto,
   CreateVoteDto,
   CreateVotedUserDto,
-  LikesVoteCommentDto,
-  LikesVoteDto,
   UpdateVoteCommentDto,
   UpdateVoteDto,
   VoteChoicesEntity,
@@ -55,8 +53,8 @@ export class VotesService {
     });
   }
 
-  async createVote(dto: CreateVoteDto) {
-    const { title, endDate, userId, voteChoices } = dto;
+  async createVote(userId: number, dto: CreateVoteDto) {
+    const { title, endDate, voteChoices } = dto;
     this._compareDates(endDate);
 
     const writer = await this.usersService.findUserByWhereOption({
@@ -96,9 +94,11 @@ export class VotesService {
     }
   }
 
-  async choiceVote(dto: CreateVotedUserDto) {
-    const { voteId, userId, choicedVoteId } = dto;
-
+  async choiceVote(
+    voteId: number,
+    userId: number,
+    { choicedVoteId }: CreateVotedUserDto,
+  ) {
     const user = await this.usersService.findUserByWhereOption({
       id: userId,
     });
@@ -123,7 +123,7 @@ export class VotesService {
     await choiced.save();
   }
 
-  async likeVote({ userId, voteId }: LikesVoteDto) {
+  async likeVote(voteId: number, userId: number) {
     const likedUser = await this.usersService.findUserByWhereOption({
       id: userId,
     });
@@ -138,7 +138,7 @@ export class VotesService {
     return await vote.save();
   }
 
-  async cancleLikedVote({ userId, voteId }: LikesVoteDto) {
+  async cancleLikedVote(voteId: number, userId: number) {
     const vote = await this.votesRepository.findOne({
       where: {
         id: voteId,
@@ -187,7 +187,11 @@ export class CommentsService {
     });
   }
 
-  async createVoteComment({ userId, voteId, content }: CreateVoteCommentDto) {
+  async createVoteComment(
+    userId: number,
+    voteId: number,
+    { content }: CreateVoteCommentDto,
+  ) {
     const user = await this.usersService.findUserByWhereOption({ id: userId });
     const vote = await this.votesService.getVoteById(voteId);
     const comment = this.commentsRepository.create({
@@ -199,7 +203,10 @@ export class CommentsService {
     return await comment.save();
   }
 
-  async updateVoteComment({ commentId, content }: UpdateVoteCommentDto) {
+  async updateVoteComment(
+    commentId: number,
+    { content }: UpdateVoteCommentDto,
+  ) {
     await this.commentsRepository.update(commentId, {
       content,
       isUpdate: true,
@@ -214,7 +221,7 @@ export class CommentsService {
     }
   }
 
-  async likeVoteComment({ userId, commentId }: LikesVoteCommentDto) {
+  async likeVoteComment(commentId: number, userId: number) {
     const likedUser = await this.usersService.findUserByWhereOption({
       id: userId,
     });
@@ -229,7 +236,7 @@ export class CommentsService {
     return await comment.save();
   }
 
-  async cancleLikedVoteComment({ userId, commentId }: LikesVoteCommentDto) {
+  async cancleLikedVoteComment(commentId: number, userId: number) {
     const comment = await this.commentsRepository.findOne({
       where: {
         id: commentId,

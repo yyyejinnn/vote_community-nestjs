@@ -6,6 +6,7 @@ import {
   UsersEntity,
   WhereOption,
 } from '@vote/common';
+import { CustomException, UsersException } from '@vote/middleware';
 
 import * as bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
@@ -30,9 +31,15 @@ export class UsersService {
   }
 
   async findUserByWhereOption(whereOption: WhereOption): Promise<UsersEntity> {
-    return await this.usersRepository.findOne({
+    const user = await this.usersRepository.findOne({
       where: whereOption,
     });
+
+    if (!user) {
+      throw new CustomException(UsersException.USER_NOT_EXIST);
+    }
+
+    return user;
   }
 
   async findMatchedRefreshToken(

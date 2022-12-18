@@ -10,9 +10,8 @@ import {
 } from '@nestjs/common';
 import {
   CreateVoteCommentDto,
+  CreateVoteDto,
   CreateVotedUserDto,
-  LikesVoteCommentDto,
-  LikesVoteDto,
   UpdateVoteCommentDto,
   UpdateVoteDto,
 } from '@vote/common';
@@ -23,9 +22,9 @@ export class VotesController {
   constructor(private readonly votesService: VotesService) {}
 
   @Post()
-  async createVote(@Body() dto) {
-    dto['userId'] = 2; //임시
-    return await this.votesService.createVote(dto);
+  async createVote(@Body() dto: CreateVoteDto) {
+    const userId = 2; //임시
+    return await this.votesService.createVote(userId, dto);
   }
 
   @Get()
@@ -41,14 +40,9 @@ export class VotesController {
   @Patch(':voteId')
   async updateVote(
     @Param('voteId', ParseIntPipe) voteId: number,
-    @Body() body: Omit<UpdateVoteDto, 'userId' | 'voteId'>,
+    @Body() body: UpdateVoteDto,
   ) {
-    const data: UpdateVoteDto = {
-      ...body,
-      voteId,
-    };
-
-    return { votes: await this.votesService.updateVote(voteId, data) };
+    return { votes: await this.votesService.updateVote(voteId, body) };
   }
 
   @Delete(':voteId')
@@ -59,43 +53,26 @@ export class VotesController {
   @Post(':voteId/choice/vote')
   async choiceVote(
     @Param('voteId', ParseIntPipe) voteId: number,
-    @Body('choicedId') choicedVoteId: number,
+    @Body() body: CreateVotedUserDto,
   ) {
     const userId = 2; // 임시
     console.log(voteId);
-    console.log(choicedVoteId);
+    console.log(body);
 
-    const data: CreateVotedUserDto = {
-      voteId,
-      userId,
-      choicedVoteId: choicedVoteId,
-    };
-
-    return await this.votesService.choiceVote(data);
+    return await this.votesService.choiceVote(voteId, userId, body);
   }
 
   @Post(':voteId/like')
   async likeVote(@Param('voteId', ParseIntPipe) voteId: number) {
     const userId = 2;
 
-    const data: LikesVoteDto = {
-      voteId,
-      userId,
-    };
-
-    await this.votesService.likeVote(data);
+    await this.votesService.likeVote(voteId, userId);
   }
 
   @Post(':voteId/cancle/likes')
   async cancleLikedVote(@Param('voteId', ParseIntPipe) voteId: number) {
     const userId = 1;
-
-    const data: LikesVoteDto = {
-      voteId,
-      userId,
-    };
-
-    await this.votesService.cancleLikedVote(data);
+    await this.votesService.cancleLikedVote(voteId, userId);
   }
 }
 
@@ -111,30 +88,20 @@ export class CommentsController {
   @Post()
   async createVoteComment(
     @Param('voteId', ParseIntPipe) voteId: number,
-    @Body('content') content: string,
+    @Body() body: CreateVoteCommentDto,
   ) {
     const userId = 1; //임시
-
-    const data: CreateVoteCommentDto = {
-      voteId,
-      userId,
-      content,
-    };
-
-    return await this.commentsService.createVoteComment(data);
+    return await this.commentsService.createVoteComment(voteId, userId, body);
   }
 
   @Patch(':commentId')
   async updateVoteComment(
     @Param('commentId', ParseIntPipe) commentId: number,
-    @Body() body: Omit<UpdateVoteCommentDto, 'commentId'>,
+    @Body() body: UpdateVoteCommentDto,
   ) {
-    const data: UpdateVoteCommentDto = {
-      ...body,
-      commentId,
+    return {
+      comments: await this.commentsService.updateVoteComment(commentId, body),
     };
-
-    return { comments: await this.commentsService.updateVoteComment(data) };
   }
 
   @Delete(':commentId')
@@ -145,13 +112,7 @@ export class CommentsController {
   @Post(':commentId/like')
   async likeVoteComment(@Param('commentId', ParseIntPipe) commentId: number) {
     const userId = 1;
-
-    const data: LikesVoteCommentDto = {
-      commentId,
-      userId,
-    };
-
-    await this.commentsService.likeVoteComment(data);
+    await this.commentsService.likeVoteComment(commentId, userId);
   }
 
   @Post(':commentId/cancle/likes')
@@ -159,12 +120,6 @@ export class CommentsController {
     @Param('voteId', ParseIntPipe) commentId: number,
   ) {
     const userId = 1;
-
-    const data: LikesVoteCommentDto = {
-      commentId,
-      userId,
-    };
-
-    await this.commentsService.cancleLikedVoteComment(data);
+    await this.commentsService.cancleLikedVoteComment(commentId, userId);
   }
 }

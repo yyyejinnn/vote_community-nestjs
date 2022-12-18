@@ -8,7 +8,6 @@ import {
   VerifiedToken,
   WhereOptionByUserEmail,
   WhereOptionByUserNickName,
-  SignOutUserDto,
   ResetPasswordDto,
   UsersEntity,
 } from '@vote/common';
@@ -73,7 +72,7 @@ export class AuthService {
     return { accessToken, refreshToken: encryptRefreshToken };
   }
 
-  async signOut({ userId }: SignOutUserDto) {
+  async signOut(userId: number) {
     return await this.usersService.signOut(userId);
   }
 
@@ -97,9 +96,10 @@ export class AuthService {
     return { accessToken };
   }
 
-  async resetPassword(dto: ResetPasswordDto) {
-    const { userId, password, checkPassword } = dto;
-
+  async resetPassword(
+    userId: number,
+    { password, checkPassword }: ResetPasswordDto,
+  ) {
     const { password: currPassword } =
       await this.usersService.findUserByWhereOption({
         id: userId,

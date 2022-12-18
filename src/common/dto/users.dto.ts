@@ -59,23 +59,7 @@ export class SignInUserDto extends PickType(SignUpUserDto, [
   'password',
 ]) {}
 
-export class SignOutUserDto {
-  @IsNotEmpty({
-    context: {
-      code: 'EMPTY_USER_ID',
-    },
-  })
-  userId: number;
-}
-
 export class ResetPasswordDto extends PickType(SignUpUserDto, [
   'password',
   'checkPassword',
-]) {
-  @IsNotEmpty({
-    context: {
-      code: 'EMPTY_USER_ID',
-    },
-  })
-  userId: number;
-}
+]) {}

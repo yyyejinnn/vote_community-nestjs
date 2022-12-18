@@ -14,7 +14,6 @@ import {
   ResetPasswordDto,
   SignIn,
   SignInUserDto,
-  SignOutUserDto,
   SignUpUserDto,
 } from '@vote/common';
 import { AuthService } from './auth.service';
@@ -49,24 +48,13 @@ export class AuthController {
   @Delete('sign-out')
   async signOut() {
     const userId = 1;
-
-    const data: SignOutUserDto = {
-      userId,
-    };
-
-    return await this.authService.signOut(data);
+    return await this.authService.signOut(userId);
   }
 
   @Patch('reset/password')
-  async resetPassword(@Body() body: Omit<ResetPasswordDto, 'userId'>) {
+  async resetPassword(@Body() body: ResetPasswordDto) {
     const userId = 1;
-
-    const data: ResetPasswordDto = {
-      ...body,
-      userId,
-    };
-
-    return await this.authService.resetPassword(data);
+    return await this.authService.resetPassword(userId, body);
   }
 
   @UseGuards(JwtAccessGuard)
