@@ -4,15 +4,15 @@ import {
   GetUserWrittenVotes,
   WhereOptionByUserId,
 } from '@vote/common';
-import { CommentsRepository, VotesRepository } from '../votes/votes.repository';
+import { CommentsService, VotesService } from '../votes/votes.service';
 import { UsersService } from './users.service';
 
 @Controller('users')
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
-    private readonly votesRepository: VotesRepository,
-    private readonly commentsRepository: CommentsRepository,
+    private readonly votesService: VotesService,
+    private readonly commentsService: CommentsService,
   ) {}
 
   @Get('profile')
@@ -23,32 +23,16 @@ export class UsersController {
   }
 
   @Get('written-votes')
-  async getWrittenVotes(): Promise<GetUserWrittenVotes> {
-    const userId = 1; //임시
-    return { votes: await this.votesRepository.getAllVotesByUserId(userId) };
+  async getWrittenVotes() {
+    const userId = 2; //임시
+    return { votes: await this.votesService.getAllVotesByUserId(userId) };
   }
 
   @Get('written-comments')
-  async getWrittenComments(): Promise<GetUserWrittenComments> {
-    const userId = 1;
+  async getWrittenComments() {
+    const userId = 2;
     return {
-      comments: await this.commentsRepository.getAllCommentsByUserId(userId),
-    };
-  }
-
-  @Get('liked-votes')
-  async getLikedVotes() {
-    const userId = 1;
-    return {
-      votes: await this.votesRepository.getAllVotesByUserId(userId),
-    };
-  }
-
-  @Get('liked-comments')
-  async getLikedComments() {
-    const userId = 1;
-    return {
-      comments: await this.commentsRepository.getLikedCommentsByUserId(userId),
+      comments: await this.commentsService.getAllCommentsByUserId(userId),
     };
   }
 }

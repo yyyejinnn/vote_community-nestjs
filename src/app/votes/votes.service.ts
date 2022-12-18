@@ -1,4 +1,4 @@
-import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   ChoicedUsersEntity,
@@ -9,7 +9,6 @@ import {
   LikesVoteDto,
   UpdateVoteCommentDto,
   UpdateVoteDto,
-  UsersEntity,
   VoteChoicesEntity,
   VotedUsersEntity,
   VotesEntity,
@@ -18,17 +17,12 @@ import { CustomException, VotesException } from '@vote/middleware';
 import { CommentsEntity } from 'src/common/entity/comments.entity';
 import { Repository } from 'typeorm';
 import { UsersService } from '../users/users.service';
-import {
-  CommentsRepository,
-  VotesRepository,
-  VotesRepository_,
-} from './votes.repository';
 
 @Injectable()
 export class VotesService {
   constructor(
     @InjectRepository(VotesEntity)
-    private readonly votesRepository: Repository<VotesEntity>, // private readonly votesRepository: VotesRepository,
+    private readonly votesRepository: Repository<VotesEntity>,
     @InjectRepository(VoteChoicesEntity)
     private readonly ChoicesRepository: Repository<VoteChoicesEntity>,
     private readonly usersService: UsersService,
@@ -49,6 +43,14 @@ export class VotesService {
       },
       where: {
         id: voteId,
+      },
+    });
+  }
+
+  async getAllVotesByUserId(userId: number) {
+    return await this.votesRepository.find({
+      where: {
+        writerId: userId,
       },
     });
   }
@@ -173,6 +175,14 @@ export class CommentsService {
     return await this.commentsRepository.find({
       where: {
         voteId,
+      },
+    });
+  }
+
+  async getAllCommentsByUserId(userId: number) {
+    return await this.commentsRepository.find({
+      where: {
+        writerId: userId,
       },
     });
   }

@@ -19,15 +19,11 @@ import {
   UpdateVoteCommentDto,
   UpdateVoteDto,
 } from '@vote/common';
-import { CommentsRepository, VotesRepository } from './votes.repository';
 import { CommentsService, VotesService } from './votes.service';
 
 @Controller('votes')
 export class VotesController {
-  constructor(
-    private readonly votesService: VotesService,
-    private readonly votesRepository: VotesRepository,
-  ) {}
+  constructor(private readonly votesService: VotesService) {}
 
   @Post()
   async createVote(@Body() dto) {
@@ -104,19 +100,11 @@ export class VotesController {
 
     await this.votesService.cancleLikedVote(data);
   }
-
-  @Get(':voteId/voted-users')
-  async getVotedUsers(@Param('id', ParseIntPipe) voteId: number) {
-    return this.votesRepository.getVotedUsers(voteId);
-  }
 }
 
 @Controller('votes/:voteId/comments')
 export class CommentsController {
-  constructor(
-    private readonly commentsService: CommentsService,
-    private readonly commentsRepository: CommentsRepository,
-  ) {}
+  constructor(private readonly commentsService: CommentsService) {}
 
   @Get()
   async getVoteComments(@Param('voteId', ParseIntPipe) voteId: number) {

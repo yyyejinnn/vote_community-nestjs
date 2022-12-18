@@ -9,7 +9,6 @@ import {
 import { CommentsEntity } from 'src/common/entity/comments.entity';
 import { UsersModule } from '../users/users.module';
 import { CommentsController, VotesController } from './votes.controller';
-import { CommentsRepository, VotesRepository } from './votes.repository';
 import { CommentsService, VotesService } from './votes.service';
 
 @Module({
@@ -24,12 +23,7 @@ import { CommentsService, VotesService } from './votes.service';
     ]),
   ],
   controllers: [VotesController, CommentsController],
-  providers: [
-    VotesService,
-    VotesRepository,
-    CommentsService,
-    CommentsRepository,
-  ],
-  exports: [TypeOrmModule, VotesRepository, CommentsRepository],
+  providers: [VotesService, CommentsService],
+  exports: [TypeOrmModule, VotesService, CommentsService],
 })
 export class VotesModule {}
