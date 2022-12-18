@@ -8,17 +8,18 @@ import {
 } from '@vote/common';
 
 import * as bcrypt from 'bcrypt';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(UsersEntity)
-    private readonly usersRepository,
+    private readonly usersRepository: Repository<UsersEntity>,
     @InjectRepository(RefreshTokensEntity)
-    private readonly refreshTokenRepository,
+    private readonly refreshTokenRepository: Repository<RefreshTokensEntity>,
   ) {}
 
-  async createUser(dto: SignUpUserDto) {
+  async createUser(dto: SignUpUserDto): Promise<UsersEntity> {
     const { email, nickname, password } = dto;
     const userEntity = this.usersRepository.create({
       email,
@@ -34,7 +35,10 @@ export class UsersService {
     });
   }
 
-  async findMatchedRefreshToken(userId: number, encryptRefreshToken: string) {
+  async findMatchedRefreshToken(
+    userId: number,
+    encryptRefreshToken: string,
+  ): Promise<UsersEntity> {
     return await this.usersRepository.findOne({
       where: {
         id: userId,
@@ -45,7 +49,10 @@ export class UsersService {
     });
   }
 
-  async createRefreshToken(userId: number, encryptedRefreshToken: string) {
+  async createRefreshToken(
+    userId: number,
+    encryptedRefreshToken: string,
+  ): Promise<RefreshTokensEntity> {
     const refreshToken = await this.refreshTokenRepository.findOne({
       where: {
         userId,
