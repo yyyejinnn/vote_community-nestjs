@@ -1,4 +1,4 @@
-import { PartialType } from '@nestjs/swagger';
+import { PartialType, PickType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsArray, IsDate, IsNotEmpty, IsString } from 'class-validator';
 
@@ -20,7 +20,7 @@ export class CreateVoteDto {
       code: 'EMPTY_END_DATE',
     },
   })
-  endDate: Date;
+  endDate;
 
   @IsArray({
     context: {
@@ -49,7 +49,7 @@ export class CreateVoteCommentDto {
   content: string;
 }
 
-export class UpdateVoteDto extends PartialType(CreateVoteDto) {}
+export class UpdateVoteDto extends PickType(CreateVoteDto, ['endDate']) {}
 
 export class CreateVotedUserDto {
   @IsNotEmpty({

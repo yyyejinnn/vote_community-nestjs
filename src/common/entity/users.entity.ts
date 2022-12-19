@@ -57,8 +57,7 @@ export class UsersEntity extends CommonEntity {
       onDelete: 'CASCADE',
     },
   )
-  @JoinTable({ name: 'liked_votes' })
-  likedComments: CommentsService[];
+  likedComments: CommentsEntity[];
 
   @AfterInsert()
   async createRefreshToken() {
