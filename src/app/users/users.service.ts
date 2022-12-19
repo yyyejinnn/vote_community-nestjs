@@ -35,10 +35,6 @@ export class UsersService {
       where: whereOption,
     });
 
-    if (!user) {
-      throw new CustomException(UsersException.USER_NOT_EXIST);
-    }
-
     return user;
   }
 
@@ -83,5 +79,9 @@ export class UsersService {
     await this.usersRepository.update(userId, {
       password: await bcrypt.hash(password, 10),
     });
+  }
+
+  async deleteUser(userId: number) {
+    await this.usersRepository.delete({ id: userId });
   }
 }

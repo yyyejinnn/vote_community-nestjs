@@ -45,9 +45,7 @@ export class AuthService {
     const createdUser: UsersEntity = await this.usersService.createUser(dto);
     const { password: pw, updatedAt, ...userRes } = createdUser;
 
-    return {
-      users: userRes,
-    };
+    return userRes;
   }
 
   async signIn({ email, password }: SignInUserDto) {
