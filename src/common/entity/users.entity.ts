@@ -50,13 +50,7 @@ export class UsersEntity extends CommonEntity {
   @OneToMany(() => CommentsEntity, (writtenComments) => writtenComments.writer)
   writtenComments: CommentsEntity[];
 
-  @ManyToMany(
-    () => CommentsEntity,
-    (likedComments) => likedComments.likedUsers,
-    {
-      onDelete: 'CASCADE',
-    },
-  )
+  @ManyToMany(() => CommentsEntity, (likedComments) => likedComments.likedUsers)
   likedComments: CommentsEntity[];
 
   @AfterInsert()

@@ -4,13 +4,20 @@ import { AppModule } from 'src/app.module';
 import { CustomValidationPipe } from 'src/middleware/pipe/validation.pipe';
 import * as request from 'supertest';
 import { MyLogger } from 'src/app/logger/logger.service';
-import { CreateVoteDto, CreateVotedUserDto, UpdateVoteDto } from '@vote/common';
+import {
+  CreateVoteCommentDto,
+  CreateVoteDto,
+  CreateVotedUserDto,
+  UpdateVoteCommentDto,
+  UpdateVoteDto,
+} from '@vote/common';
 import { VotesService } from 'src/app/votes/votes.service';
 
 describe('votes', () => {
   let app: INestApplication;
   let votesService: VotesService;
   let voteId: number;
+  let commentId: number;
 
   beforeAll(async () => {
     const moduleRef: TestingModule = await Test.createTestingModule({
@@ -82,8 +89,60 @@ describe('votes', () => {
     });
   });
 
+  describe('/votes/:voteId/comments', () => {
+    it('GET', () => {
+      return request(app.getHttpServer())
+        .get(`/votes/${voteId}/comments`)
+        .expect(200);
+    });
+    it('POST', async () => {
+      const body: CreateVoteCommentDto = {
+        content: '댓글 test',
+      };
+      return await request(app.getHttpServer())
+        .post(`/votes/${voteId}/comments`)
+        .send(body)
+        .expect(201)
+        .then((comment) => {
+          console.log(comment.body);
+          commentId = comment.body.result.comments.id;
+        });
+    });
+    it('/:commentId PATCH', () => {
+      const body: UpdateVoteCommentDto = {
+        content: '변경된 댓글 test',
+      };
+      return request(app.getHttpServer())
+        .patch(`/votes/${voteId}/comments/${commentId}`)
+        .send(body)
+        .expect(200);
+    });
+    it('/:commentId/like POST', async () => {
+      return await request(app.getHttpServer())
+        .post(`/votes/${voteId}/comments/${commentId}/like`)
+        .expect(201);
+    });
+    it(':commentId/cancle/likes POST', async () => {
+      return await request(app.getHttpServer())
+        .post(`/votes/${voteId}/comments/${commentId}/cancle/likes`)
+        .expect(201);
+    });
+  });
+
+  describe('Delete vote and comments', () => {
+    it('comment DELETE', () => {
+      return request(app.getHttpServer())
+        .delete(`/votes/${voteId}/comments/${commentId}`)
+        .expect(200);
+    });
+    it('vote DELETE', () => {
+      return request(app.getHttpServer())
+        .delete(`/votes/${voteId}`)
+        .expect(200);
+    });
+  });
+
   afterAll(async () => {
-    await votesService.deleteVote(voteId);
     await app.close();
   });
 });
