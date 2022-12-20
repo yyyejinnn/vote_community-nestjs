@@ -14,7 +14,6 @@ import {
   ResetPasswordDto,
   SignIn,
   SignInUserDto,
-  SignOutUserDto,
   SignUpUserDto,
 } from '@vote/common';
 import { AuthService } from './auth.service';
@@ -26,12 +25,12 @@ export class AuthController {
 
   @Post('sign-up')
   async signUp(@Body() dto: SignUpUserDto) {
-    return await this.authService.signUp(dto);
+    return { users: await this.authService.signUp(dto) };
   }
 
   @Post('sign-in')
-  async signIn(@Body() dto: SignInUserDto): Promise<SignIn> {
-    return await this.authService.signIn(dto);
+  async signIn(@Body() dto: SignInUserDto) {
+    return { users: await this.authService.signIn(dto) };
   }
 
   @UseGuards(JwtAccessGuard)
@@ -39,34 +38,25 @@ export class AuthController {
   async recreateAccessToken(
     @CurrUser('id', ParseIntPipe) userId: number,
     @Body('refreshToken') encryptRefreshToken: string,
-  ): Promise<RecreateAccessToken> {
-    return await this.authService.recreateAccessToken(
-      userId,
-      encryptRefreshToken,
-    );
+  ) {
+    return {
+      accessToken: await this.authService.recreateAccessToken(
+        userId,
+        encryptRefreshToken,
+      ),
+    };
   }
 
   @Delete('sign-out')
   async signOut() {
     const userId = 1;
-
-    const data: SignOutUserDto = {
-      userId,
-    };
-
-    return await this.authService.signOut(data);
+    await this.authService.signOut(userId);
   }
 
   @Patch('reset/password')
-  async resetPassword(@Body() body: Omit<ResetPasswordDto, 'userId'>) {
+  async resetPassword(@Body() body: ResetPasswordDto) {
     const userId = 1;
-
-    const data: ResetPasswordDto = {
-      ...body,
-      userId,
-    };
-
-    return await this.authService.resetPassword(data);
+    await this.authService.resetPassword(userId, body);
   }
 
   @UseGuards(JwtAccessGuard)

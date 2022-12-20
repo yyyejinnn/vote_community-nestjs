@@ -8,7 +8,6 @@ import {
   VerifiedToken,
   WhereOptionByUserEmail,
   WhereOptionByUserNickName,
-  SignOutUserDto,
   ResetPasswordDto,
   UsersEntity,
 } from '@vote/common';
@@ -46,9 +45,7 @@ export class AuthService {
     const createdUser: UsersEntity = await this.usersService.createUser(dto);
     const { password: pw, updatedAt, ...userRes } = createdUser;
 
-    return {
-      users: userRes,
-    };
+    return userRes;
   }
 
   async signIn({ email, password }: SignInUserDto) {
@@ -73,14 +70,11 @@ export class AuthService {
     return { accessToken, refreshToken: encryptRefreshToken };
   }
 
-  async signOut({ userId }: SignOutUserDto) {
+  async signOut(userId: number) {
     return await this.usersService.signOut(userId);
   }
 
-  async recreateAccessToken(
-    userId: number,
-    encryptRefreshToken: string,
-  ): Promise<RecreateAccessToken> {
+  async recreateAccessToken(userId: number, encryptRefreshToken: string) {
     if (!encryptRefreshToken) {
       throw new CustomException(UsersException.TOKEN_NOT_EXISTS);
     }
@@ -93,13 +87,13 @@ export class AuthService {
       nickname,
     };
 
-    const accessToken = this.tokenService.createAccessToken(payload);
-    return { accessToken };
+    return this.tokenService.createAccessToken(payload);
   }
 
-  async resetPassword(dto: ResetPasswordDto) {
-    const { userId, password, checkPassword } = dto;
-
+  async resetPassword(
+    userId: number,
+    { password, checkPassword }: ResetPasswordDto,
+  ) {
     const { password: currPassword } =
       await this.usersService.findUserByWhereOption({
         id: userId,
@@ -109,8 +103,7 @@ export class AuthService {
       throw new CustomException(UsersException.SAME_CURR_PASSWORD);
     }
     await this._validatePassword(password, checkPassword);
-
-    return await this.usersService.updatePassword(userId, password);
+    await this.usersService.updatePassword(userId, password);
   }
 
   private async _validatePassword(

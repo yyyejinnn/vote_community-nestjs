@@ -6,6 +6,7 @@ import {
   UsersEntity,
   WhereOption,
 } from '@vote/common';
+import { CustomException, UsersException } from '@vote/middleware';
 
 import * as bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
@@ -30,9 +31,11 @@ export class UsersService {
   }
 
   async findUserByWhereOption(whereOption: WhereOption): Promise<UsersEntity> {
-    return await this.usersRepository.findOne({
+    const user = await this.usersRepository.findOne({
       where: whereOption,
     });
+
+    return user;
   }
 
   async findMatchedRefreshToken(
@@ -76,5 +79,9 @@ export class UsersService {
     await this.usersRepository.update(userId, {
       password: await bcrypt.hash(password, 10),
     });
+  }
+
+  async deleteUser(userId: number) {
+    await this.usersRepository.delete({ id: userId });
   }
 }

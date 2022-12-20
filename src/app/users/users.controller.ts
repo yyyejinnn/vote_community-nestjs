@@ -15,7 +15,9 @@ export class UsersController {
   async getUserProfile() {
     const userId = 1; //임시
     const whereOption: WhereOptionByUserId = { id: userId };
-    return await this.usersService.findUserByWhereOption(whereOption);
+    return {
+      users: await this.usersService.findUserByWhereOption(whereOption),
+    };
   }
 
   @Get('written-votes')

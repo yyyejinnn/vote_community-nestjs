@@ -805,12 +805,12 @@
     path-to-regexp "3.2.0"
     swagger-ui-dist "4.15.1"
 
-"@nestjs/testing@^9.0.0":
-  version "9.1.2"
-  resolved "https://registry.yarnpkg.com/@nestjs/testing/-/testing-9.1.2.tgz#98925cafab0cc92e0492d37ec17a6a7739b46a21"
-  integrity sha512-BfwERdTppE4oz6qxCNJVo0kaRH2FO7mipooedT2nDtYW3krGZ8978odmGdpVgNz1xwqKDH3Y/68frs5oW2CTZw==
+"@nestjs/testing@^9.2.1":
+  version "9.2.1"
+  resolved "https://registry.yarnpkg.com/@nestjs/testing/-/testing-9.2.1.tgz#2a3f64214d58ec4ab878862395407947671e4ece"
+  integrity sha512-lemXZdRSuqoZ87l0orCrS/c7gqwxeduIFOd21g9g2RUeQ4qlWPegbQDKASzbfC28klPyrgJLW4MNq7uv2JwV8w==
   dependencies:
-    tslib "2.4.0"
+    tslib "2.4.1"
 
 "@nestjs/typeorm@^9.0.1":
   version "9.0.1"
@@ -5363,6 +5363,11 @@ tslib@2.4.0, tslib@^2.1.0, tslib@^2.3.1:
   version "2.4.0"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.4.0.tgz#7cecaa7f073ce680a05847aa77be941098f36dc3"
   integrity sha512-d6xOpEDfsi2CZVlPQzGeux8XMwLT9hssAsaPYExaQMuYskwb+x1x7J371tWlbBdWHroy99KnVB6qIkUbs5X3UQ==
+
+tslib@2.4.1:
+  version "2.4.1"
+  resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.4.1.tgz#0d0bfbaac2880b91e22df0768e55be9753a5b17e"
+  integrity sha512-tGyy4dAjRIEwI7BzsB0lynWgOpfqjUdq91XXAlIWD2OwKBH7oCl/GZG/HT4BOHrTlPMOASlMQ7veyTqpmRcrNA==
 
 tslib@^1.8.1, tslib@^1.9.0:
   version "1.14.1"

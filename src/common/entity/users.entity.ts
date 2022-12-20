@@ -50,15 +50,8 @@ export class UsersEntity extends CommonEntity {
   @OneToMany(() => CommentsEntity, (writtenComments) => writtenComments.writer)
   writtenComments: CommentsEntity[];
 
-  @ManyToMany(
-    () => CommentsEntity,
-    (likedComments) => likedComments.likedUsers,
-    {
-      onDelete: 'CASCADE',
-    },
-  )
-  @JoinTable({ name: 'liked_votes' })
-  likedComments: CommentsService[];
+  @ManyToMany(() => CommentsEntity, (likedComments) => likedComments.likedUsers)
+  likedComments: CommentsEntity[];
 
   @AfterInsert()
   async createRefreshToken() {
