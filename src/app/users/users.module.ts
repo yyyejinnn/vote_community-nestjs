@@ -1,6 +1,7 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { RefreshTokensEntity, UsersEntity } from '@vote/common';
+import { TokenService } from '../auth/auth.service';
 import { VotesModule } from '../votes/votes.module';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
@@ -11,7 +12,7 @@ import { UsersService } from './users.service';
     TypeOrmModule.forFeature([UsersEntity, RefreshTokensEntity]),
   ],
   controllers: [UsersController],
-  providers: [UsersService],
-  exports: [TypeOrmModule, UsersService],
+  providers: [UsersService, TokenService],
+  exports: [TypeOrmModule, UsersService, TokenService],
 })
 export class UsersModule {}
