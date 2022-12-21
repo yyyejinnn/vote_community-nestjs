@@ -29,34 +29,51 @@ export class UsersEntity extends CommonEntity {
   nickname: string;
 
   @OneToOne(() => RefreshTokensEntity, (refreshToken) => refreshToken.user)
-  refreshToken: RefreshTokensEntity;
+  refreshToken?: RefreshTokensEntity;
 
   @OneToMany(() => VotesEntity, (writtenVotes) => writtenVotes.writer)
-  writtenVotes: VotesEntity[];
+  writtenVotes?: VotesEntity[];
 
   @OneToMany(() => VotedUsersEntity, (votedUsers) => votedUsers.user, {
     onDelete: 'CASCADE',
   })
-  votedUsers: VotedUsersEntity[];
+  votedUsers?: VotedUsersEntity[];
 
   @OneToMany(() => ChoicedUsersEntity, (choicedUser) => choicedUser.user, {
     onDelete: 'CASCADE',
   })
-  choicedUsers: ChoicedUsersEntity[];
+  choicedUsers?: ChoicedUsersEntity[];
 
   @ManyToMany(() => VotesEntity, (likedVotes) => likedVotes.likedUsers)
-  likedVotes: VotesEntity[];
+  likedVotes?: VotesEntity[];
 
   @OneToMany(() => CommentsEntity, (writtenComments) => writtenComments.writer)
-  writtenComments: CommentsEntity[];
+  writtenComments?: CommentsEntity[];
 
   @ManyToMany(() => CommentsEntity, (likedComments) => likedComments.likedUsers)
-  likedComments: CommentsEntity[];
+  likedComments?: CommentsEntity[];
 
   @AfterInsert()
   async createRefreshToken() {
     const refreshToken = new RefreshTokensEntity();
     refreshToken.user = this;
     refreshToken.save();
+  }
+
+  static from(
+    email: string,
+    nickname: string,
+    password: string,
+    createdAt = new Date(),
+    updatedAt = new Date(),
+  ) {
+    const user = new UsersEntity();
+    user.email = email;
+    user.nickname = nickname;
+    user.password = password;
+    user.createdAt = createdAt;
+    user.updatedAt = updatedAt;
+
+    return user;
   }
 }
