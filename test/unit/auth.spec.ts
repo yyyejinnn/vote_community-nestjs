@@ -1,25 +1,22 @@
 import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import {
-  RefreshTokensEntity,
   ResetPasswordDto,
   SignInUserDto,
   SignUpUserDto,
   UsersEntity,
 } from '@vote/common';
-import exp from 'constants';
 import { AppModule } from 'src/app.module';
 import { AuthService, TokenService } from 'src/app/auth/auth.service';
 import { UsersService } from 'src/app/users/users.service';
-import { Repository } from 'typeorm';
 
-describe('Users Service', () => {
+describe('Auth Service', () => {
   let app: INestApplication;
   let authService: AuthService;
   let usersService: UsersService;
   let tokenService: TokenService;
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     const moduleRef: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
@@ -42,16 +39,13 @@ describe('Users Service', () => {
       email: 'test99@gmail.com',
       nickname: 'test99',
       createdAt: new Date('2022-12-20T12:28:21.000Z'),
+      id: 1,
     };
 
     it('signUp 201', async () => {
-      const findUserByWhereOption = jest
-        .spyOn(usersService, 'findUserByWhereOption')
-        .mockImplementation(() => {
-          return undefined;
-        });
-      const createdUser = jest
-        .spyOn(usersService, 'createUser')
+      usersService.findUserByWhereOption = jest.fn().mockReturnValue(undefined);
+      usersService.createUser = jest
+        .fn()
         .mockResolvedValue(
           UsersEntity.from(
             'test99@gmail.com',
@@ -59,19 +53,21 @@ describe('Users Service', () => {
             'test1234',
             new Date('2022-12-20T12:28:21.000Z'),
             new Date('2022-12-20T12:28:21.000Z'),
+            1,
           ),
         );
+
       const signUp = await authService.signUp(signUpDto);
 
-      expect(findUserByWhereOption).toBeCalledWith({
+      expect(usersService.findUserByWhereOption).toBeCalledWith({
         email: 'test99@gmail.com',
       });
-      expect(findUserByWhereOption).toBeCalledWith({
+      expect(usersService.findUserByWhereOption).toBeCalledWith({
         nickname: 'test99',
       });
-      expect(findUserByWhereOption).toBeCalledTimes(2);
-      expect(createdUser).toBeCalledWith(signUpDto);
-      expect(createdUser).toBeCalledTimes(1);
+      expect(usersService.findUserByWhereOption).toBeCalledTimes(2);
+      expect(usersService.createUser).toBeCalledWith(signUpDto);
+      expect(usersService.createUser).toBeCalledTimes(1);
       expect(signUp).toStrictEqual(result);
     });
   });
@@ -86,8 +82,8 @@ describe('Users Service', () => {
       refreshToken: 'hashed-refresh-token',
     };
     it('signIn 200', async () => {
-      const findUserByWhereOption = jest
-        .spyOn(usersService, 'findUserByWhereOption')
+      usersService.findUserByWhereOption = jest
+        .fn()
         .mockImplementation(async () => {
           return UsersEntity.from(
             'test99@gmail.com',
@@ -97,34 +93,32 @@ describe('Users Service', () => {
             new Date('2022-12-20T12:28:21.000Z'),
           );
         });
-      const createAccessToken = jest
-        .spyOn(tokenService, 'createAccessToken')
-        .mockImplementation(() => {
-          return 'access-token';
-        });
-      const createRefreshToken = jest
-        .spyOn(tokenService, 'createRefreshToken')
-        .mockImplementation(async () => {
-          return 'hashed-refresh-token';
-        });
+      tokenService.createAccessToken = jest
+        .fn()
+        .mockReturnValue('access-token');
+
+      tokenService.createRefreshToken = jest
+        .fn()
+        .mockReturnValue('hashed-refresh-token');
+
       const signIn = await authService.signIn(signInDto);
 
-      expect(findUserByWhereOption).toBeCalledWith({
+      expect(usersService.findUserByWhereOption).toBeCalledWith({
         email: 'test99@gmail.com',
       });
-      expect(findUserByWhereOption).toBeCalledTimes(1);
-      expect(createAccessToken).toBeCalledTimes(1);
-      expect(createRefreshToken).toBeCalledTimes(1);
+      expect(usersService.findUserByWhereOption).toBeCalledTimes(1);
+      expect(tokenService.createAccessToken).toBeCalledTimes(1);
+      expect(tokenService.createRefreshToken).toBeCalledTimes(1);
       expect(signIn).toStrictEqual(result);
     });
   });
 
-  describe.only('recreateAccessToken', () => {
+  describe('recreateAccessToken', () => {
     const userId = 1;
     const encryptRefreshToken = 'encrypt-refreshtoken';
     it('recreateAccessToken 201', async () => {
-      const verifyRefreshToken = jest
-        .spyOn(tokenService, 'verifyRefreshToken')
+      tokenService.verifyRefreshToken = jest
+        .fn()
         .mockImplementation(async () => {
           return {
             sub: 1,
@@ -133,19 +127,20 @@ describe('Users Service', () => {
             exp: 67890,
           };
         });
-      const createAccessToken = jest
-        .spyOn(tokenService, 'createAccessToken')
-        .mockImplementation(() => {
-          return 'new-access-token';
-        });
+      tokenService.createAccessToken = jest.fn().mockImplementation(() => {
+        return 'new-access-token';
+      });
       const recreateAccessToken = await authService.recreateAccessToken(
         userId,
         encryptRefreshToken,
       );
 
-      expect(verifyRefreshToken).toBeCalledTimes(1);
-      expect(verifyRefreshToken).toBeCalledWith(1, encryptRefreshToken);
-      expect(createAccessToken).toBeCalledTimes(1);
+      expect(tokenService.verifyRefreshToken).toBeCalledTimes(1);
+      expect(tokenService.verifyRefreshToken).toBeCalledWith(
+        1,
+        encryptRefreshToken,
+      );
+      expect(tokenService.createAccessToken).toBeCalledTimes(1);
       expect(recreateAccessToken).toBe('new-access-token');
     });
   });
@@ -165,5 +160,9 @@ describe('Users Service', () => {
 
       expect(usersService.findUserByWhereOption).toBeCalledTimes(1);
     });
+  });
+
+  afterEach(async () => {
+    await app.close();
   });
 });
