@@ -22,11 +22,12 @@ export class UsersService {
 
   async createUser(dto: SignUpUserDto): Promise<UsersEntity> {
     const { email, nickname, password } = dto;
-    const userEntity = this.usersRepository.create({
-      email,
-      nickname,
-      password: await bcrypt.hash(password, 10),
-    });
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // to entity
+    const entity = UsersEntity.from(email, nickname, hashedPassword);
+    const userEntity = this.usersRepository.create(entity);
+
     return await this.usersRepository.save(userEntity);
   }
 

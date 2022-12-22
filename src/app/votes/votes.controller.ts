@@ -70,7 +70,7 @@ export class VotesController {
 
   @Post(':voteId/cancle/likes')
   async cancleLikedVote(@Param('voteId', ParseIntPipe) voteId: number) {
-    const userId = 1;
+    const userId = 2;
     await this.votesService.cancleLikedVote(voteId, userId);
   }
 }
@@ -122,7 +122,7 @@ export class CommentsController {
 
   @Post(':commentId/cancle/likes')
   async cancleLikedVoteComment(
-    @Param('voteId', ParseIntPipe) commentId: number,
+    @Param('commentId', ParseIntPipe) commentId: number,
   ) {
     const userId = 1;
     await this.commentsService.cancleLikedVoteComment(commentId, userId);
