@@ -34,23 +34,29 @@ export class UsersEntity extends CommonEntity {
   @OneToMany(() => VotesEntity, (writtenVotes) => writtenVotes.writer)
   writtenVotes?: VotesEntity[];
 
-  @OneToMany(() => VotedUsersEntity, (votedUsers) => votedUsers.user, {
+  @OneToMany((type) => VotedUsersEntity, (votedUsers) => votedUsers.user, {
     onDelete: 'CASCADE',
   })
   votedUsers?: VotedUsersEntity[];
 
-  @OneToMany(() => ChoicedUsersEntity, (choicedUser) => choicedUser.user, {
+  @OneToMany((type) => ChoicedUsersEntity, (choicedUser) => choicedUser.user, {
     onDelete: 'CASCADE',
   })
   choicedUsers?: ChoicedUsersEntity[];
 
-  @ManyToMany(() => VotesEntity, (likedVotes) => likedVotes.likedUsers)
+  @ManyToMany((type) => VotesEntity, (likedVotes) => likedVotes.likedUsers)
   likedVotes?: VotesEntity[];
 
-  @OneToMany(() => CommentsEntity, (writtenComments) => writtenComments.writer)
+  @OneToMany(
+    (type) => CommentsEntity,
+    (writtenComments) => writtenComments.writer,
+  )
   writtenComments?: CommentsEntity[];
 
-  @ManyToMany(() => CommentsEntity, (likedComments) => likedComments.likedUsers)
+  @ManyToMany(
+    (type) => CommentsEntity,
+    (likedComments) => likedComments.likedUsers,
+  )
   likedComments?: CommentsEntity[];
 
   @AfterInsert()

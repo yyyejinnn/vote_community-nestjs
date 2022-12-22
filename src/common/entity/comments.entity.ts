@@ -16,7 +16,7 @@ export class CommentsEntity extends CommonEntity {
   @Column()
   content: string;
 
-  @ManyToOne(() => UsersEntity, (writer) => writer.writtenComments, {
+  @ManyToOne((type) => UsersEntity, (writer) => writer.writtenComments, {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'writerId' })
@@ -25,7 +25,7 @@ export class CommentsEntity extends CommonEntity {
   @Column()
   writerId: number;
 
-  @ManyToOne(() => VotesEntity, (vote) => vote.comments, {
+  @ManyToOne((type) => VotesEntity, (vote) => vote.comments, {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'voteId' })
@@ -39,7 +39,7 @@ export class CommentsEntity extends CommonEntity {
   })
   isUpdate: boolean;
 
-  @ManyToMany(() => UsersEntity, (likedUsers) => likedUsers.likedComments, {
+  @ManyToMany((type) => UsersEntity, (likedUsers) => likedUsers.likedComments, {
     onDelete: 'CASCADE',
     eager: true,
   })
