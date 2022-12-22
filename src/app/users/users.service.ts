@@ -1,38 +1,28 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 import {
   RefreshTokensEntity,
   SignUpUserDto,
   UsersEntity,
   WhereOption,
 } from '@vote/common';
-import { CustomException, UsersException } from '@vote/middleware';
 
 import * as bcrypt from 'bcrypt';
-import { Repository } from 'typeorm';
 
 @Injectable()
 export class UsersService {
-  constructor(
-    @InjectRepository(UsersEntity)
-    private readonly usersRepository: Repository<UsersEntity>,
-    @InjectRepository(RefreshTokensEntity)
-    private readonly refreshTokenRepository: Repository<RefreshTokensEntity>,
-  ) {}
-
   async createUser(dto: SignUpUserDto): Promise<UsersEntity> {
     const { email, nickname, password } = dto;
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // to entity
     const entity = UsersEntity.from(email, nickname, hashedPassword);
-    const userEntity = this.usersRepository.create(entity);
+    const userEntity = UsersEntity.create(entity);
 
-    return await this.usersRepository.save(userEntity);
+    return await UsersEntity.save(userEntity);
   }
 
   async findUserByWhereOption(whereOption: WhereOption): Promise<UsersEntity> {
-    const user = await this.usersRepository.findOne({
+    const user = await UsersEntity.findOne({
       where: whereOption,
     });
 
@@ -43,7 +33,7 @@ export class UsersService {
     userId: number,
     encryptRefreshToken: string,
   ): Promise<UsersEntity> {
-    return await this.usersRepository.findOne({
+    return await UsersEntity.findOne({
       where: {
         id: userId,
         refreshToken: {
@@ -57,17 +47,17 @@ export class UsersService {
     userId: number,
     encryptedRefreshToken: string,
   ): Promise<RefreshTokensEntity> {
-    const refreshToken = await this.refreshTokenRepository.findOne({
+    const refreshToken = await RefreshTokensEntity.findOne({
       where: {
         userId,
       },
     });
     refreshToken.token = encryptedRefreshToken;
-    return await this.refreshTokenRepository.save(refreshToken);
+    return await RefreshTokensEntity.save(refreshToken);
   }
 
   async signOut(userId: number) {
-    const result = await this.usersRepository.delete({
+    const result = await UsersEntity.delete({
       id: userId,
     });
 
@@ -77,12 +67,12 @@ export class UsersService {
   }
 
   async updatePassword(userId: number, password: string) {
-    await this.usersRepository.update(userId, {
+    await UsersEntity.update(userId, {
       password: await bcrypt.hash(password, 10),
     });
   }
 
   async deleteUser(userId: number) {
-    await this.usersRepository.delete({ id: userId });
+    await UsersEntity.delete({ id: userId });
   }
 }

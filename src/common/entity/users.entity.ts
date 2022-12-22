@@ -1,9 +1,7 @@
-import { CommentsService } from 'src/app/votes/votes.service';
 import {
   AfterInsert,
   Column,
   Entity,
-  JoinTable,
   ManyToMany,
   OneToMany,
   OneToOne,

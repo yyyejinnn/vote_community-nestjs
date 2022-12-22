@@ -1,5 +1,4 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 import {
   ChoicedUsersEntity,
   CreateVoteCommentDto,
@@ -13,25 +12,18 @@ import {
 } from '@vote/common';
 import { CustomException, VotesException } from '@vote/middleware';
 import { CommentsEntity } from 'src/common/entity/comments.entity';
-import { Repository } from 'typeorm';
 import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class VotesService {
-  constructor(
-    @InjectRepository(VotesEntity)
-    private readonly votesRepository: Repository<VotesEntity>,
-    @InjectRepository(VoteChoicesEntity)
-    private readonly ChoicesRepository: Repository<VoteChoicesEntity>,
-    private readonly usersService: UsersService,
-  ) {}
+  constructor(private readonly usersService: UsersService) {}
 
   async listVotes() {
-    return await this.votesRepository.find();
+    return await VotesEntity.find();
   }
 
   async getVoteById(voteId: number) {
-    return await this.votesRepository.findOne({
+    return await VotesEntity.findOne({
       relations: {
         voteChoices: {
           choiced: {
@@ -46,7 +38,7 @@ export class VotesService {
   }
 
   async getAllVotesByUserId(userId: number) {
-    return await this.votesRepository.find({
+    return await VotesEntity.find({
       where: {
         writerId: userId,
       },
@@ -61,7 +53,7 @@ export class VotesService {
       id: userId,
     });
 
-    const voteEntity = this.votesRepository.create({
+    const voteEntity = VotesEntity.create({
       title,
       endDate,
       writer,
@@ -80,13 +72,13 @@ export class VotesService {
   async updateVote(voteId: number, { endDate }: UpdateVoteDto) {
     this._compareDates(endDate);
 
-    await this.votesRepository.update(voteId, {
+    await VotesEntity.update(voteId, {
       endDate,
     });
   }
 
   async deleteVote(voteId: number) {
-    const result = await this.votesRepository.delete(voteId);
+    const result = await VotesEntity.delete(voteId);
 
     if (result.affected === 0) {
       throw new NotFoundException('존재하지 않은 레코드');
@@ -110,7 +102,7 @@ export class VotesService {
     await voted.save();
 
     // choiced 생성
-    const choice = await this.ChoicesRepository.findOne({
+    const choice = await VoteChoicesEntity.findOne({
       where: {
         id: choicedVoteId,
       },
@@ -127,7 +119,7 @@ export class VotesService {
       id: userId,
     });
 
-    const vote = await this.votesRepository.findOne({
+    const vote = await VotesEntity.findOne({
       where: {
         id: voteId,
       },
@@ -138,7 +130,7 @@ export class VotesService {
   }
 
   async cancleLikedVote(voteId: number, userId: number) {
-    const vote = await this.votesRepository.findOne({
+    const vote = await VotesEntity.findOne({
       where: {
         id: voteId,
       },
@@ -164,14 +156,12 @@ export class VotesService {
 @Injectable()
 export class CommentsService {
   constructor(
-    @InjectRepository(CommentsEntity)
-    private readonly commentsRepository: Repository<CommentsEntity>,
     private readonly usersService: UsersService,
     private readonly votesService: VotesService,
   ) {}
 
   async getAllVoteComments(voteId: number) {
-    return await this.commentsRepository.find({
+    return await CommentsEntity.find({
       where: {
         voteId,
       },
@@ -179,7 +169,7 @@ export class CommentsService {
   }
 
   async getAllCommentsByUserId(userId: number) {
-    return await this.commentsRepository.find({
+    return await CommentsEntity.find({
       where: {
         writerId: userId,
       },
@@ -193,7 +183,7 @@ export class CommentsService {
   ) {
     const user = await this.usersService.findUserByWhereOption({ id: userId });
     const vote = await this.votesService.getVoteById(voteId);
-    const comment = this.commentsRepository.create({
+    const comment = CommentsEntity.create({
       content,
       writer: user,
       vote,
@@ -206,14 +196,14 @@ export class CommentsService {
     commentId: number,
     { content }: UpdateVoteCommentDto,
   ) {
-    await this.commentsRepository.update(commentId, {
+    await CommentsEntity.update(commentId, {
       content,
       isUpdate: true,
     });
   }
 
   async deleteVoteComment(commentId: number) {
-    const result = await this.commentsRepository.delete(commentId);
+    const result = await CommentsEntity.delete(commentId);
 
     if (result.affected === 0) {
       throw new NotFoundException('존재하지 않은 레코드');
@@ -225,7 +215,7 @@ export class CommentsService {
       id: userId,
     });
 
-    const comment = await this.commentsRepository.findOne({
+    const comment = await CommentsEntity.findOne({
       where: {
         id: commentId,
       },
@@ -236,7 +226,7 @@ export class CommentsService {
   }
 
   async cancleLikedVoteComment(commentId: number, userId: number) {
-    const comment = await this.commentsRepository.findOne({
+    const comment = await CommentsEntity.findOne({
       where: {
         id: commentId,
       },
