@@ -18,7 +18,7 @@ export class UsersService {
     const entity = UsersEntity.from(email, nickname, hashedPassword);
     const userEntity = UsersEntity.create(entity);
 
-    return await UsersEntity.save(userEntity);
+    return await userEntity.save();
   }
 
   async findUserByWhereOption(whereOption: WhereOption): Promise<UsersEntity> {
@@ -53,7 +53,7 @@ export class UsersService {
       },
     });
     refreshToken.token = encryptedRefreshToken;
-    return await RefreshTokensEntity.save(refreshToken);
+    return await refreshToken.save();
   }
 
   async signOut(userId: number) {
