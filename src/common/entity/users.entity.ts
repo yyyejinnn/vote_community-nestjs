@@ -66,6 +66,7 @@ export class UsersEntity extends CommonEntity {
     password: string,
     createdAt = new Date(),
     updatedAt = new Date(),
+    id?: number,
   ) {
     const user = new UsersEntity();
     user.email = email;
@@ -73,6 +74,8 @@ export class UsersEntity extends CommonEntity {
     user.password = password;
     user.createdAt = createdAt;
     user.updatedAt = updatedAt;
+
+    if (id) user.id = id;
 
     return user;
   }
