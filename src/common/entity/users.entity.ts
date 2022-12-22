@@ -28,7 +28,9 @@ export class UsersEntity extends CommonEntity {
   @Column()
   nickname: string;
 
-  @OneToOne(() => RefreshTokensEntity, (refreshToken) => refreshToken.user)
+  @OneToOne(() => RefreshTokensEntity, (refreshToken) => refreshToken.user, {
+    cascade: ['insert'],
+  })
   refreshToken?: RefreshTokensEntity;
 
   @OneToMany(() => VotesEntity, (writtenVotes) => writtenVotes.writer)
@@ -59,12 +61,12 @@ export class UsersEntity extends CommonEntity {
   )
   likedComments?: CommentsEntity[];
 
-  @AfterInsert()
-  async createRefreshToken() {
-    const refreshToken = new RefreshTokensEntity();
-    refreshToken.user = this;
-    refreshToken.save();
-  }
+  // @AfterInsert()
+  // async createRefreshToken() {
+  //   const refreshToken = new RefreshTokensEntity();
+  //   refreshToken.user = this;
+  //   refreshToken.save();
+  // }
 
   static from(
     email: string,
