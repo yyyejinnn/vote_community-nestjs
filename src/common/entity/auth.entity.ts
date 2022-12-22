@@ -7,7 +7,7 @@ export class RefreshTokensEntity extends CommonEntity {
   @Column({ unique: true, nullable: true })
   token: string;
 
-  @OneToOne(() => UsersEntity, (user) => user.refreshToken, {
+  @OneToOne((type) => UsersEntity, (user) => user.refreshToken, {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'userId' })
