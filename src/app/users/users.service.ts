@@ -28,6 +28,10 @@ export class UsersService {
     const entity = UsersEntity.from(email, nickname, hashedPassword);
     const userEntity = this.usersRepository.create(entity);
 
+    // refreshToken
+    const token = new RefreshTokensEntity();
+    userEntity.refreshToken = token;
+
     return await this.usersRepository.save(userEntity);
   }
 

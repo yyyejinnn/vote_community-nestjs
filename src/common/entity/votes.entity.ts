@@ -24,7 +24,9 @@ export class VotesEntity extends CommonEntity {
   @Column()
   endDate: Date;
 
-  @ManyToOne((type) => UsersEntity, (writer) => writer.writtenVotes)
+  @ManyToOne((type) => UsersEntity, (writer) => writer.writtenVotes, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'writerId' })
   writer: UsersEntity;
 
@@ -33,11 +35,12 @@ export class VotesEntity extends CommonEntity {
 
   @OneToMany((type) => VoteChoicesEntity, (voteChoices) => voteChoices.vote, {
     nullable: true,
+    cascade: ['insert'],
   })
   @JoinTable()
   voteChoices: VoteChoicesEntity[];
 
-  @OneToMany((type) => VotedUsersEntity, (voted) => voted.vote)
+  @OneToMany((type) => VotedUsersEntity, (voted) => voted.vote, {})
   voted: VotedUsersEntity[];
 
   @ManyToMany((type) => UsersEntity, (likedUsers) => likedUsers.likedVotes, {
@@ -73,11 +76,13 @@ export class VoteChoicesEntity extends CommonEntity {
 @Entity({ name: 'votes_to_users' })
 @Index('voted_user', ['vote', 'user'], { unique: true })
 export class VotedUsersEntity extends CommonEntity {
-  @ManyToOne((type) => VotesEntity, (vote) => vote.voted)
+  @ManyToOne((type) => VotesEntity, (vote) => vote.voted, {
+    onDelete: 'CASCADE',
+  })
   vote: VotesEntity;
 
   @ManyToOne((type) => UsersEntity, (user) => user.votedUsers, {
-    onDelete: 'CASCADE',
+    onDelete: 'SET NULL',
   })
   user: UsersEntity;
 }
@@ -85,11 +90,13 @@ export class VotedUsersEntity extends CommonEntity {
 @Entity({ name: 'choices_to_users' })
 @Index('choiced_user', ['choice', 'user'], { unique: true })
 export class ChoicedUsersEntity extends CommonEntity {
-  @ManyToOne((type) => VoteChoicesEntity, (choice) => choice.choiced)
+  @ManyToOne((type) => VoteChoicesEntity, (choice) => choice.choiced, {
+    onDelete: 'CASCADE',
+  })
   choice: VoteChoicesEntity;
 
   @ManyToOne((type) => UsersEntity, (user) => user.choicedUsers, {
-    onDelete: 'CASCADE',
+    onDelete: 'SET NULL',
   })
   user: UsersEntity;
 }
