@@ -12,6 +12,8 @@ env:
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs:
   # 도커 이미지 빌드
@@ -52,6 +54,6 @@ jobs:
           password: ${{ secrets.GHCR_TOKEN }}
 
       - name: Run docker
-      - run: /
+        run: |
           docker stop ${{ env.DOCKER_CONTAINER }} && docker rm ${{ env.DOCKER_CONTAINER }} && docker rmi ${{ env.DOCKER_IMAGE }}:latest
           docker run -d -p 80:3000 --name ${{ env.DOCKER_CONTAINER }} --restart always ${{ env.DOCKER_IMAGE }}:latest
