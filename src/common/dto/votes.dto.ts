@@ -1,37 +1,64 @@
+import { PartialType, PickType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsArray, IsNotEmpty, IsString } from 'class-validator';
+import { IsArray, IsDate, IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateVoteDto {
-  @IsString()
-  @IsNotEmpty()
+  @IsString({
+    context: {
+      code: 'MUST_STRING_TYPE',
+    },
+  })
+  @IsNotEmpty({
+    context: {
+      code: 'EMPTY_TITLE',
+    },
+  })
   title: string;
 
-  @IsArray()
-  @IsNotEmpty()
+  @IsNotEmpty({
+    context: {
+      code: 'EMPTY_END_DATE',
+    },
+  })
+  endDate;
+
+  @IsArray({
+    context: {
+      code: 'MUST_ARRAY_TYPE',
+    },
+  })
+  @IsNotEmpty({
+    context: {
+      code: 'EMPTY_VOTE_CHOICES',
+    },
+  })
   voteChoices: string[];
-
-  @Type(() => Number)
-  userId: number;
-}
-
-export class CreateVotedUserDto {
-  votedId: number;
-  userId: number;
-  choicedVoteId: number;
 }
 
 export class CreateVoteCommentDto {
-  voteId: number;
-  userId: number;
+  @IsString({
+    context: {
+      code: 'MUST_STRING_TYPE',
+    },
+  })
+  @IsNotEmpty({
+    context: {
+      code: 'EMPTY_CONTENT',
+    },
+  })
   content: string;
 }
 
-export class LikesVoteDto {
-  voteId: number;
-  userId: number;
+export class UpdateVoteDto extends PickType(CreateVoteDto, ['endDate']) {}
+
+export class CreateVotedUserDto {
+  @IsNotEmpty({
+    context: {
+      code: 'EMPTY_CHOICED_VOTE_ID',
+    },
+  })
+  @Type(() => Number)
+  choicedVoteId: number;
 }
 
-export class LikesVoteCommentDto {
-  commentId: number;
-  userId: number;
-}
+export class UpdateVoteCommentDto extends PartialType(CreateVoteCommentDto) {}

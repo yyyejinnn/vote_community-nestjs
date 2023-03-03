@@ -1,6 +1,6 @@
 {
-  "rootDir": "./e2e",
-  "testRegex": ".*\\.e2e-spec\\.ts$",
+  "rootDir": "./unit",
+  "testRegex": ".*\\.spec\\.ts$",
   "transform": {
     "^.+\\.(t|j)s$": "ts-jest"
   },

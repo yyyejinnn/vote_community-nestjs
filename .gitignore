@@ -36,8 +36,11 @@ lerna-debug.log*
 
 
 # .env
-.env*
+*.env*
 
 # prisma
 */migrations
 dev.*
+
+# sqlite
+vote-database

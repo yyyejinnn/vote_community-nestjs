@@ -1,136 +1,36 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { RefreshTokens, Users } from '@prisma/client';
 import {
   SignUpUserDto,
   SignInUserDto,
   JwtPayload,
   RecreateAccessToken,
-  SignIn,
-  SignUp,
   VerifiedToken,
   WhereOptionByUserEmail,
   WhereOptionByUserNickName,
+  ResetPasswordDto,
+  UsersEntity,
 } from '@vote/common';
 import { CustomException, UsersException } from '@vote/middleware';
 
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
-import { UsersRepository } from '../users/users.repository';
+import { UsersService } from '../users/users.service';
 
-type ValidatePasswordType = 'signUp' | 'signIn';
+type ValidatePasswordType = 'clearPassword' | 'hashedPassword';
 
 @Injectable()
-export class AuthService {
-  private readonly tokenService: TokenService;
-
-  constructor(private readonly usersRepository: UsersRepository) {
-    this.tokenService = new TokenService(usersRepository);
-  }
-
-  async signUp(data: SignUpUserDto): Promise<SignUp> {
-    const whereOption: WhereOptionByUserEmail = {
-      email: data.email,
-    };
-    const user: Users = await this.usersRepository.findUserByWhereOption(
-      whereOption,
-    );
-
-    if (user) {
-      throw new CustomException(UsersException.USER_ALREADY_EXISTS);
-    }
-
-    await this._validatePassword(data.password, data.checkPassword);
-    await this._validateNickname(data.nickname);
-
-    const { password, updatedAt, ...createdUser }: Users =
-      await this.usersRepository.createUser(data);
-
-    return {
-      users: createdUser,
-    };
-  }
-
-  async signIn(data: SignInUserDto): Promise<SignIn> {
-    const whereOption: WhereOptionByUserEmail = {
-      email: data.email,
-    };
-    const user: Users = await this.usersRepository.findUserByWhereOption(
-      whereOption,
-    );
-
-    if (!user) {
-      throw new CustomException(UsersException.USER_NOT_EXIST);
-    }
-    await this._validatePassword(data.password, user.password, 'signIn');
-
-    // 토큰 생성
-    const payload: JwtPayload = { sub: user.id, nickname: user.nickname };
-
-    const accessToken: string = this.tokenService.createAccessToken(payload);
-    const encryptRefreshToken: string =
-      await this.tokenService.createRefreshToken(payload);
-
-    return { accessToken, refreshToken: encryptRefreshToken };
-  }
-
-  async recreateAccessToken(
-    userId: number,
-    encryptRefreshToken: string,
-  ): Promise<RecreateAccessToken> {
-    if (!encryptRefreshToken) {
-      throw new CustomException(UsersException.TOKEN_NOT_EXISTS);
-    }
-
-    const verifiedUser: VerifiedToken =
-      await this.tokenService.verifyRefreshToken(userId, encryptRefreshToken);
-
-    const payload: JwtPayload = {
-      sub: verifiedUser.sub,
-      nickname: verifiedUser.nickname,
-    };
-
-    const accessToken = this.tokenService.createAccessToken(payload);
-    return { accessToken };
-  }
-
-  private async _validatePassword(
-    password: string,
-    checkPassword: string,
-    type: ValidatePasswordType = 'signUp',
-  ) {
-    if (type == 'signUp' && password !== checkPassword) {
-      throw new CustomException(UsersException.NOT_MATCHED_PASSWORD);
-    }
-
-    if (type == 'signIn' && !(await bcrypt.compare(password, checkPassword))) {
-      throw new CustomException(UsersException.NOT_MATCHED_PASSWORD);
-    }
-  }
-
-  private async _validateNickname(nickname: string) {
-    const whereOption: WhereOptionByUserNickName = { nickname };
-    const user: Users = await this.usersRepository.findUserByWhereOption(
-      whereOption,
-    );
-
-    if (user) {
-      throw new CustomException(UsersException.NICKNAME_ALREADY_EXISTS);
-    }
-  }
-}
-
-class TokenService {
+export class TokenService {
   private readonly jwtService: JwtService;
 
-  constructor(private readonly usersRepository: UsersRepository) {
+  constructor(private readonly usersService: UsersService) {
     this.jwtService = new JwtService();
   }
 
   createAccessToken(payload: JwtPayload): string {
     const accessToken: string = this.jwtService.sign(payload, {
       secret: 'access-secret-key', // 임시
-      expiresIn: '3m', // 임시
+      expiresIn: '1h', // 임시
     });
 
     return accessToken;
@@ -139,14 +39,14 @@ class TokenService {
   async createRefreshToken(payload: JwtPayload): Promise<string> {
     const refreshToken: string = this.jwtService.sign(payload, {
       secret: 'refresh-secret-key',
-      expiresIn: '10m',
+      expiresIn: '1d',
     });
     const encryptRefreshToken: string = this._encryptRefreshToken(refreshToken);
 
-    // await this.usersRepository.createRefreshToken(
-    //   payload.sub,
-    //   encryptRefreshToken,
-    // );
+    await this.usersService.createRefreshToken(
+      payload.sub,
+      encryptRefreshToken,
+    );
 
     return encryptRefreshToken;
   }
@@ -157,11 +57,10 @@ class TokenService {
   ): Promise<VerifiedToken> {
     let verifiedToken: VerifiedToken;
 
-    const token: RefreshTokens =
-      await this.usersRepository.findMatchedRefreshToken(
-        userId,
-        encryptRefreshToken,
-      );
+    const token: UsersEntity = await this.usersService.findMatchedRefreshToken(
+      userId,
+      encryptRefreshToken,
+    );
 
     if (!token) {
       throw new CustomException(UsersException.UNVERIFIED_REFRESH_TOKEN);
@@ -201,5 +100,118 @@ class TokenService {
       decrypt.final('utf8');
 
     return decryptResult;
+  }
+}
+
+@Injectable()
+export class AuthService {
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly tokenService: TokenService,
+  ) {}
+
+  async signUp(dto: SignUpUserDto) {
+    const { email, password, checkPassword, nickname } = dto;
+
+    const whereOption: WhereOptionByUserEmail = {
+      email: email,
+    };
+    const user = await this.usersService.findUserByWhereOption(whereOption);
+
+    if (user) {
+      throw new CustomException(UsersException.USER_ALREADY_EXISTS);
+    }
+
+    await this._validatePassword(password, checkPassword);
+    await this._validateNickname(nickname);
+
+    const createdUser: UsersEntity = await this.usersService.createUser(dto);
+    const { password: pw, updatedAt, ...userRes } = createdUser;
+
+    return userRes;
+  }
+
+  async signIn({ email, password }: SignInUserDto) {
+    const whereOption: WhereOptionByUserEmail = {
+      email,
+    };
+    const user = await this.usersService.findUserByWhereOption(whereOption);
+
+    if (!user) {
+      throw new CustomException(UsersException.USER_NOT_EXIST);
+    }
+    const { password: userPw, id, nickname } = user;
+    // await this._validatePassword(password, userPw, 'hashedPassword');
+
+    // 토큰 생성
+    const payload: JwtPayload = { sub: id, nickname };
+
+    const accessToken: string = this.tokenService.createAccessToken(payload);
+    const encryptRefreshToken: string =
+      await this.tokenService.createRefreshToken(payload);
+
+    return { accessToken, refreshToken: encryptRefreshToken };
+  }
+
+  async signOut(userId: number) {
+    return await this.usersService.signOut(userId);
+  }
+
+  async recreateAccessToken(userId: number, encryptRefreshToken: string) {
+    if (!encryptRefreshToken) {
+      throw new CustomException(UsersException.TOKEN_NOT_EXISTS);
+    }
+
+    const { sub, nickname }: VerifiedToken =
+      await this.tokenService.verifyRefreshToken(userId, encryptRefreshToken);
+
+    const payload: JwtPayload = {
+      sub,
+      nickname,
+    };
+
+    return this.tokenService.createAccessToken(payload);
+  }
+
+  async resetPassword(
+    userId: number,
+    { password, checkPassword }: ResetPasswordDto,
+  ) {
+    const { password: currPassword } =
+      await this.usersService.findUserByWhereOption({
+        id: userId,
+      });
+
+    if (await bcrypt.compare(password, currPassword)) {
+      throw new CustomException(UsersException.SAME_CURR_PASSWORD);
+    }
+    // await this._validatePassword(password, checkPassword);
+    await this.usersService.updatePassword(userId, password);
+  }
+
+  private async _validatePassword(
+    password: string,
+    checkPassword: string,
+    type: ValidatePasswordType = 'clearPassword',
+  ) {
+    if (type == 'clearPassword' && password !== checkPassword) {
+      throw new CustomException(UsersException.NOT_MATCHED_PASSWORD);
+    }
+
+    if (
+      type == 'hashedPassword' &&
+      !(await bcrypt.compare(password, checkPassword))
+    ) {
+      throw new CustomException(UsersException.NOT_MATCHED_PASSWORD);
+    }
+  }
+
+  private async _validateNickname(nickname: string) {
+    const whereOption: WhereOptionByUserNickName = { nickname };
+    const user = await this.usersService.findUserByWhereOption(whereOption);
+
+    if (user) {
+      throw new CustomException(UsersException.NICKNAME_ALREADY_EXISTS);
+    }
   }
 }

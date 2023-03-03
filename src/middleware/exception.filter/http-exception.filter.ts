@@ -11,16 +11,15 @@ import { ExceptionObj } from './exception.message';
 @Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter {
   catch(exception: HttpException, host: ArgumentsHost) {
-    const response = host.switchToHttp().getResponse<Response>();
+    const httpRes = host.switchToHttp().getResponse<Response>();
     const status = exception.getStatus();
-    const exceptionObj = exception.getResponse();
+    const response = exception.getResponse();
+    const errorRes = response?.['stack'] ? response?.['response'] : response;
 
-    return response.status(status).json({
+    return httpRes.status(status).json({
       error: {
-        code: exceptionObj['code']
-          ? exceptionObj['code']
-          : exceptionObj['statusCode'],
-        message: exceptionObj['message'],
+        code: errorRes?.['code'] || status,
+        message: errorRes?.['message'],
       },
     });
   }

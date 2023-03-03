@@ -1,15 +1,18 @@
 import { forwardRef, Module } from '@nestjs/common';
-import { JwtModule } from '@nestjs/jwt';
-import { PassportModule } from '@nestjs/passport';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { RefreshTokensEntity, UsersEntity } from '@vote/common';
+import { TokenService } from '../auth/auth.service';
 import { VotesModule } from '../votes/votes.module';
 import { UsersController } from './users.controller';
-import { UsersRepository } from './users.repository';
 import { UsersService } from './users.service';
 
 @Module({
-  imports: [forwardRef(() => VotesModule)],
+  imports: [
+    forwardRef(() => VotesModule),
+    TypeOrmModule.forFeature([UsersEntity, RefreshTokensEntity]),
+  ],
   controllers: [UsersController],
-  providers: [UsersService, UsersRepository],
-  exports: [UsersRepository],
+  providers: [UsersService, TokenService],
+  exports: [TypeOrmModule, UsersService, TokenService],
 })
 export class UsersModule {}

@@ -1,17 +1,19 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   ParseIntPipe,
+  Patch,
   Post,
   UseGuards,
 } from '@nestjs/common';
 import {
   CurrUser,
   RecreateAccessToken,
+  ResetPasswordDto,
   SignIn,
   SignInUserDto,
-  SignUp,
   SignUpUserDto,
 } from '@vote/common';
 import { AuthService } from './auth.service';
@@ -22,13 +24,13 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('sign-up')
-  async signUp(@Body() data: SignUpUserDto): Promise<SignUp> {
-    return await this.authService.signUp(data);
+  async signUp(@Body() dto: SignUpUserDto) {
+    return { users: await this.authService.signUp(dto) };
   }
 
   @Post('sign-in')
-  async signIn(@Body() data: SignInUserDto): Promise<SignIn> {
-    return await this.authService.signIn(data);
+  async signIn(@Body() dto: SignInUserDto) {
+    return { users: await this.authService.signIn(dto) };
   }
 
   @UseGuards(JwtAccessGuard)
@@ -36,11 +38,25 @@ export class AuthController {
   async recreateAccessToken(
     @CurrUser('id', ParseIntPipe) userId: number,
     @Body('refreshToken') encryptRefreshToken: string,
-  ): Promise<RecreateAccessToken> {
-    return await this.authService.recreateAccessToken(
-      userId,
-      encryptRefreshToken,
-    );
+  ) {
+    return {
+      accessToken: await this.authService.recreateAccessToken(
+        userId,
+        encryptRefreshToken,
+      ),
+    };
+  }
+
+  @Delete('sign-out')
+  async signOut() {
+    const userId = 1;
+    await this.authService.signOut(userId);
+  }
+
+  @Patch('reset/password')
+  async resetPassword(@Body() body: ResetPasswordDto) {
+    const userId = 1;
+    await this.authService.resetPassword(userId, body);
   }
 
   @UseGuards(JwtAccessGuard)
