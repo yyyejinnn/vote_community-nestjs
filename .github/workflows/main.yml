@@ -41,7 +41,7 @@ jobs:
   # EC2 배포
   deploy:
     needs: build
-    runs-on: [self-hosted, lavel-vote]
+    runs-on: [self-hosted, label-vote]
 
     steps:
       - name: Login ghcr
@@ -54,4 +54,4 @@ jobs:
       - name: Run docker
       - run: /
           docker stop ${{ env.DOCKER_CONTAINER }} && docker rm ${{ env.DOCKER_CONTAINER }} && docker rmi ${{ env.DOCKER_IMAGE }}:latest
-          docker run -d -p 3000:3000 --name ${{ env.DOCKER_CONTAINER }} --restart always ${{ env.DOCKER_IMAGE }}:latest
+          docker run -d -p 80:3000 --name ${{ env.DOCKER_CONTAINER }} --restart always ${{ env.DOCKER_IMAGE }}:latest
