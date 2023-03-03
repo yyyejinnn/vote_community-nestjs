@@ -33,7 +33,7 @@ jobs:
           password: ${{ secrets.GHCR_TOKEN }}
 
       - name: Build and Push
-        id: dockere_build
+        id: docker_build
         uses: docker/build-push-action@v2
         with:
           push: true
