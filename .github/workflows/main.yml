@@ -10,8 +10,10 @@ env:
 
 # 이벤트
 on:
+  pull_request:
+    branches: ['main']
   push:
-    branches: [main]
+    branches: ['main']
 
 jobs:
   # 도커 이미지 빌드
@@ -28,11 +30,12 @@ jobs:
       - name: Login ghcr
         uses: docker/login-action@v2
         with:
-          repostry: ghcr.io
+          registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GHCR_TOKEN }}
 
       - name: Build and Push
+        id: docker_build
         uses: docker/build-push-action@v2
         with:
           push: true
@@ -47,11 +50,11 @@ jobs:
       - name: Login ghcr
         uses: docker/login-action@v2
         with:
-          repostry: ghcr.io
+          registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GHCR_TOKEN }}
 
       - name: Run docker
-      - run: /
+        run: |
           docker stop ${{ env.DOCKER_CONTAINER }} && docker rm ${{ env.DOCKER_CONTAINER }} && docker rmi ${{ env.DOCKER_IMAGE }}:latest
           docker run -d -p 80:3000 --name ${{ env.DOCKER_CONTAINER }} --restart always ${{ env.DOCKER_IMAGE }}:latest
