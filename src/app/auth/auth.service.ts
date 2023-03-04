@@ -29,8 +29,8 @@ export class TokenService {
 
   createAccessToken(payload: JwtPayload): string {
     const accessToken: string = this.jwtService.sign(payload, {
-      secret: 'access-secret-key', // 임시
-      expiresIn: '1h', // 임시
+      secret: process.env.ACCESS_TOKEN_SECRET_KEY,
+      expiresIn: process.env.ACCESS_TOKEN_EXPIRATION_TIME,
     });
 
     return accessToken;
@@ -38,8 +38,8 @@ export class TokenService {
 
   async createRefreshToken(payload: JwtPayload): Promise<string> {
     const refreshToken: string = this.jwtService.sign(payload, {
-      secret: 'refresh-secret-key',
-      expiresIn: '1d',
+      secret: process.env.REFRESH_TOKEN_SECRET_KEY,
+      expiresIn: process.env.REFRESH_TOKEN_EXPIRATION_TIME,
     });
     const encryptRefreshToken: string = this._encryptRefreshToken(refreshToken);
 
@@ -71,7 +71,7 @@ export class TokenService {
 
     try {
       verifiedToken = this.jwtService.verify(decryptRefreshToken, {
-        secret: 'refresh-secret-key',
+        secret: process.env.REFRESH_TOKEN_SECRET_KEY,
       });
     } catch (error) {
       switch (error.message) {
@@ -108,7 +108,7 @@ export class AuthService {
   constructor(
     private readonly usersService: UsersService,
     private readonly tokenService: TokenService,
-  ) {}
+  ) { }
 
   async signUp(dto: SignUpUserDto) {
     const { email, password, checkPassword, nickname } = dto;
