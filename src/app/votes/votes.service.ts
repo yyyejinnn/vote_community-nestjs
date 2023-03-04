@@ -7,6 +7,7 @@ import {
   CreateVotedUserDto,
   UpdateVoteCommentDto,
   UpdateVoteDto,
+  UsersEntity,
   VoteChoicesEntity,
   VotedUsersEntity,
   VotesEntity,
@@ -22,7 +23,12 @@ export class VotesService {
     @InjectRepository(VotesEntity)
     private readonly votesRepository: Repository<VotesEntity>,
     @InjectRepository(VoteChoicesEntity)
-    private readonly ChoicesRepository: Repository<VoteChoicesEntity>,
+    private readonly choicesRepository: Repository<VoteChoicesEntity>,
+    @InjectRepository(ChoicedUsersEntity)
+    private readonly choicedRepository: Repository<ChoicedUsersEntity>,
+    @InjectRepository(VotedUsersEntity)
+    private readonly votedRepository: Repository<VotedUsersEntity>,
+
     private readonly usersService: UsersService,
   ) {}
 
@@ -65,16 +71,14 @@ export class VotesService {
       title,
       endDate,
       writer,
-      voteChoices: await Promise.all(
-        voteChoices.map(async (value) => {
-          const choice = new VoteChoicesEntity();
-          choice.title = value;
-          return await choice.save();
-        }),
-      ),
+      voteChoices: voteChoices.map((value) => {
+        const choice = new VoteChoicesEntity();
+        choice.title = value;
+        return choice;
+      }),
     });
 
-    return await voteEntity.save();
+    return await this.votesRepository.save(voteEntity);
   }
 
   async updateVote(voteId: number, { endDate }: UpdateVoteDto) {
@@ -107,10 +111,10 @@ export class VotesService {
     const voted = new VotedUsersEntity();
     voted.vote = vote;
     voted.user = user;
-    await voted.save();
+    await this.votedRepository.save(voted);
 
     // choiced 생성
-    const choice = await this.ChoicesRepository.findOne({
+    const choice = await this.choicesRepository.findOne({
       where: {
         id: choicedVoteId,
       },
@@ -119,7 +123,7 @@ export class VotesService {
     const choiced = new ChoicedUsersEntity();
     choiced.choice = choice;
     choiced.user = user;
-    await choiced.save();
+    await this.choicedRepository.save(choiced);
   }
 
   async likeVote(voteId: number, userId: number) {
@@ -134,7 +138,7 @@ export class VotesService {
     });
     vote.likedUsers.push(likedUser);
 
-    await vote.save();
+    await this.votesRepository.save(vote);
   }
 
   async cancleLikedVote(voteId: number, userId: number) {
@@ -148,7 +152,7 @@ export class VotesService {
       return user.id !== userId;
     });
 
-    await vote.save();
+    await this.votesRepository.save(vote);
   }
 
   private _compareDates(endDate: Date | string) {
@@ -199,7 +203,7 @@ export class CommentsService {
       vote,
     });
 
-    return await comment.save();
+    return await this.commentsRepository.save(comment);
   }
 
   async updateVoteComment(
@@ -232,7 +236,7 @@ export class CommentsService {
     });
     comment.likedUsers.push(likedUser);
 
-    await comment.save();
+    await this.commentsRepository.save(comment);
   }
 
   async cancleLikedVoteComment(commentId: number, userId: number) {
@@ -245,6 +249,6 @@ export class CommentsService {
       return user.id !== userId;
     });
 
-    await comment.save();
+    await this.commentsRepository.save(comment);
   }
 }
