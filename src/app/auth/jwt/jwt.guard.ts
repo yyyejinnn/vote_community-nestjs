@@ -21,7 +21,7 @@ export class JwtAccessGuard extends AuthGuard('jwt-access-token') {
 
     try {
       this.jwtService.verify(accessToken, {
-        secret: 'access-secret-key',
+        secret: process.env.ACCESS_TOKEN_SECRET_KEY,
       });
     } catch (error) {
       switch (error.message) {
