@@ -12,6 +12,7 @@ import configuration from './config/settings';
 import * as Joi from 'joi';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { typeORMConfig } from './config/typeorm.config';
+import { ServiceModule } from './app/service/service.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { typeORMConfig } from './config/typeorm.config';
     AuthModule,
     VotesModule,
     LoggerModule,
+    ServiceModule,
   ],
   controllers: [AppController],
   providers: [
@@ -48,4 +50,4 @@ import { typeORMConfig } from './config/typeorm.config';
     },
   ],
 })
-export class AppModule {}
+export class AppModule { }
