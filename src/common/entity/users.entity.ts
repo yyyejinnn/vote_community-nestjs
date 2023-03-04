@@ -28,6 +28,9 @@ export class UsersEntity extends CommonEntity {
   @Column()
   nickname: string;
 
+  @Column({ nullable: true })
+  photo: string;
+
   @OneToOne(() => RefreshTokensEntity, (refreshToken) => refreshToken.user, {
     cascade: ['insert'],
   })
