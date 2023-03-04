@@ -12,9 +12,9 @@ import { JwtAccessStrategy } from './jwt/jwt.strategy';
     UsersModule,
     PassportModule.register({ defaultStrategy: 'jwt-access-token' }),
     JwtModule.register({
-      secret: 'access-secret-key',
+      secret: process.env.ACCESS_TOKEN_SECRET_KEY,
       signOptions: {
-        expiresIn: '3m', //임시
+        expiresIn: process.env.ACCESS_TOKEN_EXPIRATION_TIME,
       },
     }),
   ],
@@ -22,4 +22,4 @@ import { JwtAccessStrategy } from './jwt/jwt.strategy';
   providers: [AuthService, JwtAccessStrategy, UsersService],
   exports: [AuthService, JwtAccessStrategy],
 })
-export class AuthModule {}
+export class AuthModule { }
