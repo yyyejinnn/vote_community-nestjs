@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
+import { ServiceModule } from '../service/service.module';
 import { UsersModule } from '../users/users.module';
 import { UsersService } from '../users/users.service';
 import { AuthController } from './auth.controller';
@@ -10,6 +11,7 @@ import { JwtAccessStrategy } from './jwt/jwt.strategy';
 @Module({
   imports: [
     UsersModule,
+    ServiceModule,
     PassportModule.register({ defaultStrategy: 'jwt-access-token' }),
     JwtModule.register({
       secret: process.env.ACCESS_TOKEN_SECRET_KEY,
