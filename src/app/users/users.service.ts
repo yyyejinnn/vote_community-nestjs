@@ -10,15 +10,17 @@ import { CustomException, UsersException } from '@vote/middleware';
 
 import * as bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
+import { S3Service } from '../service/s3.service';
 
 @Injectable()
 export class UsersService {
   constructor(
+    private readonly s3: S3Service,
     @InjectRepository(UsersEntity)
     private readonly usersRepository: Repository<UsersEntity>,
     @InjectRepository(RefreshTokensEntity)
     private readonly refreshTokenRepository: Repository<RefreshTokensEntity>,
-  ) {}
+  ) { }
 
   async createUser(dto: SignUpUserDto): Promise<UsersEntity> {
     const { email, nickname, password } = dto;
@@ -78,6 +80,17 @@ export class UsersService {
     if (result.affected === 0) {
       throw new NotFoundException('존재하지 않은 레코드');
     }
+  }
+
+  async updateProfilePhoto(userId: number, profilePhoto: Express.Multer.File) {
+    const folder = 'profile';
+    const key = `profile_${userId}_${new Date().getTime()}`;
+
+    await this.s3.uploadFile(folder, key, profilePhoto);
+
+    await this.usersRepository.update(userId, {
+      photo: key
+    })
   }
 
   async updatePassword(userId: number, password: string) {

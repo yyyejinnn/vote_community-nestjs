@@ -72,6 +72,13 @@ export class VotesException {
   };
 }
 
+export class AwsException {
+  static FAILED_UPLOAD_S3: ExceptionObj = {
+    code: 'FAILED_UPLOAD_S3',
+    message: 's3 파일 업로드에 실패했습니다.'
+  }
+}
+
 export class OthersException {
   static NOT_VALIDATION_ERROR_CODE: ExceptionObj = {
     code: 'NOT_VALIDATION_ERROR_CODE',
