@@ -19,13 +19,11 @@ import { ServiceModule } from './app/service/service.module';
     ConfigModule.forRoot({
       isGlobal: true,
       load: [configuration],
-      envFilePath:
-        process.env.NODE_ENV == 'production'
-          ? '.env.production'
-          : '.env.development',
+      ignoreEnvFile: true,
+      envFilePath: ['.env.development'],
       validationSchema: Joi.object({
         NODE_ENV: Joi.string()
-          .valid('development', 'production', 'test')
+          .valid('development', 'production')
           .default('development'),
         PORT: Joi.number().default(3000),
       }),

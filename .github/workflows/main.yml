@@ -16,22 +16,6 @@ on:
     branches: ['main']
 
 jobs:
-  # env file 생성
-  create-envfile:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Make envfile
-        uses: SpicyPizza/create-envfile@v1.3
-        with:
-          envkey_NODE_ENV: 'production'
-          envkey_ACCESS_TOKEN_SECRET_KEY: ${{ secrets.ACCESS_TOKEN_SECRET_KEY }}
-          envkey_ACCESS_TOKEN_EXPIRATION_TIME: ${{ secrets.ACCESS_TOKEN_EXPIRATION_TIME }}
-          envkey_REFRESH_TOKEN_SECRET_KEY: ${{ secrets.REFRESH_TOKEN_SECRET_KEY }}
-          envkey_REFRESH_TOKEN_EXPIRATION_TIME: ${{ secrets.REFRESH_TOKEN_EXPIRATION_TIME }}
-          file_name: .env.production
-          fail_on_empty: true
-
   # 도커 이미지 빌드
   build:
     runs-on: ubuntu-latest
@@ -63,6 +47,20 @@ jobs:
     runs-on: [self-hosted, label-vote]
 
     steps:
+      - name: Make envfile
+        uses: SpicyPizza/create-envfile@v1.3
+        with:
+          envkey_NODE_ENV: 'production'
+          envkey_ACCESS_TOKEN_SECRET_KEY: ${{ secrets.ACCESS_TOKEN_SECRET_KEY }}
+          envkey_ACCESS_TOKEN_EXPIRATION_TIME: ${{ secrets.ACCESS_TOKEN_EXPIRATION_TIME }}
+          envkey_REFRESH_TOKEN_SECRET_KEY: ${{ secrets.REFRESH_TOKEN_SECRET_KEY }}
+          envkey_REFRESH_TOKEN_EXPIRATION_TIME: ${{ secrets.REFRESH_TOKEN_EXPIRATION_TIME }}
+          envkey_S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
+          envkey_AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
+          envkey_AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_KEY }}
+          file_name: .env
+          fail_on_empty: true
+
       - name: Login ghcr
         uses: docker/login-action@v2
         with:
@@ -73,4 +71,4 @@ jobs:
       - name: Run docker
         run: |
           docker stop ${{ env.DOCKER_CONTAINER }} && docker rm ${{ env.DOCKER_CONTAINER }} && docker rmi ${{ env.DOCKER_IMAGE }}:latest
-          docker run -d -p 80:3000 --name ${{ env.DOCKER_CONTAINER }} --restart always ${{ env.DOCKER_IMAGE }}:latest
+          docker run -d -p 80:3000 --env-file ./.env --name ${{ env.DOCKER_CONTAINER }} ${{ env.DOCKER_IMAGE }}:latest
