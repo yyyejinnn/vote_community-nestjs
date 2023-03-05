@@ -12,13 +12,14 @@ import * as Joi from 'joi';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { configuration, typeORMConfig } from './config/configuration';
 import { ServiceModule } from './app/service/service.module';
+import { CommentsModule } from './app/comments/comments.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       load: [configuration],
-      ignoreEnvFile: process.env.NODE_ENV === "production",
+      ignoreEnvFile: process.env.NODE_ENV === 'production',
       envFilePath: '.env.development',
       validationSchema: Joi.object({
         NODE_ENV: Joi.string()
@@ -41,6 +42,7 @@ import { ServiceModule } from './app/service/service.module';
     UsersModule,
     AuthModule,
     VotesModule,
+    CommentsModule,
     LoggerModule,
     ServiceModule,
   ],
@@ -57,4 +59,4 @@ import { ServiceModule } from './app/service/service.module';
     },
   ],
 })
-export class AppModule { }
+export class AppModule {}
