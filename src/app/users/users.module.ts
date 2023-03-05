@@ -2,6 +2,8 @@ import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { RefreshTokensEntity, UsersEntity } from '@vote/common';
 import { TokenService } from '../auth/auth.service';
+import { CommentsModule } from '../comments/comments.module';
+import { CommentsService } from '../comments/comments.service';
 import { S3Service } from '../service/s3.service';
 import { ServiceModule } from '../service/service.module';
 import { VotesModule } from '../votes/votes.module';
@@ -10,12 +12,13 @@ import { UsersService } from './users.service';
 
 @Module({
   imports: [
-    forwardRef(() => VotesModule),
     TypeOrmModule.forFeature([UsersEntity, RefreshTokensEntity]),
+    forwardRef(() => VotesModule),
+    forwardRef(() => CommentsModule),
     ServiceModule,
   ],
   controllers: [UsersController],
-  providers: [UsersService, TokenService, S3Service],
+  providers: [UsersService, TokenService, CommentsService, S3Service],
   exports: [TypeOrmModule, UsersService, TokenService],
 })
-export class UsersModule { }
+export class UsersModule {}
