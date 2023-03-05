@@ -20,7 +20,7 @@ export class UsersService {
     private readonly usersRepository: Repository<UsersEntity>,
     @InjectRepository(RefreshTokensEntity)
     private readonly refreshTokenRepository: Repository<RefreshTokensEntity>,
-  ) { }
+  ) {}
 
   async createUser(dto: SignUpUserDto): Promise<UsersEntity> {
     const { email, nickname, password } = dto;
@@ -35,6 +35,10 @@ export class UsersService {
     userEntity.refreshToken = token;
 
     return await this.usersRepository.save(userEntity);
+  }
+
+  async getAllUsers() {
+    return await this.usersRepository.find();
   }
 
   async findUserByWhereOption(whereOption: WhereOption): Promise<UsersEntity> {
@@ -89,8 +93,8 @@ export class UsersService {
     await this.s3.uploadFile(folder, key, profilePhoto);
 
     await this.usersRepository.update(userId, {
-      photo: key
-    })
+      photo: key,
+    });
   }
 
   async updatePassword(userId: number, password: string) {
