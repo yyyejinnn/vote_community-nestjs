@@ -1,5 +1,5 @@
-.git
-.env
+.git*
+.env*
 
 Dockerfile
 node_modules
