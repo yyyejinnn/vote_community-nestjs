@@ -51,13 +51,20 @@ jobs:
         uses: SpicyPizza/create-envfile@v1.3
         with:
           envkey_NODE_ENV: 'production'
+          # jwt
           envkey_ACCESS_TOKEN_SECRET_KEY: ${{ secrets.ACCESS_TOKEN_SECRET_KEY }}
           envkey_ACCESS_TOKEN_EXPIRATION_TIME: ${{ secrets.ACCESS_TOKEN_EXPIRATION_TIME }}
           envkey_REFRESH_TOKEN_SECRET_KEY: ${{ secrets.REFRESH_TOKEN_SECRET_KEY }}
           envkey_REFRESH_TOKEN_EXPIRATION_TIME: ${{ secrets.REFRESH_TOKEN_EXPIRATION_TIME }}
+          # aws
           envkey_S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
           envkey_AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
           envkey_AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_KEY }}
+          # db
+          envkey_DB_HOST: ${{ secrets.DB_HOST }}
+          envkey_DB_USERNAME: ${{ secrets.DB_USERNAME }}
+          envkey_DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          envkey_DB_NAME: ${{ secrets.DB_NAME }}
           file_name: .env
           fail_on_empty: true
 
