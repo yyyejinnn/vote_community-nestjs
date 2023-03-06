@@ -63,7 +63,7 @@ export class UsersService {
     });
   }
 
-  async createRefreshToken(
+  async updateRefreshToken(
     userId: number,
     encryptedRefreshToken: string,
   ): Promise<RefreshTokensEntity> {
@@ -77,13 +77,12 @@ export class UsersService {
   }
 
   async signOut(userId: number) {
-    const result = await this.usersRepository.delete({
-      id: userId,
-    });
-
-    if (result.affected === 0) {
-      throw new NotFoundException('존재하지 않은 레코드');
-    }
+    await this.refreshTokenRepository.update(
+      { userId },
+      {
+        token: null,
+      },
+    );
   }
 
   async updateProfilePhoto(userId: number, profilePhoto: Express.Multer.File) {

@@ -43,7 +43,8 @@ export class TokenService {
     });
     const encryptRefreshToken: string = this._encryptRefreshToken(refreshToken);
 
-    await this.usersService.createRefreshToken(
+    // db 저장
+    await this.usersService.updateRefreshToken(
       payload.sub,
       encryptRefreshToken,
     );
@@ -108,7 +109,7 @@ export class AuthService {
   constructor(
     private readonly usersService: UsersService,
     private readonly tokenService: TokenService,
-  ) { }
+  ) {}
 
   async signUp(dto: SignUpUserDto) {
     const { email, password, checkPassword, nickname } = dto;

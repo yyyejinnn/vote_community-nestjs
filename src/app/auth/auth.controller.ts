@@ -49,13 +49,13 @@ export class AuthController {
 
   @Delete('sign-out')
   async signOut() {
-    const userId = 1;
+    const userId = 2;
     await this.authService.signOut(userId);
   }
 
   @Patch('reset/password')
   async resetPassword(@Body() body: ResetPasswordDto) {
-    const userId = 1;
+    const userId = 2;
     await this.authService.resetPassword(userId, body);
   }
 
