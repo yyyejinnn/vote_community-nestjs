@@ -20,7 +20,7 @@ export class UsersService {
     private readonly usersRepository: Repository<UsersEntity>,
     @InjectRepository(RefreshTokensEntity)
     private readonly refreshTokenRepository: Repository<RefreshTokensEntity>,
-  ) { }
+  ) {}
 
   async createUser(dto: SignUpUserDto): Promise<UsersEntity> {
     const { email, nickname, password } = dto;
@@ -35,6 +35,10 @@ export class UsersService {
     userEntity.refreshToken = token;
 
     return await this.usersRepository.save(userEntity);
+  }
+
+  async getAllUsers() {
+    return await this.usersRepository.find();
   }
 
   async findUserByWhereOption(whereOption: WhereOption): Promise<UsersEntity> {
@@ -59,7 +63,7 @@ export class UsersService {
     });
   }
 
-  async createRefreshToken(
+  async updateRefreshToken(
     userId: number,
     encryptedRefreshToken: string,
   ): Promise<RefreshTokensEntity> {
@@ -73,13 +77,12 @@ export class UsersService {
   }
 
   async signOut(userId: number) {
-    const result = await this.usersRepository.delete({
-      id: userId,
-    });
-
-    if (result.affected === 0) {
-      throw new NotFoundException('존재하지 않은 레코드');
-    }
+    await this.refreshTokenRepository.update(
+      { userId },
+      {
+        token: null,
+      },
+    );
   }
 
   async updateProfilePhoto(userId: number, profilePhoto: Express.Multer.File) {
@@ -89,8 +92,8 @@ export class UsersService {
     await this.s3.uploadFile(folder, key, profilePhoto);
 
     await this.usersRepository.update(userId, {
-      photo: key
-    })
+      photo: key,
+    });
   }
 
   async updatePassword(userId: number, password: string) {

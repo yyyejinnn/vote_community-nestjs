@@ -7,13 +7,14 @@ import {
   VotesEntity,
 } from '@vote/common';
 import { CommentsEntity } from 'src/common/entity/comments.entity';
+import { CommentsController } from '../comments/comments.controller';
+import { CommentsModule } from '../comments/comments.module';
 import { UsersModule } from '../users/users.module';
-import { CommentsController, VotesController } from './votes.controller';
-import { CommentsService, VotesService } from './votes.service';
+import { VotesController } from './votes.controller';
+import { VotesService } from './votes.service';
 
 @Module({
   imports: [
-    forwardRef(() => UsersModule),
     TypeOrmModule.forFeature([
       VotesEntity,
       VoteChoicesEntity,
@@ -21,9 +22,11 @@ import { CommentsService, VotesService } from './votes.service';
       ChoicedUsersEntity,
       CommentsEntity,
     ]),
+    forwardRef(() => UsersModule),
+    forwardRef(() => CommentsModule),
   ],
-  controllers: [VotesController, CommentsController],
-  providers: [VotesService, CommentsService],
-  exports: [TypeOrmModule, VotesService, CommentsService],
+  controllers: [VotesController],
+  providers: [VotesService],
+  exports: [TypeOrmModule, VotesService],
 })
 export class VotesModule {}
