@@ -7,7 +7,10 @@ import { UsersModule } from '../users/users.module';
 import { UsersService } from '../users/users.service';
 import { VotesModule } from '../votes/votes.module';
 import { VotesService } from '../votes/votes.service';
-import { CommentsController } from './comments.controller';
+import {
+  CommentsController,
+  CommentsOfVoteController,
+} from './comments.controller';
 import { CommentsService } from './comments.service';
 
 @Module({
@@ -17,7 +20,7 @@ import { CommentsService } from './comments.service';
     forwardRef(() => UsersModule),
     ServiceModule,
   ],
-  controllers: [CommentsController],
+  controllers: [CommentsOfVoteController, CommentsController],
   providers: [CommentsService, VotesService, UsersService, S3Service],
   exports: [TypeOrmModule, CommentsService],
 })

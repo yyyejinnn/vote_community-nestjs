@@ -12,7 +12,7 @@ import { CreateVoteCommentDto, UpdateVoteCommentDto } from '@vote/common';
 import { CommentsService } from './comments.service';
 
 @Controller('votes/:voteId/comments')
-export class CommentsController {
+export class CommentsOfVoteController {
   constructor(private readonly commentsService: CommentsService) {}
 
   @Get()
@@ -25,7 +25,7 @@ export class CommentsController {
     @Param('voteId', ParseIntPipe) voteId: number,
     @Body() body: CreateVoteCommentDto,
   ) {
-    const userId = 1; //임시
+    const userId = 2; //임시
     return {
       comments: await this.commentsService.createVoteComment(
         voteId,
@@ -34,6 +34,11 @@ export class CommentsController {
       ),
     };
   }
+}
+
+@Controller('comments')
+export class CommentsController {
+  constructor(private readonly commentsService: CommentsService) {}
 
   @Patch(':commentId')
   async updateVoteComment(
@@ -52,7 +57,7 @@ export class CommentsController {
 
   @Post(':commentId/like')
   async likeVoteComment(@Param('commentId', ParseIntPipe) commentId: number) {
-    const userId = 1;
+    const userId = 2;
     await this.commentsService.likeVoteComment(commentId, userId);
   }
 
@@ -60,7 +65,7 @@ export class CommentsController {
   async cancleLikedVoteComment(
     @Param('commentId', ParseIntPipe) commentId: number,
   ) {
-    const userId = 1;
+    const userId = 2;
     await this.commentsService.cancleLikedVoteComment(commentId, userId);
   }
 }
