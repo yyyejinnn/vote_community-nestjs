@@ -23,7 +23,7 @@ export class UsersController {
 
   @Get('profile')
   async getUserProfile() {
-    const userId = 1; //임시
+    const userId = 2; //임시
     const whereOption: WhereOptionByUserId = { id: userId };
     return {
       users: await this.usersService.findUserByWhereOption(whereOption),
@@ -33,7 +33,7 @@ export class UsersController {
   @Patch('profile-photo')
   @UseInterceptors(FileInterceptor('profilePhoto'))
   async updateProfilePhoto(@UploadedFile() photo: Express.Multer.File) {
-    const userId = 1;
+    const userId = 2;
     await this.usersService.updateProfilePhoto(userId, photo);
   }
 
