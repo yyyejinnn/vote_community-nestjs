@@ -35,6 +35,7 @@ export class VotesEntity extends CommonEntity {
 
   @OneToMany((type) => VoteChoicesEntity, (voteChoices) => voteChoices.vote, {
     nullable: true,
+    eager: true,
     cascade: ['insert'],
   })
   @JoinTable()

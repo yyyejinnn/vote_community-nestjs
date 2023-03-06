@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import {
   ChoicedUsersEntity,
   CreateVoteDto,
-  CreateVotedUserDto,
   UpdateVoteDto,
   VoteChoicesEntity,
   VotedUsersEntity,
@@ -34,13 +33,6 @@ export class VotesService {
 
   async getVoteById(voteId: number) {
     return await this.votesRepository.findOne({
-      relations: {
-        voteChoices: {
-          choiced: {
-            user: true,
-          },
-        },
-      },
       where: {
         id: voteId,
       },
@@ -93,17 +85,19 @@ export class VotesService {
     }
   }
 
-  async choiceVote(
-    voteId: number,
-    userId: number,
-    { choicedVoteId }: CreateVotedUserDto,
-  ) {
+  async choiceVote(choicedId: number, userId: number) {
     const user = await this.usersService.findUserByWhereOption({
       id: userId,
     });
 
     // voted 생성
-    const vote = await this.getVoteById(voteId);
+    const vote = await this.votesRepository.findOne({
+      where: {
+        voteChoices: {
+          id: choicedId,
+        },
+      },
+    });
     const voted = new VotedUsersEntity();
     voted.vote = vote;
     voted.user = user;
@@ -112,10 +106,9 @@ export class VotesService {
     // choiced 생성
     const choice = await this.choicesRepository.findOne({
       where: {
-        id: choicedVoteId,
+        id: choicedId,
       },
     });
-
     const choiced = new ChoicedUsersEntity();
     choiced.choice = choice;
     choiced.user = user;

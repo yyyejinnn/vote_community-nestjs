@@ -36,13 +36,3 @@ export class CreateVoteDto {
 }
 
 export class UpdateVoteDto extends PickType(CreateVoteDto, ['endDate']) {}
-
-export class CreateVotedUserDto {
-  @IsNotEmpty({
-    context: {
-      code: 'EMPTY_CHOICED_VOTE_ID',
-    },
-  })
-  @Type(() => Number)
-  choicedVoteId: number;
-}

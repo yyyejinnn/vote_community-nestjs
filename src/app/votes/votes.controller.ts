@@ -8,7 +8,7 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
-import { CreateVoteDto, CreateVotedUserDto, UpdateVoteDto } from '@vote/common';
+import { CreateVoteDto, UpdateVoteDto } from '@vote/common';
 import { VotesService } from './votes.service';
 
 @Controller('votes')
@@ -44,16 +44,12 @@ export class VotesController {
     await this.votesService.deleteVote(voteId);
   }
 
-  @Post(':voteId/choice/vote')
-  async choiceVote(
-    @Param('voteId', ParseIntPipe) voteId: number,
-    @Body() body: CreateVotedUserDto,
-  ) {
+  @Post('choice/:choicedId')
+  async choiceVote(@Param('choicedId', ParseIntPipe) choicedId: number) {
     const userId = 2; // 임시
-    console.log(voteId);
-    console.log(body);
+    console.log(choicedId);
 
-    await this.votesService.choiceVote(voteId, userId, body);
+    await this.votesService.choiceVote(choicedId, userId);
   }
 
   @Post(':voteId/like')
