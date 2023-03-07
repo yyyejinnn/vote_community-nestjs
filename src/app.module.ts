@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { CacheModule, Module } from '@nestjs/common';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { HttpExceptionFilter, ResponseInterceptor } from './middleware';
 import { AppController } from './app.controller';
@@ -10,9 +10,14 @@ import { LoggerModule } from './app/logger/logger.module';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { configuration, typeORMConfig } from './config/configuration';
+import {
+  configuration,
+  redisConfig,
+  typeORMConfig,
+} from './config/configuration';
 import { ServiceModule } from './app/service/service.module';
 import { CommentsModule } from './app/comments/comments.module';
+import type { ClientOpts } from 'redis';
 
 @Module({
   imports: [
@@ -38,6 +43,7 @@ import { CommentsModule } from './app/comments/comments.module';
         AWS_SECRET_KEY: Joi.string().required(),
       }),
     }),
+    CacheModule.register<ClientOpts>(redisConfig()),
     TypeOrmModule.forRoot(typeORMConfig()),
     UsersModule,
     AuthModule,
