@@ -1,10 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import {
   SignUpUserDto,
   SignInUserDto,
   JwtPayload,
-  RecreateAccessToken,
   VerifiedToken,
   WhereOptionByUserEmail,
   WhereOptionByUserNickName,
@@ -14,6 +13,7 @@ import {
 import { CustomException, UsersException } from '@vote/middleware';
 
 import * as bcrypt from 'bcrypt';
+import { Cache } from 'cache-manager';
 import * as crypto from 'crypto';
 import { UsersService } from '../users/users.service';
 
@@ -23,7 +23,7 @@ type ValidatePasswordType = 'clearPassword' | 'hashedPassword';
 export class TokenService {
   private readonly jwtService: JwtService;
 
-  constructor(private readonly usersService: UsersService) {
+  constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {
     this.jwtService = new JwtService();
   }
 
@@ -43,11 +43,9 @@ export class TokenService {
     });
     const encryptRefreshToken: string = this._encryptRefreshToken(refreshToken);
 
-    // db 저장
-    await this.usersService.updateRefreshToken(
-      payload.sub,
-      encryptRefreshToken,
-    );
+    // redis 저장
+    const ttl = +process.env.REFRESH_TOKEN_EXPIRATION_TIME;
+    await this.cacheManager.set(`${payload.sub}`, 'encryptRefreshToken', ttl);
 
     return encryptRefreshToken;
   }
@@ -58,15 +56,13 @@ export class TokenService {
   ): Promise<VerifiedToken> {
     let verifiedToken: VerifiedToken;
 
-    const token: UsersEntity = await this.usersService.findMatchedRefreshToken(
-      userId,
-      encryptRefreshToken,
-    );
-
+    // get redis
+    const token = await this.cacheManager.get(`${userId}`);
     if (!token) {
-      throw new CustomException(UsersException.UNVERIFIED_REFRESH_TOKEN);
+      throw new CustomException(UsersException.REFRESH_TOKEN_NOT_EXISTS);
     }
 
+    // 복호화
     const decryptRefreshToken: string =
       this._decryptRefreshToken(encryptRefreshToken);
 
@@ -84,6 +80,10 @@ export class TokenService {
     }
 
     return verifiedToken;
+  }
+
+  async deleteRefreshToken(userId: number) {
+    await this.cacheManager.del(`${userId}`);
   }
 
   private _encryptRefreshToken(refreshToken: string): string {
@@ -155,7 +155,7 @@ export class AuthService {
   }
 
   async signOut(userId: number) {
-    return await this.usersService.signOut(userId);
+    return await this.tokenService.deleteRefreshToken(userId);
   }
 
   async recreateAccessToken(userId: number, encryptRefreshToken: string) {
