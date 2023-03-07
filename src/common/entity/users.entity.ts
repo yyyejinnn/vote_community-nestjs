@@ -7,7 +7,6 @@ import {
   OneToMany,
   OneToOne,
 } from 'typeorm';
-import { RefreshTokensEntity } from './auth.entity';
 import { CommonEntity } from './base.entity';
 import { CommentsEntity } from './comments.entity';
 import {
@@ -29,11 +28,6 @@ export class UsersEntity extends CommonEntity {
 
   @Column({ nullable: true })
   photo: string;
-
-  @OneToOne(() => RefreshTokensEntity, (refreshToken) => refreshToken.user, {
-    cascade: ['insert'],
-  })
-  refreshToken?: RefreshTokensEntity;
 
   @OneToMany(() => VotesEntity, (writtenVotes) => writtenVotes.writer)
   writtenVotes?: VotesEntity[];

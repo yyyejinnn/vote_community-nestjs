@@ -1,6 +1,6 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { RefreshTokensEntity, UsersEntity } from '@vote/common';
+import { UsersEntity } from '@vote/common';
 import { TokenService } from '../auth/auth.service';
 import { CommentsModule } from '../comments/comments.module';
 import { CommentsService } from '../comments/comments.service';
@@ -12,7 +12,7 @@ import { UsersService } from './users.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([UsersEntity, RefreshTokensEntity]),
+    TypeOrmModule.forFeature([UsersEntity]),
     forwardRef(() => VotesModule),
     forwardRef(() => CommentsModule),
     ServiceModule,
