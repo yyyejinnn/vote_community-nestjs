@@ -18,6 +18,7 @@ import {
 import { ServiceModule } from './app/service/service.module';
 import { CommentsModule } from './app/comments/comments.module';
 import type { ClientOpts } from 'redis';
+import { SearchModule } from './app/search/search.module';
 
 @Module({
   imports: [
@@ -51,6 +52,7 @@ import type { ClientOpts } from 'redis';
     CommentsModule,
     LoggerModule,
     ServiceModule,
+    SearchModule,
   ],
   controllers: [AppController],
   providers: [
