@@ -55,6 +55,25 @@ export class VotesEntity extends CommonEntity {
     eager: true,
   })
   comments: CommentsEntity[];
+
+  @ManyToMany((type) => TagsEntity, (tags) => tags.votes, {
+    nullable: true,
+    eager: true,
+    cascade: true,
+  })
+  tags: TagsEntity[];
+}
+
+@Entity({ name: 'tags' })
+export class TagsEntity extends CommonEntity {
+  @Column({
+    unique: true,
+  })
+  name: string;
+
+  @ManyToMany((type) => VotesEntity, (votes) => votes.tags)
+  @JoinTable()
+  votes: VotesEntity[];
 }
 
 @Entity({ name: 'vote-options' })

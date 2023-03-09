@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import {
   ChoicedUsersEntity,
   CreateVoteDto,
+  TagsEntity,
   UpdateVoteDto,
   VoteChoicesEntity,
   VotedUsersEntity,
@@ -23,7 +24,8 @@ export class VotesService {
     private readonly choicedRepository: Repository<ChoicedUsersEntity>,
     @InjectRepository(VotedUsersEntity)
     private readonly votedRepository: Repository<VotedUsersEntity>,
-
+    @InjectRepository(TagsEntity)
+    private readonly tagsRepository: Repository<TagsEntity>,
     private readonly usersService: UsersService,
   ) {}
 
@@ -48,22 +50,46 @@ export class VotesService {
   }
 
   async createVote(userId: number, dto: CreateVoteDto) {
-    const { title, endDate, voteChoices } = dto;
+    const { title, endDate, voteChoices, tags } = dto;
     this._compareDates(endDate);
 
     const writer = await this.usersService.findUserByWhereOption({
       id: userId,
     });
 
+    // connect tags
+    const savedTags = await Promise.all(
+      tags.map((name) => {
+        const result = this.tagsRepository
+          .findOne({
+            where: {
+              name,
+            },
+          })
+          .then((value) => {
+            if (!value) {
+              const tagEntity = new TagsEntity();
+              tagEntity.name = name;
+              return tagEntity;
+            } else {
+              return value;
+            }
+          });
+
+        return result;
+      }),
+    );
+
     const voteEntity = this.votesRepository.create({
       title,
       endDate,
       writer,
       voteChoices: voteChoices.map((value) => {
-        const choice = new VoteChoicesEntity();
-        choice.title = value;
-        return choice;
+        const choiceEntity = new VoteChoicesEntity();
+        choiceEntity.title = value;
+        return choiceEntity;
       }),
+      tags: savedTags,
     });
 
     return await this.votesRepository.save(voteEntity);
