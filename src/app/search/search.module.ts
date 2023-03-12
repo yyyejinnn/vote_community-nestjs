@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { TagsEntity } from '@vote/common';
+import { TagsEntity, VotesEntity } from '@vote/common';
 import { SearchController } from './search.controller';
 import { SearchService } from './search.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([TagsEntity])],
+  imports: [TypeOrmModule.forFeature([TagsEntity, VotesEntity])],
   controllers: [SearchController],
   providers: [SearchService],
   exports: [TypeOrmModule],

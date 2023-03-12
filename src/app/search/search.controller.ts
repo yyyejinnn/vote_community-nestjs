@@ -11,4 +11,11 @@ export class SearchController {
       votes: await this.searchService.searchByTag(tag),
     };
   }
+
+  @Get()
+  async sortVotes(@Query('sorting') sorting, @Query('order') order) {
+    return {
+      votes: await this.searchService.sortVotes(sorting, order),
+    };
+  }
 }
