@@ -33,6 +33,13 @@ export class CreateVoteDto {
     },
   })
   voteChoices: string[];
+
+  @IsArray({
+    context: {
+      code: 'MUST_ARRAY_TYPE',
+    },
+  })
+  tags?: string[];
 }
 
 export class UpdateVoteDto extends PickType(CreateVoteDto, ['endDate']) {}

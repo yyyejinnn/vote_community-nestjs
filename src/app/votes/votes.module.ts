@@ -2,6 +2,7 @@ import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import {
   ChoicedUsersEntity,
+  TagsEntity,
   VoteChoicesEntity,
   VotedUsersEntity,
   VotesEntity,
@@ -17,6 +18,7 @@ import { VotesService } from './votes.service';
   imports: [
     TypeOrmModule.forFeature([
       VotesEntity,
+      TagsEntity,
       VoteChoicesEntity,
       VotedUsersEntity,
       ChoicedUsersEntity,
