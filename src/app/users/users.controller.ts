@@ -1,6 +1,9 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Patch, UseInterceptors } from '@nestjs/common';
+import { UploadedFile } from '@nestjs/common/decorators';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { WhereOptionByUserId } from '@vote/common';
-import { CommentsService, VotesService } from '../votes/votes.service';
+import { CommentsService } from '../comments/comments.service';
+import { VotesService } from '../votes/votes.service';
 import { UsersService } from './users.service';
 
 @Controller('users')
@@ -11,13 +14,27 @@ export class UsersController {
     private readonly commentsService: CommentsService,
   ) {}
 
+  @Get()
+  async getAllUsers() {
+    return {
+      users: await this.usersService.getAllUsers(),
+    };
+  }
+
   @Get('profile')
   async getUserProfile() {
-    const userId = 1; //임시
+    const userId = 2; //임시
     const whereOption: WhereOptionByUserId = { id: userId };
     return {
       users: await this.usersService.findUserByWhereOption(whereOption),
     };
+  }
+
+  @Patch('profile-photo')
+  @UseInterceptors(FileInterceptor('profilePhoto'))
+  async updateProfilePhoto(@UploadedFile() photo: Express.Multer.File) {
+    const userId = 2;
+    await this.usersService.updateProfilePhoto(userId, photo);
   }
 
   @Get('written-votes')

@@ -1,4 +1,3 @@
-import { CommentsService } from 'src/app/votes/votes.service';
 import {
   AfterInsert,
   Column,
@@ -8,7 +7,6 @@ import {
   OneToMany,
   OneToOne,
 } from 'typeorm';
-import { RefreshTokensEntity } from './auth.entity';
 import { CommonEntity } from './base.entity';
 import { CommentsEntity } from './comments.entity';
 import {
@@ -28,10 +26,8 @@ export class UsersEntity extends CommonEntity {
   @Column()
   nickname: string;
 
-  @OneToOne(() => RefreshTokensEntity, (refreshToken) => refreshToken.user, {
-    cascade: ['insert'],
-  })
-  refreshToken?: RefreshTokensEntity;
+  @Column({ nullable: true })
+  photo: string;
 
   @OneToMany(() => VotesEntity, (writtenVotes) => writtenVotes.writer)
   writtenVotes?: VotesEntity[];

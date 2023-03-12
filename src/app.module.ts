@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { CacheModule, Module } from '@nestjs/common';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { HttpExceptionFilter, ResponseInterceptor } from './middleware';
 import { AppController } from './app.controller';
@@ -8,32 +8,51 @@ import { AuthModule } from './app/auth/auth.module';
 import { VotesModule } from './app/votes/votes.module';
 import { LoggerModule } from './app/logger/logger.module';
 import { ConfigModule } from '@nestjs/config';
-import configuration from './config/settings';
 import * as Joi from 'joi';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { typeORMConfig } from './config/typeorm.config';
+import {
+  configuration,
+  redisConfig,
+  typeORMConfig,
+} from './config/configuration';
+import { ServiceModule } from './app/service/service.module';
+import { CommentsModule } from './app/comments/comments.module';
+import type { ClientOpts } from 'redis';
+import { SearchModule } from './app/search/search.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       load: [configuration],
-      envFilePath:
-        process.env.NODE_ENV == 'production'
-          ? '.env.production'
-          : '.env.development',
+      ignoreEnvFile: process.env.NODE_ENV === 'production',
+      envFilePath: '.env.development',
       validationSchema: Joi.object({
         NODE_ENV: Joi.string()
-          .valid('development', 'production', 'test')
+          .valid('development', 'production')
           .default('development'),
         PORT: Joi.number().default(3000),
+        // db
+        DB_HOST: Joi.string().required(),
+        DB_PORT: Joi.number().required().default(5432),
+        DB_USERNAME: Joi.string().required(),
+        DB_PASSWORD: Joi.string().required(),
+        DB_NAME: Joi.string().required(),
+        // aws
+        S3_BUCKET_NAME: Joi.string().required(),
+        AWS_ACCESS_KEY: Joi.string().required(),
+        AWS_SECRET_KEY: Joi.string().required(),
       }),
     }),
-    TypeOrmModule.forRoot(typeORMConfig),
+    CacheModule.register<ClientOpts>(redisConfig()),
+    TypeOrmModule.forRoot(typeORMConfig()),
     UsersModule,
     AuthModule,
     VotesModule,
+    CommentsModule,
     LoggerModule,
+    ServiceModule,
+    SearchModule,
   ],
   controllers: [AppController],
   providers: [

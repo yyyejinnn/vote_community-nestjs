@@ -44,6 +44,11 @@ export class UsersException {
     message: '유효하지 않은 Access 토큰입니다.',
   };
 
+  static REFRESH_TOKEN_NOT_EXISTS: ExceptionObj = {
+    code: 'REFRESH_TOKEN_NOT_EXISTS',
+    message: 'Refresh 토큰이 없습니다. (재로그인 필요)',
+  };
+
   static UNVERIFIED_REFRESH_TOKEN: ExceptionObj = {
     code: 'UNVERIFIED_REFRESH_TOKEN',
     message: '유효하지 않은 Refresh 토큰입니다.',
@@ -69,6 +74,13 @@ export class VotesException {
   static END_DATE_LTE_TO_NOW: ExceptionObj = {
     code: 'END_DATE_LTE_TO_NOW',
     message: '투표 종료일이 오늘 날짜와 같거나 작습니다.',
+  };
+}
+
+export class AwsException {
+  static FAILED_UPLOAD_S3: ExceptionObj = {
+    code: 'FAILED_UPLOAD_S3',
+    message: 's3 파일 업로드에 실패했습니다.',
   };
 }
 
