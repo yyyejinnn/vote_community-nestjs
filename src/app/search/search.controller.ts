@@ -1,9 +1,13 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Inject, Query } from '@nestjs/common';
 import { SearchService } from './search.service';
+import { SearchServiceInterface } from './search.service.interface';
 
 @Controller('search')
 export class SearchController {
-  constructor(private readonly searchService: SearchService) {}
+  constructor(
+    @Inject('SEARCH_SERVICE')
+    private readonly searchService: SearchServiceInterface,
+  ) {}
 
   @Get()
   async searchByTag(@Query('tag') tag: string) {

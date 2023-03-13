@@ -21,6 +21,8 @@ import {
   TokenServiceInterface,
 } from './auth.service.interface';
 
+import { UsersServiceInterface } from '../users/users.service.interface';
+
 type ValidatePasswordType = 'clearPassword' | 'hashedPassword';
 
 @Injectable()
@@ -111,7 +113,8 @@ export class TokenService implements TokenServiceInterface {
 @Injectable()
 export class AuthService implements AuthServiceInterface {
   constructor(
-    private readonly usersService: UsersService,
+    @Inject('USERS_SERVICE')
+    private readonly usersService: UsersServiceInterface,
     private readonly tokenService: TokenService,
   ) {}
 

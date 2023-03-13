@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SignUpUserDto, UsersEntity, WhereOption } from '@vote/common';
 import { CustomException, UsersException } from '@vote/middleware';
@@ -6,12 +6,12 @@ import { CustomException, UsersException } from '@vote/middleware';
 import * as bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
 import { S3Service } from '../service/s3.service';
-import { UserServiceInterface } from './users.service.interface';
+import { UsersServiceInterface } from './users.service.interface';
 
 @Injectable()
-export class UsersService implements UserServiceInterface {
+export class UsersService implements UsersServiceInterface {
   constructor(
-    private readonly s3: S3Service,
+    @Inject('S3_SERVICE') private readonly s3: S3Service,
     @InjectRepository(UsersEntity)
     private readonly usersRepository: Repository<UsersEntity>,
   ) {}

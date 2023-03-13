@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Inject,
   Param,
   ParseIntPipe,
   Patch,
@@ -10,10 +11,14 @@ import {
 } from '@nestjs/common';
 import { CreateVoteDto, UpdateVoteDto } from '@vote/common';
 import { VotesService } from './votes.service';
+import { VotesServiceInterface } from './votes.service.interface';
 
 @Controller('votes')
 export class VotesController {
-  constructor(private readonly votesService: VotesService) {}
+  constructor(
+    @Inject('VOTES_SERVICE')
+    private readonly votesService: VotesServiceInterface,
+  ) {}
 
   @Post()
   async createVote(@Body() dto: CreateVoteDto) {

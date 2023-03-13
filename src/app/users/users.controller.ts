@@ -1,17 +1,23 @@
 import { Controller, Get, Patch, UseInterceptors } from '@nestjs/common';
-import { UploadedFile } from '@nestjs/common/decorators';
+import { Inject, UploadedFile } from '@nestjs/common/decorators';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { WhereOptionByUserId } from '@vote/common';
 import { CommentsService } from '../comments/comments.service';
+import { CommentsServiceInterface } from '../comments/comments.service.interface';
 import { VotesService } from '../votes/votes.service';
+import { VotesServiceInterface } from '../votes/votes.service.interface';
 import { UsersService } from './users.service';
+import { UsersServiceInterface } from './users.service.interface';
 
 @Controller('users')
 export class UsersController {
   constructor(
-    private readonly usersService: UsersService,
-    private readonly votesService: VotesService,
-    private readonly commentsService: CommentsService,
+    @Inject('USERS_SERVICE')
+    private readonly usersService: UsersServiceInterface,
+    @Inject('VOTES_SERVICE')
+    private readonly votesService: VotesServiceInterface,
+    @Inject('COMMENTS_SERVICE')
+    private readonly commentsService: CommentsServiceInterface,
   ) {}
 
   @Get()

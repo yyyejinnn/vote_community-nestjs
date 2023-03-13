@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Inject,
   Param,
   ParseIntPipe,
   Patch,
@@ -10,10 +11,14 @@ import {
 } from '@nestjs/common';
 import { CreateVoteCommentDto, UpdateVoteCommentDto } from '@vote/common';
 import { CommentsService } from './comments.service';
+import { CommentsServiceInterface } from './comments.service.interface';
 
 @Controller('votes/:voteId/comments')
 export class CommentsOfVoteController {
-  constructor(private readonly commentsService: CommentsService) {}
+  constructor(
+    @Inject('COMMENTS_SERVICE')
+    private readonly commentsService: CommentsServiceInterface,
+  ) {}
 
   @Get()
   async getVoteComments(@Param('voteId', ParseIntPipe) voteId: number) {
@@ -38,7 +43,10 @@ export class CommentsOfVoteController {
 
 @Controller('comments')
 export class CommentsController {
-  constructor(private readonly commentsService: CommentsService) {}
+  constructor(
+    @Inject('COMMENTS_SERVICE')
+    private readonly commentsService: CommentsServiceInterface,
+  ) {}
 
   @Patch(':commentId')
   async updateVoteComment(
