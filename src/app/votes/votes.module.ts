@@ -28,7 +28,12 @@ import { VotesService } from './votes.service';
     forwardRef(() => CommentsModule),
   ],
   controllers: [VotesController],
-  providers: [VotesService],
-  exports: [TypeOrmModule, VotesService],
+  providers: [
+    {
+      provide: 'VOTES_SERVICE',
+      useClass: VotesService,
+    },
+  ],
+  exports: [TypeOrmModule, 'VOTES_SERVICE'],
 })
 export class VotesModule {}

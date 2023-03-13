@@ -1,6 +1,6 @@
 import { SignUpUserDto, WhereOption } from '@vote/common';
 
-export interface UserServiceInterface {
+export interface UsersServiceInterface {
   createUser(dto: SignUpUserDto);
   getAllUsers();
   findUserByWhereOption(whereOption: WhereOption);

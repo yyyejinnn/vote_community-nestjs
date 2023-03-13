@@ -7,7 +7,12 @@ import { SearchService } from './search.service';
 @Module({
   imports: [TypeOrmModule.forFeature([TagsEntity, VotesEntity])],
   controllers: [SearchController],
-  providers: [SearchService],
+  providers: [
+    {
+      provide: 'SEARCH_SERVICE',
+      useClass: SearchService,
+    },
+  ],
   exports: [TypeOrmModule],
 })
 export class SearchModule {}

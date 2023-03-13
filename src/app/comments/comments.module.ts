@@ -21,7 +21,12 @@ import { CommentsService } from './comments.service';
     ServiceModule,
   ],
   controllers: [CommentsOfVoteController, CommentsController],
-  providers: [CommentsService, VotesService, UsersService, S3Service],
-  exports: [TypeOrmModule, CommentsService],
+  providers: [
+    {
+      provide: 'COMMENTS_SERVICE',
+      useClass: CommentsService,
+    },
+  ],
+  exports: [TypeOrmModule, 'COMMENTS_SERVICE'],
 })
 export class CommentsModule {}
