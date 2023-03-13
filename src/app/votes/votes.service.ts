@@ -12,9 +12,10 @@ import {
 import { CustomException, VotesException } from '@vote/middleware';
 import { Repository } from 'typeorm';
 import { UsersService } from '../users/users.service';
+import { VotesServiceInterface } from './votes.service.interface';
 
 @Injectable()
-export class VotesService {
+export class VotesService implements VotesServiceInterface {
   constructor(
     @InjectRepository(VotesEntity)
     private readonly votesRepository: Repository<VotesEntity>,

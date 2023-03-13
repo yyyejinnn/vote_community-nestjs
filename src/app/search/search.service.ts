@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TagsEntity, VotesEntity } from '@vote/common';
-import { FindManyOptions, FindOptionsOrderValue, Repository } from 'typeorm';
+import { FindManyOptions, Repository } from 'typeorm';
+import { SearchServiceInterface } from './search.service.interface';
 
 @Injectable()
-export class SearchService {
+export class SearchService implements SearchServiceInterface {
   constructor(
     @InjectRepository(TagsEntity)
     private readonly tagsRepository: Repository<TagsEntity>,

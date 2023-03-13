@@ -5,9 +5,10 @@ import { CommentsEntity } from 'src/common/entity/comments.entity';
 import { Repository } from 'typeorm';
 import { UsersService } from '../users/users.service';
 import { VotesService } from '../votes/votes.service';
+import { CommentsServiceInterface } from './comments.service.interface';
 
 @Injectable()
-export class CommentsService {
+export class CommentsService implements CommentsServiceInterface {
   constructor(
     @InjectRepository(CommentsEntity)
     private readonly commentsRepository: Repository<CommentsEntity>,

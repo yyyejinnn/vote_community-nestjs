@@ -6,9 +6,10 @@ import { CustomException, UsersException } from '@vote/middleware';
 import * as bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
 import { S3Service } from '../service/s3.service';
+import { UserServiceInterface } from './users.service.interface';
 
 @Injectable()
-export class UsersService {
+export class UsersService implements UserServiceInterface {
   constructor(
     private readonly s3: S3Service,
     @InjectRepository(UsersEntity)
