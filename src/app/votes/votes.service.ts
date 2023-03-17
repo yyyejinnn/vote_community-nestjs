@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   ChoicedUsersEntity,
@@ -12,9 +12,11 @@ import {
 import { CustomException, VotesException } from '@vote/middleware';
 import { Repository } from 'typeorm';
 import { UsersService } from '../users/users.service';
+import { UsersServiceInterface } from '../users/users.service.interface';
+import { VotesServiceInterface } from './votes.service.interface';
 
 @Injectable()
-export class VotesService {
+export class VotesService implements VotesServiceInterface {
   constructor(
     @InjectRepository(VotesEntity)
     private readonly votesRepository: Repository<VotesEntity>,
@@ -26,7 +28,8 @@ export class VotesService {
     private readonly votedRepository: Repository<VotedUsersEntity>,
     @InjectRepository(TagsEntity)
     private readonly tagsRepository: Repository<TagsEntity>,
-    private readonly usersService: UsersService,
+    @Inject('USERS_SERVICE')
+    private readonly usersService: UsersServiceInterface,
   ) {}
 
   async listVotes() {

@@ -16,11 +16,17 @@ import * as bcrypt from 'bcrypt';
 import { Cache } from 'cache-manager';
 import * as crypto from 'crypto';
 import { UsersService } from '../users/users.service';
+import {
+  AuthServiceInterface,
+  TokenServiceInterface,
+} from './auth.service.interface';
+
+import { UsersServiceInterface } from '../users/users.service.interface';
 
 type ValidatePasswordType = 'clearPassword' | 'hashedPassword';
 
 @Injectable()
-export class TokenService {
+export class TokenService implements TokenServiceInterface {
   private readonly jwtService: JwtService;
 
   constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {
@@ -105,9 +111,10 @@ export class TokenService {
 }
 
 @Injectable()
-export class AuthService {
+export class AuthService implements AuthServiceInterface {
   constructor(
-    private readonly usersService: UsersService,
+    @Inject('USERS_SERVICE')
+    private readonly usersService: UsersServiceInterface,
     private readonly tokenService: TokenService,
   ) {}
 

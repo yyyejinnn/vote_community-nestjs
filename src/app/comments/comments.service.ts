@@ -1,18 +1,23 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateVoteCommentDto, UpdateVoteCommentDto } from '@vote/common';
 import { CommentsEntity } from 'src/common/entity/comments.entity';
 import { Repository } from 'typeorm';
 import { UsersService } from '../users/users.service';
+import { UsersServiceInterface } from '../users/users.service.interface';
 import { VotesService } from '../votes/votes.service';
+import { VotesServiceInterface } from '../votes/votes.service.interface';
+import { CommentsServiceInterface } from './comments.service.interface';
 
 @Injectable()
-export class CommentsService {
+export class CommentsService implements CommentsServiceInterface {
   constructor(
     @InjectRepository(CommentsEntity)
     private readonly commentsRepository: Repository<CommentsEntity>,
-    private readonly usersService: UsersService,
-    private readonly votesService: VotesService,
+    @Inject('USERS_SERVICE')
+    private readonly usersService: UsersServiceInterface,
+    @Inject('VOTES_SERVICE')
+    private readonly votesService: VotesServiceInterface,
   ) {}
 
   async getAllVoteComments(voteId: number) {

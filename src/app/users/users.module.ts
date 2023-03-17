@@ -18,7 +18,12 @@ import { UsersService } from './users.service';
     ServiceModule,
   ],
   controllers: [UsersController],
-  providers: [UsersService, TokenService, CommentsService, S3Service],
-  exports: [TypeOrmModule, UsersService, TokenService],
+  providers: [
+    {
+      provide: 'USERS_SERVICE',
+      useClass: UsersService,
+    },
+  ],
+  exports: [TypeOrmModule, 'USERS_SERVICE'],
 })
 export class UsersModule {}

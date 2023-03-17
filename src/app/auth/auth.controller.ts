@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Inject,
   ParseIntPipe,
   Patch,
   Post,
@@ -16,12 +17,15 @@ import {
   SignInUserDto,
   SignUpUserDto,
 } from '@vote/common';
-import { AuthService } from './auth.service';
+import { AuthServiceInterface } from './auth.service.interface';
 import { JwtAccessGuard } from './jwt/jwt.guard';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    @Inject('AUTH_SERVICE')
+    private readonly authService: AuthServiceInterface,
+  ) {}
 
   @Post('sign-up')
   async signUp(@Body() dto: SignUpUserDto) {
