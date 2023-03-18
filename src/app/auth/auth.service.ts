@@ -22,6 +22,8 @@ import {
 } from './auth.service.interface';
 
 import { UsersServiceInterface } from '../users/users.service.interface';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 type ValidatePasswordType = 'clearPassword' | 'hashedPassword';
 
@@ -115,16 +117,19 @@ export class AuthService implements AuthServiceInterface {
   constructor(
     @Inject('USERS_SERVICE')
     private readonly usersService: UsersServiceInterface,
+    @InjectRepository(UsersEntity)
+    private readonly usersRepository: Repository<UsersEntity>,
     private readonly tokenService: TokenService,
   ) {}
 
   async signUp(dto: SignUpUserDto) {
-    const { email, password, checkPassword, nickname } = dto;
+    const { email, nickname, password, checkPassword } = dto;
 
-    const whereOption: WhereOptionByUserEmail = {
-      email: email,
-    };
-    const user = await this.usersService.findUserByWhereOption(whereOption);
+    const user = await this.usersRepository.findOne({
+      where: {
+        email,
+      },
+    });
 
     if (user) {
       throw new CustomException(UsersException.USER_ALREADY_EXISTS);
@@ -133,23 +138,22 @@ export class AuthService implements AuthServiceInterface {
     await this._validatePassword(password, checkPassword);
     await this._validateNickname(nickname);
 
-    const createdUser: UsersEntity = await this.usersService.createUser(dto);
-    const { password: pw, updatedAt, ...userRes } = createdUser;
-
-    return userRes;
+    const entity = await UsersEntity.toEntity(email, nickname, password);
+    return await this.usersRepository.insert(entity);
   }
 
   async signIn({ email, password }: SignInUserDto) {
-    const whereOption: WhereOptionByUserEmail = {
-      email,
-    };
-    const user = await this.usersService.findUserByWhereOption(whereOption);
+    const user = await this.usersRepository.findOne({
+      where: {
+        email,
+      },
+    });
 
     if (!user) {
       throw new CustomException(UsersException.USER_NOT_EXIST);
     }
     const { password: userPw, id, nickname } = user;
-    // await this._validatePassword(password, userPw, 'hashedPassword');
+    await this._validatePassword(password, userPw, 'hashedPassword');
 
     // 토큰 생성
     const payload: JwtPayload = { sub: id, nickname };
@@ -185,16 +189,18 @@ export class AuthService implements AuthServiceInterface {
     userId: number,
     { password, checkPassword }: ResetPasswordDto,
   ) {
-    const { password: currPassword } =
-      await this.usersService.findUserByWhereOption({
+    const user = await this.usersRepository.findOne({
+      where: {
         id: userId,
-      });
+      },
+    });
 
-    if (await bcrypt.compare(password, currPassword)) {
+    if (await bcrypt.compare(password, user.password)) {
       throw new CustomException(UsersException.SAME_CURR_PASSWORD);
     }
-    // await this._validatePassword(password, checkPassword);
-    await this.usersService.updatePassword(userId, password);
+    await this._validatePassword(password, checkPassword);
+
+    await this.usersRepository.update(userId, { password });
   }
 
   private async _validatePassword(
