@@ -8,6 +8,7 @@ import {
   VotesEntity,
 } from '@vote/common';
 import { CommentsEntity } from 'src/common/entity/comments.entity';
+import { VotesMapper } from 'src/common/entity/mapper/votes.mapper';
 import { CommentsController } from '../comments/comments.controller';
 import { CommentsModule } from '../comments/comments.module';
 import { UsersModule } from '../users/users.module';
@@ -33,6 +34,7 @@ import { VotesService } from './votes.service';
       provide: 'VOTES_SERVICE',
       useClass: VotesService,
     },
+    VotesMapper,
   ],
   exports: [TypeOrmModule, 'VOTES_SERVICE'],
 })
