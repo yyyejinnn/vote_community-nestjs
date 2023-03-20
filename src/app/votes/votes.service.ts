@@ -13,8 +13,6 @@ import {
 import { CustomException, VotesException } from '@vote/middleware';
 import { VotesMapper } from 'src/common/entity/mapper/votes.mapper';
 import { Repository } from 'typeorm';
-import { UsersService } from '../users/users.service';
-import { UsersServiceInterface } from '../users/users.service.interface';
 import { VotesServiceInterface } from './votes.service.interface';
 
 @Injectable()
@@ -28,12 +26,8 @@ export class VotesService implements VotesServiceInterface {
     private readonly choicedRepository: Repository<ChoicedUsersEntity>,
     @InjectRepository(VotedUsersEntity)
     private readonly votedRepository: Repository<VotedUsersEntity>,
-    @InjectRepository(TagsEntity)
-    private readonly tagsRepository: Repository<TagsEntity>,
     @InjectRepository(UsersEntity)
     private readonly usersRepository: Repository<UsersEntity>,
-    @Inject('USERS_SERVICE')
-    private readonly usersService: UsersServiceInterface,
     private readonly votesMapper: VotesMapper,
   ) {}
 

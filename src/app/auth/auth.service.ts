@@ -5,8 +5,6 @@ import {
   SignInUserDto,
   JwtPayload,
   VerifiedToken,
-  WhereOptionByUserEmail,
-  WhereOptionByUserNickName,
   ResetPasswordDto,
   UsersEntity,
 } from '@vote/common';
@@ -15,7 +13,6 @@ import { CustomException, UsersException } from '@vote/middleware';
 import * as bcrypt from 'bcrypt';
 import { Cache } from 'cache-manager';
 import * as crypto from 'crypto';
-import { UsersService } from '../users/users.service';
 import {
   AuthServiceInterface,
   TokenServiceInterface,
@@ -115,8 +112,6 @@ export class TokenService implements TokenServiceInterface {
 @Injectable()
 export class AuthService implements AuthServiceInterface {
   constructor(
-    @Inject('USERS_SERVICE')
-    private readonly usersService: UsersServiceInterface,
     @InjectRepository(UsersEntity)
     private readonly usersRepository: Repository<UsersEntity>,
     private readonly tokenService: TokenService,
@@ -221,8 +216,11 @@ export class AuthService implements AuthServiceInterface {
   }
 
   private async _validateNickname(nickname: string) {
-    const whereOption: WhereOptionByUserNickName = { nickname };
-    const user = await this.usersService.findUserByWhereOption(whereOption);
+    const user = await this.usersRepository.findOne({
+      where: {
+        nickname,
+      },
+    });
 
     if (user) {
       throw new CustomException(UsersException.NICKNAME_ALREADY_EXISTS);

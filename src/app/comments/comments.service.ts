@@ -17,14 +17,10 @@ import { CommentsServiceInterface } from './comments.service.interface';
 @Injectable()
 export class CommentsService implements CommentsServiceInterface {
   constructor(
-    @InjectRepository(CommentsEntity)
-    private readonly commentsRepository: Repository<CommentsEntity>,
     @InjectRepository(UsersEntity)
     private readonly usersRepository: Repository<UsersEntity>,
-    @Inject('USERS_SERVICE')
-    private readonly usersService: UsersServiceInterface,
-    @Inject('VOTES_SERVICE')
-    private readonly votesService: VotesServiceInterface,
+    @InjectRepository(CommentsEntity)
+    private readonly commentsRepository: Repository<CommentsEntity>,
     private readonly commentsMapper: CommentsMapper,
   ) {}
 
@@ -77,8 +73,10 @@ export class CommentsService implements CommentsServiceInterface {
   }
 
   async likeVoteComment(commentId: number, userId: number) {
-    const likedUser = await this.usersService.findUserByWhereOption({
-      id: userId,
+    const likedUser = await this.usersRepository.findOne({
+      where: {
+        id: userId,
+      },
     });
 
     const comment = await this.commentsRepository.findOne({
