@@ -1,7 +1,12 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CreateVoteCommentDto, UpdateVoteCommentDto } from '@vote/common';
+import {
+  CreateVoteCommentDto,
+  UpdateVoteCommentDto,
+  UsersEntity,
+} from '@vote/common';
 import { CommentsEntity } from 'src/common/entity/comments.entity';
+import { CommentsMapper } from 'src/common/entity/mapper/comments.mapper';
 import { Repository } from 'typeorm';
 import { UsersService } from '../users/users.service';
 import { UsersServiceInterface } from '../users/users.service.interface';
@@ -14,10 +19,13 @@ export class CommentsService implements CommentsServiceInterface {
   constructor(
     @InjectRepository(CommentsEntity)
     private readonly commentsRepository: Repository<CommentsEntity>,
+    @InjectRepository(UsersEntity)
+    private readonly usersRepository: Repository<UsersEntity>,
     @Inject('USERS_SERVICE')
     private readonly usersService: UsersServiceInterface,
     @Inject('VOTES_SERVICE')
     private readonly votesService: VotesServiceInterface,
+    private readonly commentsMapper: CommentsMapper,
   ) {}
 
   async getAllVoteComments(voteId: number) {
@@ -41,15 +49,13 @@ export class CommentsService implements CommentsServiceInterface {
     userId: number,
     { content }: CreateVoteCommentDto,
   ) {
-    const user = await this.usersService.findUserByWhereOption({ id: userId });
-    const vote = await this.votesService.getVoteById(voteId);
-    const comment = this.commentsRepository.create({
+    const entity = await this.commentsMapper.createCommentsEntity(
+      voteId,
+      userId,
       content,
-      writer: user,
-      vote,
-    });
+    );
 
-    return await this.commentsRepository.save(comment);
+    return await this.commentsRepository.save(entity);
   }
 
   async updateVoteComment(
