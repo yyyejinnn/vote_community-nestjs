@@ -30,9 +30,8 @@ export class UsersController {
   @Get('profile')
   async getUserProfile() {
     const userId = 2; //임시
-    const whereOption: WhereOptionByUserId = { id: userId };
     return {
-      users: await this.usersService.findUserByWhereOption(whereOption),
+      users: await this.usersService.getUserProfile(userId),
     };
   }
 

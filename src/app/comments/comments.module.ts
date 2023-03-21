@@ -1,6 +1,7 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CommentsEntity } from '@vote/common';
+import { CommentsMapper } from 'src/common/entity/mapper/comments.mapper';
 import { S3Service } from '../service/s3.service';
 import { ServiceModule } from '../service/service.module';
 import { UsersModule } from '../users/users.module';
@@ -26,6 +27,7 @@ import { CommentsService } from './comments.service';
       provide: 'COMMENTS_SERVICE',
       useClass: CommentsService,
     },
+    CommentsMapper,
   ],
   exports: [TypeOrmModule, 'COMMENTS_SERVICE'],
 })

@@ -1,7 +1,6 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { SignUpUserDto, UsersEntity, WhereOption } from '@vote/common';
-import { CustomException, UsersException } from '@vote/middleware';
+import { UsersEntity } from '@vote/common';
 
 import * as bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
@@ -16,24 +15,15 @@ export class UsersService implements UsersServiceInterface {
     private readonly usersRepository: Repository<UsersEntity>,
   ) {}
 
-  async createUser(dto: SignUpUserDto): Promise<UsersEntity> {
-    const { email, nickname, password } = dto;
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // to entity
-    const entity = UsersEntity.from(email, nickname, hashedPassword);
-    const userEntity = this.usersRepository.create(entity);
-
-    return await this.usersRepository.save(userEntity);
-  }
-
   async getAllUsers() {
     return await this.usersRepository.find();
   }
 
-  async findUserByWhereOption(whereOption: WhereOption): Promise<UsersEntity> {
+  async getUserProfile(userId: number): Promise<UsersEntity> {
     const user = await this.usersRepository.findOne({
-      where: whereOption,
+      where: {
+        id: userId,
+      },
     });
 
     return user;

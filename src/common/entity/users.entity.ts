@@ -14,6 +14,7 @@ import {
   VotedUsersEntity,
   VotesEntity,
 } from './votes.entity';
+import * as bcrypt from 'bcrypt';
 
 @Entity({ name: 'users' })
 export class UsersEntity extends CommonEntity {
@@ -64,21 +65,18 @@ export class UsersEntity extends CommonEntity {
   //   refreshToken.save();
   // }
 
-  static from(
-    email: string,
-    nickname: string,
-    password: string,
-    createdAt = new Date(),
-    updatedAt = new Date(),
+  static async toEntity(
+    email?: string,
+    nickname?: string,
+    password?: string,
+    photo?: string,
     id?: number,
   ) {
     const user = new UsersEntity();
-    user.email = email;
-    user.nickname = nickname;
-    user.password = password;
-    user.createdAt = createdAt;
-    user.updatedAt = updatedAt;
-
+    if (email) user.email = email;
+    if (nickname) user.nickname = nickname;
+    if (password) user.password = await bcrypt.hash(password, 10);
+    if (photo) user.photo = photo;
     if (id) user.id = id;
 
     return user;

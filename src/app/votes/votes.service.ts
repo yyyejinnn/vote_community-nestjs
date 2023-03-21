@@ -5,14 +5,14 @@ import {
   CreateVoteDto,
   TagsEntity,
   UpdateVoteDto,
+  UsersEntity,
   VoteChoicesEntity,
   VotedUsersEntity,
   VotesEntity,
 } from '@vote/common';
 import { CustomException, VotesException } from '@vote/middleware';
+import { VotesMapper } from 'src/common/entity/mapper/votes.mapper';
 import { Repository } from 'typeorm';
-import { UsersService } from '../users/users.service';
-import { UsersServiceInterface } from '../users/users.service.interface';
 import { VotesServiceInterface } from './votes.service.interface';
 
 @Injectable()
@@ -26,10 +26,9 @@ export class VotesService implements VotesServiceInterface {
     private readonly choicedRepository: Repository<ChoicedUsersEntity>,
     @InjectRepository(VotedUsersEntity)
     private readonly votedRepository: Repository<VotedUsersEntity>,
-    @InjectRepository(TagsEntity)
-    private readonly tagsRepository: Repository<TagsEntity>,
-    @Inject('USERS_SERVICE')
-    private readonly usersService: UsersServiceInterface,
+    @InjectRepository(UsersEntity)
+    private readonly usersRepository: Repository<UsersEntity>,
+    private readonly votesMapper: VotesMapper,
   ) {}
 
   async listVotes() {
@@ -56,44 +55,13 @@ export class VotesService implements VotesServiceInterface {
     const { title, endDate, voteChoices, tags } = dto;
     this._compareDates(endDate);
 
-    const writer = await this.usersService.findUserByWhereOption({
-      id: userId,
-    });
-
-    // connect tags
-    const savedTags = await Promise.all(
-      tags.map((name) => {
-        const result = this.tagsRepository
-          .findOne({
-            where: {
-              name,
-            },
-          })
-          .then((value) => {
-            if (!value) {
-              const tagEntity = new TagsEntity();
-              tagEntity.name = name;
-              return tagEntity;
-            } else {
-              return value;
-            }
-          });
-
-        return result;
-      }),
-    );
-
-    const voteEntity = this.votesRepository.create({
+    const voteEntity = await this.votesMapper.createVoteEntity(
       title,
       endDate,
-      writer,
-      voteChoices: voteChoices.map((value) => {
-        const choiceEntity = new VoteChoicesEntity();
-        choiceEntity.title = value;
-        return choiceEntity;
-      }),
-      tags: savedTags,
-    });
+      voteChoices,
+      tags,
+      userId,
+    );
 
     return await this.votesRepository.save(voteEntity);
   }
@@ -115,38 +83,28 @@ export class VotesService implements VotesServiceInterface {
   }
 
   async choiceVote(choicedId: number, userId: number) {
-    const user = await this.usersService.findUserByWhereOption({
-      id: userId,
-    });
-
     // voted 생성
-    const vote = await this.votesRepository.findOne({
-      where: {
-        voteChoices: {
-          id: choicedId,
-        },
-      },
-    });
-    const voted = new VotedUsersEntity();
-    voted.vote = vote;
-    voted.user = user;
-    await this.votedRepository.save(voted);
+    const votedEntity = await this.votesMapper.createVotedUsersEntity(
+      choicedId,
+      userId,
+    );
 
     // choiced 생성
-    const choice = await this.choicesRepository.findOne({
-      where: {
-        id: choicedId,
-      },
-    });
-    const choiced = new ChoicedUsersEntity();
-    choiced.choice = choice;
-    choiced.user = user;
-    await this.choicedRepository.save(choiced);
+    const choicedEntity = await this.votesMapper.createChoicedUsersEntity(
+      choicedId,
+      userId,
+    );
+
+    // 저장
+    await this.votedRepository.save(votedEntity);
+    await this.choicedRepository.save(choicedEntity);
   }
 
   async likeVote(voteId: number, userId: number) {
-    const likedUser = await this.usersService.findUserByWhereOption({
-      id: userId,
+    const likedUser = await this.usersRepository.findOne({
+      where: {
+        id: userId,
+      },
     });
 
     const vote = await this.votesRepository.findOne({
