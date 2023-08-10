@@ -7,9 +7,9 @@ export const configuration = () => ({
 });
 
 export const typeORMConfig = (): TypeOrmModuleOptions => ({
-  type: 'postgres',
+  type: 'mariadb',
   host: process.env.DB_HOST,
-  port: parseInt(process.env.DB_HOST, 10) || 5432,
+  port: parseInt(process.env.DB_PORT, 10) || 3306,
   username: process.env.DB_USERNAME,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
@@ -17,10 +17,10 @@ export const typeORMConfig = (): TypeOrmModuleOptions => ({
   synchronize: true,
 });
 
-export const redisConfig = (): ClientOpts => ({
-  store: redisStore,
-  host: process.env.REDIS_HOST,
-  port: parseInt(process.env.REDIS_PORT, 10) || 6379,
-  auth_pass: process.env.REDIS_AUTH_PASSWORD,
-  isGlobal: true,
-});
+// export const redisConfig = (): ClientOpts => ({
+//   store: redisStore,
+//   host: process.env.REDIS_HOST,
+//   port: parseInt(process.env.REDIS_PORT, 10) || 6379,
+//   auth_pass: process.env.REDIS_AUTH_PASSWORD,
+//   isGlobal: true,
+// });

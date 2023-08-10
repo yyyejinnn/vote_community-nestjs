@@ -10,9 +10,10 @@ import { LoggerModule } from './app/logger/logger.module';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
 import { TypeOrmModule } from '@nestjs/typeorm';
+
 import {
   configuration,
-  redisConfig,
+  // redisConfig,
   typeORMConfig,
 } from './config/configuration';
 import { ServiceModule } from './app/service/service.module';
@@ -34,7 +35,7 @@ import { SearchModule } from './app/search/search.module';
         PORT: Joi.number().default(3000),
         // db
         DB_HOST: Joi.string().required(),
-        DB_PORT: Joi.number().required().default(5432),
+        DB_PORT: Joi.number().required().default(3306),
         DB_USERNAME: Joi.string().required(),
         DB_PASSWORD: Joi.string().required(),
         DB_NAME: Joi.string().required(),
@@ -44,7 +45,7 @@ import { SearchModule } from './app/search/search.module';
         AWS_SECRET_KEY: Joi.string().required(),
       }),
     }),
-    CacheModule.register<ClientOpts>(redisConfig()),
+    // CacheModule.register<ClientOpts>(redisConfig()),
     TypeOrmModule.forRoot(typeORMConfig()),
     UsersModule,
     AuthModule,

@@ -29,7 +29,9 @@ type ValidatePasswordType = 'clearPassword' | 'hashedPassword';
 export class TokenService implements TokenServiceInterface {
   private readonly jwtService: JwtService;
 
-  constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {
+  constructor(
+    // @Inject(CACHE_MANAGER) private cacheManager: Cache
+  ) {
     this.jwtService = new JwtService();
   }
 
@@ -50,8 +52,8 @@ export class TokenService implements TokenServiceInterface {
     const encryptRefreshToken: string = this._encryptRefreshToken(refreshToken);
 
     // redis 저장
-    const ttl = +process.env.REFRESH_TOKEN_EXPIRATION_TIME;
-    await this.cacheManager.set(`${payload.sub}`, 'encryptRefreshToken', ttl);
+    // const ttl = +process.env.REFRESH_TOKEN_EXPIRATION_TIME;
+    // await this.cacheManager.set(`${payload.sub}`, 'encryptRefreshToken', ttl);
 
     return encryptRefreshToken;
   }
@@ -63,10 +65,10 @@ export class TokenService implements TokenServiceInterface {
     let verifiedToken: VerifiedToken;
 
     // get redis
-    const token = await this.cacheManager.get(`${userId}`);
-    if (!token) {
-      throw new CustomException(UsersException.REFRESH_TOKEN_NOT_EXISTS);
-    }
+    // const token = await this.cacheManager.get(`${userId}`);
+    // if (!token) {
+    // throw new CustomException(UsersException.REFRESH_TOKEN_NOT_EXISTS);
+    // }
 
     // 복호화
     const decryptRefreshToken: string =
@@ -89,7 +91,7 @@ export class TokenService implements TokenServiceInterface {
   }
 
   async deleteRefreshToken(userId: number) {
-    await this.cacheManager.del(`${userId}`);
+    // await this.cacheManager.del(`${userId}`);
   }
 
   private _encryptRefreshToken(refreshToken: string): string {
