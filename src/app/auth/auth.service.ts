@@ -5,8 +5,6 @@ import {
   SignInUserDto,
   JwtPayload,
   VerifiedToken,
-  WhereOptionByUserEmail,
-  WhereOptionByUserNickName,
   ResetPasswordDto,
   UsersEntity,
 } from '@vote/common';
@@ -22,6 +20,8 @@ import {
 } from './auth.service.interface';
 
 import { UsersServiceInterface } from '../users/users.service.interface';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 type ValidatePasswordType = 'clearPassword' | 'hashedPassword';
 
@@ -118,15 +118,15 @@ export class AuthService implements AuthServiceInterface {
     @Inject('USERS_SERVICE')
     private readonly usersService: UsersServiceInterface,
     private readonly tokenService: TokenService,
-  ) {}
+
+    @InjectRepository(UsersEntity)
+    private readonly usersRepository: Repository<UsersEntity>,
+  ) { }
 
   async signUp(dto: SignUpUserDto) {
     const { email, password, checkPassword, nickname } = dto;
 
-    const whereOption: WhereOptionByUserEmail = {
-      email: email,
-    };
-    const user = await this.usersService.findUserByWhereOption(whereOption);
+    const user = await this.usersRepository.findOne({ where: { email } });
 
     if (user) {
       throw new CustomException(UsersException.USER_ALREADY_EXISTS);
@@ -142,10 +142,7 @@ export class AuthService implements AuthServiceInterface {
   }
 
   async signIn({ email, password }: SignInUserDto) {
-    const whereOption: WhereOptionByUserEmail = {
-      email,
-    };
-    const user = await this.usersService.findUserByWhereOption(whereOption);
+    const user = await this.usersRepository.findOne({ where: { email } });
 
     if (!user) {
       throw new CustomException(UsersException.USER_NOT_EXIST);
@@ -188,9 +185,7 @@ export class AuthService implements AuthServiceInterface {
     { password, checkPassword }: ResetPasswordDto,
   ) {
     const { password: currPassword } =
-      await this.usersService.findUserByWhereOption({
-        id: userId,
-      });
+      await this.usersRepository.findOne({ where: { id: userId } });
 
     if (await bcrypt.compare(password, currPassword)) {
       throw new CustomException(UsersException.SAME_CURR_PASSWORD);
@@ -217,8 +212,7 @@ export class AuthService implements AuthServiceInterface {
   }
 
   private async _validateNickname(nickname: string) {
-    const whereOption: WhereOptionByUserNickName = { nickname };
-    const user = await this.usersService.findUserByWhereOption(whereOption);
+    const user = await this.usersRepository.findOne({ where: { nickname } });
 
     if (user) {
       throw new CustomException(UsersException.NICKNAME_ALREADY_EXISTS);
