@@ -13,7 +13,6 @@ import { CustomException, UsersException } from '@vote/middleware';
 import * as bcrypt from 'bcrypt';
 import { Cache } from 'cache-manager';
 import * as crypto from 'crypto';
-import { UsersService } from '../users/users.service';
 import {
   AuthServiceInterface,
   TokenServiceInterface,

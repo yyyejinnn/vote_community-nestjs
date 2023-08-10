@@ -9,23 +9,6 @@ export type VerifiedToken = JwtPayload & {
   exp: number;
 };
 
-export type WhereOptionByUserId = {
-  id: number;
-};
-
-export type WhereOptionByUserEmail = {
-  email: string;
-};
-
-export type WhereOptionByUserNickName = {
-  nickname: string;
-};
-
-export type WhereOption =
-  | WhereOptionByUserId
-  | WhereOptionByUserEmail
-  | WhereOptionByUserNickName;
-
 // interface
 export interface SignUp {
   users: {

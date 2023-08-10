@@ -1,6 +1,6 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { SignUpUserDto, UsersEntity, WhereOption } from '@vote/common';
+import { SignUpUserDto, UsersEntity } from '@vote/common';
 import { CustomException, UsersException } from '@vote/middleware';
 
 import * as bcrypt from 'bcrypt';
@@ -14,7 +14,7 @@ export class UsersService implements UsersServiceInterface {
     @Inject('S3_SERVICE') private readonly s3: S3Service,
     @InjectRepository(UsersEntity)
     private readonly usersRepository: Repository<UsersEntity>,
-  ) {}
+  ) { }
 
   async createUser(dto: SignUpUserDto): Promise<UsersEntity> {
     const { email, nickname, password } = dto;
@@ -31,9 +31,9 @@ export class UsersService implements UsersServiceInterface {
     return await this.usersRepository.find();
   }
 
-  async findUserByWhereOption(whereOption: WhereOption): Promise<UsersEntity> {
+  async getUserProfile(userId: number): Promise<UsersEntity> {
     const user = await this.usersRepository.findOne({
-      where: whereOption,
+      where: { id: userId },
     });
 
     return user;

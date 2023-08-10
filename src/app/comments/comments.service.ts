@@ -1,11 +1,8 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CreateVoteCommentDto, UpdateVoteCommentDto } from '@vote/common';
+import { CreateVoteCommentDto, UpdateVoteCommentDto, UsersEntity } from '@vote/common';
 import { CommentsEntity } from 'src/common/entity/comments.entity';
 import { Repository } from 'typeorm';
-import { UsersService } from '../users/users.service';
-import { UsersServiceInterface } from '../users/users.service.interface';
-import { VotesService } from '../votes/votes.service';
 import { VotesServiceInterface } from '../votes/votes.service.interface';
 import { CommentsServiceInterface } from './comments.service.interface';
 
@@ -14,11 +11,11 @@ export class CommentsService implements CommentsServiceInterface {
   constructor(
     @InjectRepository(CommentsEntity)
     private readonly commentsRepository: Repository<CommentsEntity>,
-    @Inject('USERS_SERVICE')
-    private readonly usersService: UsersServiceInterface,
     @Inject('VOTES_SERVICE')
     private readonly votesService: VotesServiceInterface,
-  ) {}
+    @InjectRepository(UsersEntity)
+    private readonly usersRepository: Repository<UsersEntity>,
+  ) { }
 
   async getAllVoteComments(voteId: number) {
     return await this.commentsRepository.find({
@@ -41,7 +38,7 @@ export class CommentsService implements CommentsServiceInterface {
     userId: number,
     { content }: CreateVoteCommentDto,
   ) {
-    const user = await this.usersService.findUserByWhereOption({ id: userId });
+    const user = await this.usersRepository.findOne({ where: { id: userId } });
     const vote = await this.votesService.getVoteById(voteId);
     const comment = this.commentsRepository.create({
       content,
@@ -71,8 +68,8 @@ export class CommentsService implements CommentsServiceInterface {
   }
 
   async likeVoteComment(commentId: number, userId: number) {
-    const likedUser = await this.usersService.findUserByWhereOption({
-      id: userId,
+    const likedUser = await this.usersRepository.findOne({
+      where: { id: userId }
     });
 
     const comment = await this.commentsRepository.findOne({

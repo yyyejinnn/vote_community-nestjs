@@ -5,6 +5,7 @@ import {
   CreateVoteDto,
   TagsEntity,
   UpdateVoteDto,
+  UsersEntity,
   VoteChoicesEntity,
   VotedUsersEntity,
   VotesEntity,
@@ -28,9 +29,9 @@ export class VotesService implements VotesServiceInterface {
     private readonly votedRepository: Repository<VotedUsersEntity>,
     @InjectRepository(TagsEntity)
     private readonly tagsRepository: Repository<TagsEntity>,
-    @Inject('USERS_SERVICE')
-    private readonly usersService: UsersServiceInterface,
-  ) {}
+    @InjectRepository(UsersEntity)
+    private readonly usersRepository: Repository<UsersEntity>,
+  ) { }
 
   async listVotes() {
     return await this.votesRepository.find();
@@ -56,8 +57,8 @@ export class VotesService implements VotesServiceInterface {
     const { title, endDate, voteChoices, tags } = dto;
     this._compareDates(endDate);
 
-    const writer = await this.usersService.findUserByWhereOption({
-      id: userId,
+    const writer = await this.usersRepository.findOne({
+      where: { id: userId }
     });
 
     // connect tags
@@ -115,8 +116,8 @@ export class VotesService implements VotesServiceInterface {
   }
 
   async choiceVote(choicedId: number, userId: number) {
-    const user = await this.usersService.findUserByWhereOption({
-      id: userId,
+    const user = await this.usersRepository.findOne({
+      where: { id: userId }
     });
 
     // voted 생성
@@ -145,8 +146,8 @@ export class VotesService implements VotesServiceInterface {
   }
 
   async likeVote(voteId: number, userId: number) {
-    const likedUser = await this.usersService.findUserByWhereOption({
-      id: userId,
+    const likedUser = await this.usersRepository.findOne({
+      where: { id: userId }
     });
 
     const vote = await this.votesRepository.findOne({
