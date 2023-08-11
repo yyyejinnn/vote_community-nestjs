@@ -1,7 +1,6 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
-  ChoicedUsersEntity,
   CreateVoteDto,
   TagsEntity,
   UpdateVoteDto,
@@ -23,8 +22,8 @@ export class VotesService implements VotesServiceInterface {
     private readonly votesRepository: Repository<VotesEntity>,
     @InjectRepository(VoteChoicesEntity)
     private readonly choicesRepository: Repository<VoteChoicesEntity>,
-    @InjectRepository(ChoicedUsersEntity)
-    private readonly choicedRepository: Repository<ChoicedUsersEntity>,
+    // @InjectRepository(ChoicedUsersEntity)
+    // private readonly choicedRepository: Repository<ChoicedUsersEntity>,
     @InjectRepository(VotedUsersEntity)
     private readonly votedRepository: Repository<VotedUsersEntity>,
     @InjectRepository(TagsEntity)
@@ -54,6 +53,7 @@ export class VotesService implements VotesServiceInterface {
     });
   }
 
+  /****** create Vote */
   async createVote(userId: number, dto: CreateVoteDto) {
     const { title, endDate, voteChoices, tags } = dto;
 
@@ -100,6 +100,8 @@ export class VotesService implements VotesServiceInterface {
     };
   }
 
+
+  /****** */
   async updateVote(voteId: number, { endDate }: UpdateVoteDto) {
     this._compareDates(endDate);
 
@@ -117,62 +119,27 @@ export class VotesService implements VotesServiceInterface {
   }
 
   async choiceVote(choicedId: number, userId: number) {
-    const user = await this.usersRepository.findOne({
-      where: { id: userId }
-    });
-
-    // voted 생성
-    const vote = await this.votesRepository.findOne({
-      where: {
-        voteChoices: {
-          id: choicedId,
-        },
-      },
-    });
-    const voted = new VotedUsersEntity();
-    voted.vote = vote;
-    voted.user = user;
-    await this.votedRepository.save(voted);
-
-    // choiced 생성
-    const choice = await this.choicesRepository.findOne({
-      where: {
-        id: choicedId,
-      },
-    });
-    const choiced = new ChoicedUsersEntity();
-    choiced.choice = choice;
-    choiced.user = user;
-    await this.choicedRepository.save(choiced);
+    await this.choicesRepository
+      .createQueryBuilder()
+      .relation('choicedUsers')
+      .of(choicedId)
+      .add(userId);
   }
 
   async likeVote(voteId: number, userId: number) {
-    const likedUser = await this.usersRepository.findOne({
-      where: { id: userId }
-    });
-
-    const vote = await this.votesRepository.findOne({
-      where: {
-        id: voteId,
-      },
-    });
-    vote.likedUsers.push(likedUser);
-
-    await this.votesRepository.save(vote);
+    await this.votesRepository
+      .createQueryBuilder()
+      .relation('likedUsers')
+      .of(voteId)
+      .add(userId);
   }
 
   async cancleLikedVote(voteId: number, userId: number) {
-    const vote = await this.votesRepository.findOne({
-      where: {
-        id: voteId,
-      },
-    });
-
-    vote.likedUsers = vote.likedUsers.filter((user) => {
-      return user.id !== userId;
-    });
-
-    await this.votesRepository.save(vote);
+    await this.votesRepository
+      .createQueryBuilder()
+      .relation('likedUsers')
+      .of(voteId)
+      .remove(userId);
   }
 
   private _compareDates(endDate: Date | string) {

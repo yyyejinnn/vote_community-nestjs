@@ -10,7 +10,7 @@ import {
 import { CommonEntity } from './base.entity';
 import { CommentsEntity } from './comments.entity';
 import {
-  ChoicedUsersEntity,
+  VoteChoicesEntity,
   VotedUsersEntity,
   VotesEntity,
 } from './votes.entity';
@@ -37,10 +37,8 @@ export class UsersEntity extends CommonEntity {
   })
   votedUsers?: VotedUsersEntity[];
 
-  @OneToMany((type) => ChoicedUsersEntity, (choicedUser) => choicedUser.user, {
-    onDelete: 'CASCADE',
-  })
-  choicedUsers?: ChoicedUsersEntity[];
+  @ManyToMany(() => VoteChoicesEntity)
+  choicedOptions?: VoteChoicesEntity[];
 
   @ManyToMany((type) => VotesEntity, (likedVotes) => likedVotes.likedUsers)
   likedVotes?: VotesEntity[];

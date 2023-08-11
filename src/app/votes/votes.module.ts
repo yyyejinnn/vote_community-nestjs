@@ -1,7 +1,6 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import {
-  ChoicedUsersEntity,
   TagsEntity,
   VoteChoicesEntity,
   VotedUsersEntity,
@@ -21,7 +20,6 @@ import { VotesService } from './votes.service';
       TagsEntity,
       VoteChoicesEntity,
       VotedUsersEntity,
-      ChoicedUsersEntity,
       CommentsEntity,
     ]),
     forwardRef(() => UsersModule),

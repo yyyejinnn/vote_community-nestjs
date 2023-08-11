@@ -86,11 +86,9 @@ export class VoteChoicesEntity extends CommonEntity {
   @Column()
   title: string;
 
-  @OneToMany((type) => ChoicedUsersEntity, (choiced) => choiced.choice, {
-    eager: true,
-  })
+  @ManyToMany(() => UsersEntity)
   @JoinTable()
-  choiced: ChoicedUsersEntity[];
+  choicedUsers: UsersEntity[];
 }
 
 @Entity({ name: 'votes_to_users' })
@@ -107,16 +105,19 @@ export class VotedUsersEntity extends CommonEntity {
   user: UsersEntity;
 }
 
-@Entity({ name: 'choices_to_users' })
-@Index('choiced_user', ['choice', 'user'], { unique: true })
-export class ChoicedUsersEntity extends CommonEntity {
-  @ManyToOne((type) => VoteChoicesEntity, (choice) => choice.choiced, {
-    onDelete: 'CASCADE',
-  })
-  choice: VoteChoicesEntity;
+// @Entity({ name: 'choices_to_users' })
+// @Unique(['choice', 'user'])
+// export class ChoicedUsersEntity extends CommonEntity {
 
-  @ManyToOne((type) => UsersEntity, (user) => user.choicedUsers, {
-    onDelete: 'SET NULL',
-  })
-  user: UsersEntity;
-}
+//   @ManyToOne((type) => VoteChoicesEntity, (choice) => choice.choicedUsers, {
+//     onDelete: 'CASCADE',
+//   })
+//   @JoinColumn({ name: 'choiceId' })
+//   choice: VoteChoicesEntity;
+
+//   @ManyToOne((type) => UsersEntity, (user) => user.choicedOptions, {
+//     onDelete: 'CASCADE'
+//   })
+//   @JoinColumn({ name: 'userId' })
+//   user: UsersEntity;
+// }
