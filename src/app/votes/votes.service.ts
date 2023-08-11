@@ -31,7 +31,8 @@ export class VotesService implements VotesServiceInterface {
     private readonly tagsRepository: Repository<TagsEntity>,
     @InjectRepository(UsersEntity)
     private readonly usersRepository: Repository<UsersEntity>,
-  ) { }
+  ) {
+  }
 
   async listVotes() {
     return await this.votesRepository.find();
@@ -55,48 +56,48 @@ export class VotesService implements VotesServiceInterface {
 
   async createVote(userId: number, dto: CreateVoteDto) {
     const { title, endDate, voteChoices, tags } = dto;
+
     this._compareDates(endDate);
 
-    const writer = await this.usersRepository.findOne({
-      where: { id: userId }
-    });
-
-    // connect tags
-    const savedTags = await Promise.all(
-      tags.map((name) => {
-        const result = this.tagsRepository
-          .findOne({
-            where: {
-              name,
-            },
-          })
-          .then((value) => {
-            if (!value) {
-              const tagEntity = new TagsEntity();
-              tagEntity.name = name;
-              return tagEntity;
-            } else {
-              return value;
-            }
-          });
-
-        return result;
-      }),
-    );
+    const writer = await this.usersRepository.findOne({ where: { id: userId } });
 
     const voteEntity = this.votesRepository.create({
       title,
       endDate,
       writer,
-      voteChoices: voteChoices.map((value) => {
-        const choiceEntity = new VoteChoicesEntity();
-        choiceEntity.title = value;
-        return choiceEntity;
-      }),
-      tags: savedTags,
+      voteChoices: await this.getChoiceEntities(voteChoices),
+      tags: await this.getTagEntities(tags),
     });
 
     return await this.votesRepository.save(voteEntity);
+  }
+
+  private voteChoiceEntityFor(title: string) {
+    return this.choicesRepository.create({ title });
+  }
+
+  private async getTagEntities(tags: string[]) {
+    return Promise.all(tags.map(name => this.tagEntityFor(name)));
+  }
+
+  private async getChoiceEntities(voteChoices: string[]) {
+    return Promise.all(voteChoices.map(value => this.voteChoiceEntityFor(value)));
+  }
+
+  private async tagEntityFor(name: string) {
+    const originName = name;
+
+    const tag = await this.tagsRepository.findOne({ where: { name: formedName() } });
+
+    if (tag == null) {
+      return this.tagsRepository.create({ name: formedName() });
+    }
+
+    return tag;
+
+    function formedName() {
+      return originName.toUpperCase().replace(/ /g, "");
+    };
   }
 
   async updateVote(voteId: number, { endDate }: UpdateVoteDto) {
